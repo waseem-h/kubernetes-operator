@@ -59,7 +59,7 @@ string
 <td>
 <code>metadata</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#objectmeta-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
 Kubernetes meta/v1.ObjectMeta
 </a>
 </em>
@@ -109,7 +109,7 @@ Every single change here requires a pod restart.</p>
 <td>
 <em>(Optional)</em>
 <p>SeedJobs defines list of Jenkins Seed Job configurations
-More info: <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines">https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines</a></p>
+More info: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration#configure-seed-jobs-and-pipelines">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration#configure-seed-jobs-and-pipelines</a></p>
 </td>
 </tr>
 <tr>
@@ -173,7 +173,7 @@ Backup
 <td>
 <em>(Optional)</em>
 <p>Backup defines configuration of Jenkins backup
-More info: <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore">https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore</a></p>
+More info: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/</a></p>
 </td>
 </tr>
 <tr>
@@ -188,7 +188,7 @@ Restore
 <td>
 <em>(Optional)</em>
 <p>Backup defines configuration of Jenkins backup restore
-More info: <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore">https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore</a></p>
+More info: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/</a></p>
 </td>
 </tr>
 <tr>
@@ -223,7 +223,7 @@ ConfigurationAsCode
 <td>
 <code>roles</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#roleref-v1-rbac">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#roleref-v1-rbac">
 []Kubernetes rbac/v1.RoleRef
 </a>
 </em>
@@ -285,7 +285,7 @@ JenkinsStatus
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsStatus">JenkinsStatus</a>)
 </p>
 <p>
-<p>AppliedGroovyScript is the applied groovy script in Jenkins by the operator</p>
+<p>AppliedGroovyScript is the applied groovy script in Jenkins by the operator.</p>
 </p>
 <table>
 <thead>
@@ -357,7 +357,7 @@ string
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
 </p>
 <p>
-<p>Backup defines configuration of Jenkins backup</p>
+<p>Backup defines configuration of Jenkins backup.</p>
 </p>
 <table>
 <thead>
@@ -423,7 +423,7 @@ bool
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Customization">Customization</a>)
 </p>
 <p>
-<p>ConfigMapRef is reference to Kubernetes ConfigMap</p>
+<p>ConfigMapRef is reference to Kubernetes ConfigMap.</p>
 </p>
 <table>
 <thead>
@@ -452,7 +452,7 @@ string
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
 </p>
 <p>
-<p>ConfigurationAsCode defines configuration of Jenkins customization via Configuration as Code Jenkins plugin</p>
+<p>ConfigurationAsCode defines configuration of Jenkins customization via Configuration as Code Jenkins plugin.</p>
 </p>
 <table>
 <thead>
@@ -486,7 +486,7 @@ Customization
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsMaster">JenkinsMaster</a>)
 </p>
 <p>
-<p>Container defines Kubernetes container attributes</p>
+<p>Container defines Kubernetes container attributes.</p>
 </p>
 <table>
 <thead>
@@ -524,7 +524,7 @@ More info: <a href="https://kubernetes.io/docs/concepts/containers/images">https
 <td>
 <code>imagePullPolicy</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#pullpolicy-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#pullpolicy-v1-core">
 Kubernetes core/v1.PullPolicy
 </a>
 </em>
@@ -539,7 +539,7 @@ Defaults to Always.</p>
 <td>
 <code>resources</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#resourcerequirements-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#resourcerequirements-v1-core">
 Kubernetes core/v1.ResourceRequirements
 </a>
 </em>
@@ -603,7 +603,7 @@ might be configured in the container image.</p>
 <td>
 <code>ports</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#containerport-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#containerport-v1-core">
 []Kubernetes core/v1.ContainerPort
 </a>
 </em>
@@ -622,7 +622,7 @@ accessible from the network.</p>
 <td>
 <code>envFrom</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#envfromsource-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#envfromsource-v1-core">
 []Kubernetes core/v1.EnvFromSource
 </a>
 </em>
@@ -640,7 +640,7 @@ Values defined by an Env with a duplicate key will take precedence.</p>
 <td>
 <code>env</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#envvar-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#envvar-v1-core">
 []Kubernetes core/v1.EnvVar
 </a>
 </em>
@@ -654,7 +654,7 @@ Values defined by an Env with a duplicate key will take precedence.</p>
 <td>
 <code>volumeMounts</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#volumemount-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#volumemount-v1-core">
 []Kubernetes core/v1.VolumeMount
 </a>
 </em>
@@ -668,7 +668,7 @@ Values defined by an Env with a duplicate key will take precedence.</p>
 <td>
 <code>livenessProbe</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#probe-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#probe-v1-core">
 Kubernetes core/v1.Probe
 </a>
 </em>
@@ -683,7 +683,7 @@ Container will be restarted if the probe fails.</p>
 <td>
 <code>readinessProbe</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#probe-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#probe-v1-core">
 Kubernetes core/v1.Probe
 </a>
 </em>
@@ -698,7 +698,7 @@ Container will be removed from service endpoints if the probe fails.</p>
 <td>
 <code>lifecycle</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#lifecycle-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#lifecycle-v1-core">
 Kubernetes core/v1.Lifecycle
 </a>
 </em>
@@ -712,7 +712,7 @@ Kubernetes core/v1.Lifecycle
 <td>
 <code>securityContext</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#securitycontext-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#securitycontext-v1-core">
 Kubernetes core/v1.SecurityContext
 </a>
 </em>
@@ -734,7 +734,7 @@ More info: <a href="https://kubernetes.io/docs/tasks/configure-pod-container/sec
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.GroovyScripts">GroovyScripts</a>)
 </p>
 <p>
-<p>Customization defines configuration of Jenkins customization</p>
+<p>Customization defines configuration of Jenkins customization.</p>
 </p>
 <table>
 <thead>
@@ -777,7 +777,7 @@ SecretRef
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
 </p>
 <p>
-<p>GroovyScripts defines configuration of Jenkins customization via groovy scripts</p>
+<p>GroovyScripts defines configuration of Jenkins customization via groovy scripts.</p>
 </p>
 <table>
 <thead>
@@ -812,7 +812,7 @@ Customization
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Restore">Restore</a>)
 </p>
 <p>
-<p>Handler defines a specific action that should be taken</p>
+<p>Handler defines a specific action that should be taken.</p>
 </p>
 <table>
 <thead>
@@ -826,13 +826,52 @@ Customization
 <td>
 <code>exec</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#execaction-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#execaction-v1-core">
 Kubernetes core/v1.ExecAction
 </a>
 </em>
 </td>
 <td>
 <p>Exec specifies the action to take.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Image">Image
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsImageSpec">JenkinsImageSpec</a>)
+</p>
+<p>
+<p>Defines Jenkins Plugin structure</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>version</code></br>
+<em>
+string
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -875,8 +914,183 @@ AuthorizationStrategy
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.SeedJob">SeedJob</a>)
 </p>
 <p>
-<p>JenkinsCredentialType defines type of Jenkins credential used to seed job mechanism</p>
+<p>JenkinsCredentialType defines type of Jenkins credential used to seed job mechanism.</p>
 </p>
+<h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsImage">JenkinsImage
+</h3>
+<p>
+<p>JenkinsImage is the Schema for the jenkinsimages API</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsImageSpec">
+JenkinsImageSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>image</code></br>
+<em>
+<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Image">
+Image
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>plugins</code></br>
+<em>
+<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsPlugin">
+[][]github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsPlugin
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsImageStatus">
+JenkinsImageStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsImageSpec">JenkinsImageSpec
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsImage">JenkinsImage</a>)
+</p>
+<p>
+<p>JenkinsImageSpec defines the desired state of JenkinsImage</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>image</code></br>
+<em>
+<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Image">
+Image
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>plugins</code></br>
+<em>
+<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsPlugin">
+[][]github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsPlugin
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsImageStatus">JenkinsImageStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsImage">JenkinsImage</a>)
+</p>
+<p>
+<p>JenkinsImageStatus defines the observed state of JenkinsImage</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>image</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>md5sum</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>installedPlugins</code></br>
+<em>
+<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsPlugin">
+[][]github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsPlugin
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsMaster">JenkinsMaster
 </h3>
 <p>
@@ -885,7 +1099,7 @@ AuthorizationStrategy
 </p>
 <p>
 <p>JenkinsMaster defines the Jenkins master pod attributes and plugins,
-every single change requires a Jenkins master pod restart</p>
+every single change requires a Jenkins master pod restart.</p>
 </p>
 <table>
 <thead>
@@ -959,7 +1173,7 @@ More info: <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod
 <td>
 <code>securityContext</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#podsecuritycontext-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#podsecuritycontext-v1-core">
 Kubernetes core/v1.PodSecurityContext
 </a>
 </em>
@@ -1025,7 +1239,7 @@ memory: 600Mi</p>
 <td>
 <code>imagePullSecrets</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#localobjectreference-v1-core">
 []Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1042,7 +1256,7 @@ More info: <a href="https://kubernetes.io/docs/concepts/containers/images#specif
 <td>
 <code>volumes</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#volume-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#volume-v1-core">
 []Kubernetes core/v1.Volume
 </a>
 </em>
@@ -1057,7 +1271,7 @@ More info: <a href="https://kubernetes.io/docs/concepts/storage/volumes">https:/
 <td>
 <code>tolerations</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#toleration-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#toleration-v1-core">
 []Kubernetes core/v1.Toleration
 </a>
 </em>
@@ -1081,19 +1295,19 @@ More info: <a href="https://kubernetes.io/docs/concepts/storage/volumes">https:/
 <p>BasePlugins contains plugins required by operator
 Defaults to :
 - name: kubernetes
-version: 1.15.7
+version: 1.25.2
 - name: workflow-job
 version: &ldquo;2.39&rdquo;
 - name: workflow-aggregator
 version: &ldquo;2.6&rdquo;
 - name: git
-version: 3.10.0
+version: 4.2.2
 - name: job-dsl
-version: &ldquo;1.74&rdquo;
+version: &ldquo;1.77&rdquo;
 - name: configuration-as-code
-version: &ldquo;1.19&rdquo;
+version: &ldquo;1.38&rdquo;
 - name: kubernetes-credentials-provider
-version: 0.12.1</p>
+version: 0.13</p>
 </td>
 </tr>
 <tr>
@@ -1135,6 +1349,46 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsPlugin">JenkinsPlugin
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsImageSpec">JenkinsImageSpec</a>, 
+<a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsImageStatus">JenkinsImageStatus</a>)
+</p>
+<p>
+<p>Defines Jenkins Plugin structure</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>name</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>version</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.JenkinsSpec">JenkinsSpec
 </h3>
 <p>
@@ -1142,7 +1396,7 @@ string
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Jenkins">Jenkins</a>)
 </p>
 <p>
-<p>JenkinsSpec defines the desired state of the Jenkins</p>
+<p>JenkinsSpec defines the desired state of the Jenkins.</p>
 </p>
 <table>
 <thead>
@@ -1178,7 +1432,7 @@ Every single change here requires a pod restart.</p>
 <td>
 <em>(Optional)</em>
 <p>SeedJobs defines list of Jenkins Seed Job configurations
-More info: <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines">https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines</a></p>
+More info: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration#configure-seed-jobs-and-pipelines">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration#configure-seed-jobs-and-pipelines</a></p>
 </td>
 </tr>
 <tr>
@@ -1242,7 +1496,7 @@ Backup
 <td>
 <em>(Optional)</em>
 <p>Backup defines configuration of Jenkins backup
-More info: <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore">https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore</a></p>
+More info: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/</a></p>
 </td>
 </tr>
 <tr>
@@ -1257,7 +1511,7 @@ Restore
 <td>
 <em>(Optional)</em>
 <p>Backup defines configuration of Jenkins backup restore
-More info: <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore">https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore</a></p>
+More info: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/</a></p>
 </td>
 </tr>
 <tr>
@@ -1292,7 +1546,7 @@ ConfigurationAsCode
 <td>
 <code>roles</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#roleref-v1-rbac">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#roleref-v1-rbac">
 []Kubernetes rbac/v1.RoleRef
 </a>
 </em>
@@ -1364,7 +1618,7 @@ string
 <td>
 <code>provisionStartTime</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1378,7 +1632,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>baseConfigurationCompletedTime</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1392,7 +1646,7 @@ Kubernetes meta/v1.Time
 <td>
 <code>userConfigurationCompletedTime</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#time-v1-meta">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
 Kubernetes meta/v1.Time
 </a>
 </em>
@@ -1497,7 +1751,7 @@ string
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Notification">Notification</a>)
 </p>
 <p>
-<p>Mailgun is handler for Mailgun email service notification channel</p>
+<p>Mailgun is handler for Mailgun email service notification channel.</p>
 </p>
 <table>
 <thead>
@@ -1558,7 +1812,7 @@ string
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Notification">Notification</a>)
 </p>
 <p>
-<p>MicrosoftTeams is handler for Microsoft MicrosoftTeams notification channel</p>
+<p>MicrosoftTeams is handler for Microsoft MicrosoftTeams notification channel.</p>
 </p>
 <table>
 <thead>
@@ -1590,7 +1844,7 @@ SecretKeySelector
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
 </p>
 <p>
-<p>Notification is a service configuration used to send notifications about Jenkins status</p>
+<p>Notification is a service configuration used to send notifications about Jenkins status.</p>
 </p>
 <table>
 <thead>
@@ -1689,7 +1943,7 @@ github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.SMTP
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Notification">Notification</a>)
 </p>
 <p>
-<p>NotificationLevel defines the level of a Notification</p>
+<p>NotificationLevel defines the level of a Notification.</p>
 </p>
 <h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Plugin">Plugin
 </h3>
@@ -1698,7 +1952,7 @@ github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.SMTP
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsMaster">JenkinsMaster</a>)
 </p>
 <p>
-<p>Plugin defines Jenkins plugin</p>
+<p>Plugin defines Jenkins plugin.</p>
 </p>
 <table>
 <thead>
@@ -1750,7 +2004,7 @@ string
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
 </p>
 <p>
-<p>Restore defines configuration of Jenkins backup restore operation</p>
+<p>Restore defines configuration of Jenkins backup restore operation.</p>
 </p>
 <table>
 <thead>
@@ -1805,7 +2059,7 @@ uint64
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Notification">Notification</a>)
 </p>
 <p>
-<p>SMTP is handler for sending emails via this protocol</p>
+<p>SMTP is handler for sending emails via this protocol.</p>
 </p>
 <table>
 <thead>
@@ -1915,7 +2169,7 @@ string
 <td>
 <code>secret</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#localobjectreference-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#localobjectreference-v1-core">
 Kubernetes core/v1.LocalObjectReference
 </a>
 </em>
@@ -1944,7 +2198,7 @@ string
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Customization">Customization</a>)
 </p>
 <p>
-<p>SecretRef is reference to Kubernetes secret</p>
+<p>SecretRef is reference to Kubernetes secret.</p>
 </p>
 <table>
 <thead>
@@ -1974,7 +2228,7 @@ string
 </p>
 <p>
 <p>SeedJob defines configuration for seed job
-More info: <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines">https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines</a></p>
+More info: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#configure-seed-jobs-and-pipelines">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#configure-seed-jobs-and-pipelines</a>.</p>
 </p>
 <table>
 <thead>
@@ -2216,7 +2470,7 @@ More info: <a href="https://kubernetes.io/docs/concepts/services-networking/serv
 <td>
 <code>type</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.12/#servicetype-v1-core">
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#servicetype-v1-core">
 Kubernetes core/v1.ServiceType
 </a>
 </em>
@@ -2279,7 +2533,7 @@ More info: <a href="https://kubernetes.io/docs/concepts/services-networking/serv
 <p>If specified and supported by the platform, this will restrict traffic through the cloud-provider
 load-balancer will be restricted to the specified client IPs. This field will be ignored if the
 cloud-provider does not support the feature.&rdquo;
-More info: <a href="https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/">https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/</a></p>
+More info: <a href="https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#restricting-cloud-metadata-api-access">https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#restricting-cloud-metadata-api-access</a></p>
 </td>
 </tr>
 <tr>
@@ -2341,7 +2595,7 @@ More info: <a href="http://kubernetes.io/docs/user-guide/annotations">http://kub
 <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.Notification">Notification</a>)
 </p>
 <p>
-<p>Slack is handler for Slack notification channel</p>
+<p>Slack is handler for Slack notification channel.</p>
 </p>
 <table>
 <thead>
@@ -2369,5 +2623,5 @@ SecretKeySelector
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>8404b97</code>.
+on git commit <code>1c853e69</code>.
 </em></p>

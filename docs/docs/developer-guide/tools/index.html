@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.57.2" />
+<meta name="generator" content="Hugo 0.62.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -30,16 +30,13 @@
 <meta itemprop="name" content="Tools">
 <meta itemprop="description" content="Required tools for building and running Jenkins Operator
 ">
-
-
 <meta itemprop="datePublished" content="2019-08-05T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-08-05T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="75">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Tools"/>
 <meta name="twitter:description" content="Required tools for building and running Jenkins Operator
 "/>
@@ -48,8 +45,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" as="style">
+<link href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -670,39 +667,27 @@
 <span style="color:#204a87">export</span> <span style="color:#000">GOROOT</span><span style="color:#ce5c00;font-weight:bold">=</span>/usr/lib/go-1.12 <span style="color:#8f5902;font-style:italic"># example value</span>
 <span style="color:#204a87">export</span> <span style="color:#000">PATH</span><span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">$GOPATH</span>/bin:<span style="color:#000">$PATH</span></code></pre></div>
 <h2 id="goimports">goimports</h2>
-
 <pre><code>go get golang.org/x/tools/cmd/goimports
 cd $GOPATH/src/golang.org/x/tools/cmd/goimports
 go build
-go install
-</code></pre>
-
+go install</code></pre>
 <h2 id="golint">golint</h2>
-
 <pre><code>go get -u golang.org/x/lint/golint
 cd  $GOPATH/src/golang.org/x/lint/golint
 go build
-go install
-</code></pre>
-
+go install</code></pre>
 <h2 id="checkmake">checkmake</h2>
-
 <pre><code>go get github.com/mrtazz/checkmake
 cd $GOPATH/src/github.com/mrtazz/checkmake
 go build
-go install
-</code></pre>
-
+go install</code></pre>
 <h2 id="staticcheck">staticcheck</h2>
-
 <pre><code>mkdir -p $GOPATH/src/github.com/dominikh/
 cd $GOPATH/src/github.com/dominikh/
 git clone https://github.com/dominikh/go-tools.git
 cd  $GOPATH/src/github.com/dominikh/go-tools/staticcheck
 go build
-go install
-</code></pre>
-
+go install</code></pre>
 	
 	
 	<div class="text-muted mt-5 pt-3 border-top">Last modified August 5, 2019
