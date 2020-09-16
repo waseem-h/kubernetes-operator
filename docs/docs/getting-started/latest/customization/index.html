@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.57.2" />
+<meta name="generator" content="Hugo 0.62.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -30,16 +30,13 @@
 <meta itemprop="name" content="Customization">
 <meta itemprop="description" content="How to customize Jenkins
 ">
-
-
 <meta itemprop="datePublished" content="2020-04-13T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-04-13T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="309">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Customization"/>
 <meta name="twitter:description" content="How to customize Jenkins
 "/>
@@ -48,8 +45,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" as="style">
+<link href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -674,7 +671,7 @@
 <h2 id="how-to-customize-jenkins">How to customize Jenkins</h2>
 
 <p>Jenkins can be customized with plugins.
-Plugin&rsquo;s configuration is applied as groovy scripts or the <a href="https://github.com/jenkinsci/configuration-as-code-plugin" target="_blank">configuration as code plugin</a>.
+Plugin&rsquo;s configuration is applied as groovy scripts or the <a href="https://github.com/jenkinsci/configuration-as-code-plugin">configuration as code plugin</a>.
 Any plugin working for Jenkins can be installed by the Jenkins Operator.</p>
 
 <p>Pre-installed plugins:
@@ -686,12 +683,11 @@ Any plugin working for Jenkins can be installed by the Jenkins Operator.</p>
 * workflow-aggregator v2.6
 * workflow-job v2.38</p>
 
-<p>Rest of the plugins can be found in <a href="https://plugins.jenkins.io/" target="_blank">plugins repository</a>.</p>
+<p>Rest of the plugins can be found in <a href="https://plugins.jenkins.io/">plugins repository</a>.</p>
 
 <h4 id="install-plugins">Install plugins</h4>
 
 <p>Edit Custom Resource under <code>spec.master.plugins</code>:</p>
-
 <pre><code>apiVersion: jenkins.io/v1alpha2
 kind: Jenkins
 metadata:
@@ -700,9 +696,7 @@ spec:
   master:
    plugins:
    - name: simple-theme-plugin
-     version: 0.5.1
-</code></pre>
-
+     version: 0.5.1</code></pre>
 <p>Under <code>spec.master.basePlugins</code> you can find plugins for a valid <strong>Jenkins Operator</strong>:</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">apiVersion<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins.io/v1alpha2<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline"></span>kind<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>Jenkins<span style="color:#f8f8f8;text-decoration:underline">
@@ -712,26 +706,26 @@ spec:
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span>master<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>basePlugins<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>kubernetes<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">1.18.3</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">1.18</span><span style="color:#0000cf;font-weight:bold">.3</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>workflow-job<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;2.34&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>workflow-aggregator<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;2.6&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>git<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.12.0</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.12</span><span style="color:#0000cf;font-weight:bold">.0</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>job-dsl<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.76&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>configuration-as-code<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.29&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>kubernetes-credentials-provider<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">0.12.1</span></code></pre></div>
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">0.12</span><span style="color:#0000cf;font-weight:bold">.1</span></code></pre></div>
 <p>You can change their versions.</p>
 
 <p>The <strong>Jenkins Operator</strong> will then automatically install plugins after the Jenkins master pod restart.</p>
 
 <h4 id="apply-plugin-s-config">Apply plugin&rsquo;s config</h4>
 
-<p>By using a <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/" target="_blank">ConfigMap</a> you can create your own <strong>Jenkins</strong> customized configuration.
+<p>By using a <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/">ConfigMap</a> you can create your own <strong>Jenkins</strong> customized configuration.
 Then you must reference the <strong><code>ConfigMap</code></strong> in the <strong>Jenkins</strong> pod customization file in <code>spec.groovyScripts</code> or <code>spec.configurationAsCode</code></p>
 
 <p>Create a <strong><code>ConfigMap</code></strong> with specific name (eg. <code>jenkins-operator-user-configuration</code>). Then, modify the <strong>Jenkins</strong> manifest:</p>
@@ -753,7 +747,7 @@ Then you must reference the <strong><code>ConfigMap</code></strong> in the <stro
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins-operator-user-configuration<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline"></span>data<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#0000cf;font-weight:bold">1</span>-configure-theme.groovy<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic">| 
-</span><span style="color:#8f5902;font-style:italic">    import jenkins.*</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#8f5902;font-style:italic">   </span><span style="color:#8f5902;font-style:italic"> </span><span style="color:#8f5902;font-style:italic">import jenkins.*</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>import<span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins.model.*<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>import<span style="color:#f8f8f8;text-decoration:underline"> </span>hudson.*<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>import<span style="color:#f8f8f8;text-decoration:underline"> </span>hudson.model.*<span style="color:#f8f8f8;text-decoration:underline">
@@ -773,7 +767,7 @@ Then you must reference the <strong><code>ConfigMap</code></strong> in the <stro
 </span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>jenkins.save()<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#0000cf;font-weight:bold">1</span>-system-message.yaml<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic">|
-</span><span style="color:#8f5902;font-style:italic">    jenkins:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#8f5902;font-style:italic">   </span><span style="color:#8f5902;font-style:italic"> </span><span style="color:#8f5902;font-style:italic">jenkins:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>systemMessage<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;Configuration as Code integration works!!!&#34;</span></code></pre></div>
 <ul>
 <li><code>*.groovy</code> is Groovy script configuration</li>
@@ -788,7 +782,7 @@ Jenkins will reconcile and apply the new configuration.</p>
 <p>If you configured <code>spec.groovyScripts.secret.name</code>, then this secret is available to use from map Groovy scripts.
 The secrets are loaded to <code>secrets</code> map.</p>
 
-<p>Create a <a href="https://kubernetes.io/docs/concepts/configuration/secret/" target="_blank">secret</a> with for example the name <code>jenkins-conf-secrets</code>.</p>
+<p>Create a <a href="https://kubernetes.io/docs/concepts/configuration/secret/">secret</a> with for example the name <code>jenkins-conf-secrets</code>.</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">kind<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>Secret<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline"></span>apiVersion<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>v1<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline"></span>type<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>Opaque<span style="color:#f8f8f8;text-decoration:underline">
@@ -820,7 +814,7 @@ The secrets are loaded to <code>secrets</code> map.</p>
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins-operator-user-configuration<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline"></span>data<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#0000cf;font-weight:bold">1</span>-system-message.groovy<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic">| 
-</span><span style="color:#8f5902;font-style:italic">    import jenkins.*</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#8f5902;font-style:italic">   </span><span style="color:#8f5902;font-style:italic"> </span><span style="color:#8f5902;font-style:italic">import jenkins.*</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>import<span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins.model.*<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>import<span style="color:#f8f8f8;text-decoration:underline"> </span>hudson.*<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>import<span style="color:#f8f8f8;text-decoration:underline"> </span>hudson.model.*<span style="color:#f8f8f8;text-decoration:underline">
@@ -835,7 +829,7 @@ The secrets are loaded to <code>secrets</code> map.</p>
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins-operator-user-configuration<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline"></span>data<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span><span style="color:#0000cf;font-weight:bold">1</span>-system-message.yaml<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic">|
-</span><span style="color:#8f5902;font-style:italic">    jenkins:</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#8f5902;font-style:italic">   </span><span style="color:#8f5902;font-style:italic"> </span><span style="color:#8f5902;font-style:italic">jenkins:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>systemMessage<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>${SYSTEM_MESSAGE}</code></pre></div>
 <p>After this, you should see the <code>Hello world</code> system message from the <strong>Jenkins</strong> homepage.</p>
 

@@ -14,7 +14,7 @@ type JenkinsSpec struct {
 	Master JenkinsMaster `json:"master"`
 
 	// SeedJobs defines list of Jenkins Seed Job configurations
-	// More info: https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines
+	// More info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration#configure-seed-jobs-and-pipelines
 	// +optional
 	SeedJobs []SeedJob `json:"seedJobs,omitempty"`
 
@@ -38,12 +38,12 @@ type JenkinsSpec struct {
 	SlaveService Service `json:"slaveService,omitempty"`
 
 	// Backup defines configuration of Jenkins backup
-	// More info: https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore
+	// More info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/
 	// +optional
 	Backup Backup `json:"backup,omitempty"`
 
 	// Backup defines configuration of Jenkins backup restore
-	// More info: https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore
+	// More info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/
 	// +optional
 	Restore Restore `json:"restore,omitempty"`
 
@@ -351,19 +351,19 @@ type JenkinsMaster struct {
 	// +optional
 	// Defaults to :
 	// - name: kubernetes
-	// version: 1.15.7
+	// version: 1.25.2
 	// - name: workflow-job
 	// version: "2.39"
 	// - name: workflow-aggregator
 	// version: "2.6"
 	// - name: git
-	// version: 3.10.0
+	// version: 4.2.2
 	// - name: job-dsl
-	// version: "1.74"
+	// version: "1.77"
 	// - name: configuration-as-code
-	// version: "1.19"
+	// version: "1.38"
 	// - name: kubernetes-credentials-provider
-	// version: 0.12.1
+	// version: 0.13
 	BasePlugins []Plugin `json:"basePlugins,omitempty"`
 
 	// Plugins contains plugins required by user
@@ -428,7 +428,7 @@ type Service struct {
 	// If specified and supported by the platform, this will restrict traffic through the cloud-provider
 	// load-balancer will be restricted to the specified client IPs. This field will be ignored if the
 	// cloud-provider does not support the feature."
-	// More info: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/
+	// More info: https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#restricting-cloud-metadata-api-access
 	// +optional
 	LoadBalancerSourceRanges []string `json:"loadBalancerSourceRanges,omitempty"`
 
@@ -538,7 +538,7 @@ var AllowedJenkinsCredentialMap = map[string]string{
 }
 
 // SeedJob defines configuration for seed job
-// More info: https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines.
+// More info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#configure-seed-jobs-and-pipelines.
 type SeedJob struct {
 	// ID is the unique seed job name
 	ID string `json:"id,omitempty"`

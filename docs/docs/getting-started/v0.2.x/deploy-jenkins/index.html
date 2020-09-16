@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.57.2" />
+<meta name="generator" content="Hugo 0.62.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -30,16 +30,13 @@
 <meta itemprop="name" content="Deploy Jenkins">
 <meta itemprop="description" content="Deploy production ready Jenkins Operator manifest
 ">
-
-
 <meta itemprop="datePublished" content="2019-08-05T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-08-05T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="171">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Deploy Jenkins"/>
 <meta name="twitter:description" content="Deploy production ready Jenkins Operator manifest
 "/>
@@ -48,8 +45,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" as="style">
+<link href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -705,7 +702,7 @@ kubectl get secret jenkins-operator-credentials-&lt;cr_name&gt; -o <span style="
 <p>Connect to the Jenkins instance (minikube):</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">minikube service jenkins-operator-http-&lt;cr_name&gt; --url</code></pre></div>
 <p>Connect to the Jenkins instance (actual Kubernetes cluster):</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl port-forward jenkins-&lt;cr_name&gt; <span style="color:#0000cf;font-weight:bold">8080</span>:8080</code></pre></div>
+<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">kubectl port-forward jenkins-&lt;cr_name&gt; 8080:8080</code></pre></div>
 <p>Then open browser with address <code>http://localhost:8080</code>.
 <img src="/img/jenkins.png" alt="jenkins" /></p>
 

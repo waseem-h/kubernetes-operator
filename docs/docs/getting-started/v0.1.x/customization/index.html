@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.57.2" />
+<meta name="generator" content="Hugo 0.62.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -30,16 +30,13 @@
 <meta itemprop="name" content="Customization">
 <meta itemprop="description" content="How to customize Jenkins
 ">
-
-
 <meta itemprop="datePublished" content="2019-08-05T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-08-05T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="244">
+<meta itemprop="wordCount" content="243">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Customization"/>
 <meta name="twitter:description" content="How to customize Jenkins
 "/>
@@ -48,8 +45,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" as="style">
+<link href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -660,21 +657,16 @@ the <strong>jenkins-operator-user-configuration-<cr_name></strong> ConfigMap, wh
 <p>The <strong>Jenkins Operator</strong> creates a <strong>jenkins-operator-user-configuration-<cr_name></strong> secret where the user can store sensitive
 information used for custom configuration. If you have an entry in the secret named <code>PASSWORD</code> then you can use it in the
 Jenkins Configuration as a Code Plugin as <code>adminAddress: &quot;${PASSWORD}&quot;</code>.</p>
-
-<pre><code>kubectl get secret jenkins-operator-user-configuration-&lt;cr_name&gt; -o yaml
+<pre><code>kubectl get secret jenkins-operator-user-configuration-<cr_name> -o yaml
 
 kind: Secret
 apiVersion: v1
 type: Opaque
 metadata:
-  name: jenkins-operator-user-configuration-&lt;cr_name&gt;
+  name: jenkins-operator-user-configuration-<cr_name>
   namespace: default
 data:
-  SECRET_JENKINS_ADMIN_ADDRESS: YXNkZgo=
-
-</code></pre>
-
-<pre><code>kubectl get configmap jenkins-operator-user-configuration-&lt;cr_name&gt; -o yaml
+  SECRET_JENKINS_ADMIN_ADDRESS: YXNkZgo=</code></pre><pre><code>kubectl get configmap jenkins-operator-user-configuration-<cr_name> -o yaml
 
 apiVersion: v1
 data:
@@ -691,23 +683,21 @@ data:
 
     def decorator = Jenkins.instance.getDescriptorByType(org.codefirst.SimpleThemeDecorator.class)
 
-    List&lt;ThemeElement&gt; configElements = new ArrayList&lt;&gt;();
-    configElements.add(new CssTextThemeElement(&quot;DEFAULT&quot;));
-    configElements.add(new CssUrlThemeElement(&quot;https://cdn.rawgit.com/afonsof/jenkins-material-theme/gh-pages/dist/material-light-green.css&quot;));
+    List<ThemeElement> configElements = new ArrayList<>();
+    configElements.add(new CssTextThemeElement("DEFAULT"));
+    configElements.add(new CssUrlThemeElement("https://cdn.rawgit.com/afonsof/jenkins-material-theme/gh-pages/dist/material-light-green.css"));
     decorator.setElements(configElements);
     decorator.save();
 
     jenkins.save()
   1-system-message.yaml: |2
     jenkins:
-      systemMessage: &quot;Configuration as Code integration works!!!&quot;
-      adminAddress: &quot;${SECRET_JENKINS_ADMIN_ADDRESS}&quot;
+      systemMessage: "Configuration as Code integration works!!!"
+      adminAddress: "${SECRET_JENKINS_ADMIN_ADDRESS}"
 kind: ConfigMap
 metadata:
-  name: jenkins-operator-user-configuration-&lt;cr_name&gt;
-  namespace: default
-</code></pre>
-
+  name: jenkins-operator-user-configuration-<cr_name>
+  namespace: default</code></pre>
 <p>When the <strong>jenkins-operator-user-configuration-<cr_name></strong> ConfigMap is updated, Jenkins automatically
 runs the <strong>jenkins-operator-user-configuration</strong> Jenkins Job which executes all scripts, and  then
 runs the <strong>jenkins-operator-user-configuration-casc</strong> Jenkins Job which applies the Configuration as Code configuration.</p>
@@ -715,7 +705,6 @@ runs the <strong>jenkins-operator-user-configuration-casc</strong> Jenkins Job w
 <h2 id="install-plugins">Install Plugins</h2>
 
 <p>Edit CR under <code>spec.master.plugins</code>:</p>
-
 <pre><code>apiVersion: jenkins.io/v1alpha2
 kind: Jenkins
 metadata:
@@ -724,9 +713,7 @@ spec:
   master:
    plugins:
    - name: simple-theme-plugin
-     version: 0.5.1
-</code></pre>
-
+     version: 0.5.1</code></pre>
 <p>Under <code>spec.master.basePlugins</code> you can find plugins for a valid <strong>Jenkins Operator</strong>:</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">apiVersion<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins.io/v1alpha2<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline"></span>kind<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>Jenkins<span style="color:#f8f8f8;text-decoration:underline">
@@ -736,19 +723,19 @@ spec:
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span>master<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>basePlugins<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>kubernetes<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">1.18.3</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">1.18</span><span style="color:#0000cf;font-weight:bold">.3</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>workflow-job<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;2.34&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>workflow-aggregator<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;2.6&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>git<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.12.0</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">3.12</span><span style="color:#0000cf;font-weight:bold">.0</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>job-dsl<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.76&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>configuration-as-code<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.31&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>kubernetes-credentials-provider<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">0.12.1</span></code></pre></div>
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">0.12</span><span style="color:#0000cf;font-weight:bold">.1</span></code></pre></div>
 <p>You can change their versions.</p>
 
 <p>The <strong>Jenkins Operator</strong> will then automatically install those plugins after the Jenkins master pod restart.</p>

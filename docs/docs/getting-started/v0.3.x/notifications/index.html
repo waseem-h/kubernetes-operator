@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.57.2" />
+<meta name="generator" content="Hugo 0.62.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -30,16 +30,13 @@
 <meta itemprop="name" content="Notifications">
 <meta itemprop="description" content="How to setup operator notifications.
 ">
-
-
 <meta itemprop="datePublished" content="2019-12-20T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-12-20T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="208">
+<meta itemprop="wordCount" content="192">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Notifications"/>
 <meta name="twitter:description" content="How to setup operator notifications.
 "/>
@@ -48,8 +45,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" as="style">
+<link href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -669,67 +666,58 @@
 
 <h2 id="slack">Slack</h2>
 
-<p>Please follow <a href="https://api.slack.com/incoming-webhooks" target="_blank">this</a> instructions to get web hook URL.</p>
+<p>Please follow <a href="https://api.slack.com/incoming-webhooks">this</a> instructions to get web hook URL.</p>
 
 <p>Create web hook secret with name <code>jenkins-operator-notification-data</code>. Contains key <code>url</code> with provided web hook URL.</p>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ kubectl create secret generic jenkins-operator-notification-data --from-literal<span style="color:#ce5c00;font-weight:bold">=</span><span style="color:#000">url</span><span style="color:#ce5c00;font-weight:bold">=</span>&lt;webhook_url&gt;</code></pre></div>
 <p>Example configuration for Slack:</p>
-
 <pre><code>kind: Jenkins
 spec:
   master:
     notifications:
     - loggingLevel: info
       verbose: true
-      name: &lt;name&gt;
+      name: <name>
       slack:
         webHookURLSecretKeySelector:
           secret:
-            name: &lt;secret_name&gt;
-          key: &lt;key&gt;
-</code></pre>
-
+            name: <secret_name>
+          key: <key></code></pre>
 <h2 id="microsoft-teams">Microsoft Teams</h2>
 
-<p>Please follow <a href="https://docs.microsoft.com/en-gb/outlook/actionable-messages/send-via-connectors" target="_blank">this</a> instructions to get web hook URL.</p>
+<p>Please follow <a href="https://docs.microsoft.com/en-gb/outlook/actionable-messages/send-via-connectors">this</a> instructions to get web hook URL.</p>
 
 <p>Example configuration for Microsoft Teams:</p>
-
 <pre><code>kind: Jenkins
 spec:
   master:
     notifications:
     - loggingLevel: info
       verbose: true
-      name: &lt;name&gt;
+      name: <name>
       teams:
         webHookURLSecretKeySelector:
           secret:
-            name: &lt;secret_name&gt;
-          key: &lt;key&gt;
-</code></pre>
-
+            name: <secret_name>
+          key: <key></code></pre>
 <h2 id="mailgun">Mailgun</h2>
 
 <p>Example configuration for Mailgun:</p>
-
 <pre><code>kind: Jenkins
 spec:
   master:
     notifications:
     - loggingLevel: info
       verbose: true
-      name: &lt;name&gt;
+      name: <name>
       mailgun:
-        domain: &lt;domain&gt;
+        domain: <domain>
         apiKeySecretKeySelector:
           secret:
-            name: &lt;secret_name&gt;
-          key: &lt;key&gt;
-        recipient: &lt;your_email&gt;
-        from: &lt;mailgun_email&gt;
-</code></pre>
-
+            name: <secret_name>
+          key: <key>
+        recipient: <your_email>
+        from: <mailgun_email></code></pre>
 <h2 id="debug-options">Debug options</h2>
 
 <p>As you see there is two debugging options:</p>
@@ -744,7 +732,6 @@ spec:
 
 <p>You can use multiple providers to send notification to another communication channels at the same time.
 For example you will send notifications to Slack and Teams.</p>
-
 <pre><code>kind: Jenkins
 spec:
   master:
@@ -755,18 +742,16 @@ spec:
       slack:
         webHookURLSecretKeySelector:
           secret:
-            name: &lt;secret_name&gt;
-          key: &lt;key&gt;
+            name: <secret_name>
+          key: <key>
     - loggingLevel: info
       verbose: true
       name: nteams
       teams:
         webHookURLSecretKeySelector:
           secret:
-            name: &lt;secret_name&gt;
-          key: &lt;key&gt;
-</code></pre>
-
+            name: <secret_name>
+          key: <key></code></pre>
 	
 	
 	<div class="text-muted mt-5 pt-3 border-top">Last modified December 20, 2019

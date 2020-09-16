@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.57.2" />
+<meta name="generator" content="Hugo 0.62.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -30,16 +30,13 @@
 <meta itemprop="name" content="Configuration">
 <meta itemprop="description" content="How to configure Jenkins with Operator
 ">
-
-
 <meta itemprop="datePublished" content="2019-12-20T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2019-12-20T00:00:00&#43;00:00" />
 <meta itemprop="wordCount" content="726">
 
 
 
-<meta itemprop="keywords" content="" />
-<meta name="twitter:card" content="summary"/>
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Configuration"/>
 <meta name="twitter:description" content="How to configure Jenkins with Operator
 "/>
@@ -48,8 +45,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" as="style">
+<link href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -681,22 +678,18 @@
 
 <h2 id="configure-seed-jobs-and-pipelines">Configure Seed Jobs and Pipelines</h2>
 
-<p>Jenkins operator uses <a href="https://github.com/jenkinsci/job-dsl-plugin" target="_blank">job-dsl</a> and <a href="https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/" target="_blank">kubernetes-credentials-provider</a> plugins for configuring jobs
+<p>Jenkins operator uses <a href="https://github.com/jenkinsci/job-dsl-plugin">job-dsl</a> and <a href="https://jenkinsci.github.io/kubernetes-credentials-provider-plugin/">kubernetes-credentials-provider</a> plugins for configuring jobs
 and deploy keys.</p>
 
 <h2 id="prepare-job-definitions-and-pipelines">Prepare job definitions and pipelines</h2>
 
 <p>First you have to prepare pipelines and job definition in your GitHub repository using the following structure:</p>
-
 <pre><code>cicd/
 ├── jobs
 │   └── build.jenkins
 └── pipelines
-    └── build.jenkins
-</code></pre>
-
+    └── build.jenkins</code></pre>
 <p><strong><code>cicd/jobs/build.jenkins</code></strong> is a job definition:</p>
-
 <pre><code>#!/usr/bin/env groovy
 
 pipelineJob('build-jenkins-operator') {
@@ -716,17 +709,14 @@ pipelineJob('build-jenkins-operator') {
             scriptPath('cicd/pipelines/build.jenkins')
         }
     }
-}
-</code></pre>
-
+}</code></pre>
 <p><strong><code>cicd/pipelines/build.jenkins</code></strong> is an actual Jenkins pipeline:</p>
-
 <pre><code>#!/usr/bin/env groovy
 
-def label = &quot;build-jenkins-operator-${UUID.randomUUID().toString()}&quot;
-def home = &quot;/home/jenkins&quot;
-def workspace = &quot;${home}/workspace/build-jenkins-operator&quot;
-def workdir = &quot;${workspace}/src/github.com/jenkinsci/kubernetes-operator/&quot;
+def label = "build-jenkins-operator-${UUID.randomUUID().toString()}"
+def home = "/home/jenkins"
+def workspace = "${home}/workspace/build-jenkins-operator"
+def workdir = "${workspace}/src/github.com/jenkinsci/kubernetes-operator/"
 
 podTemplate(label: label,
         containers: [
@@ -768,13 +758,10 @@ podTemplate(label: label,
             }
         }
     }
-}
-</code></pre>
-
+}</code></pre>
 <h2 id="configure-seed-jobs">Configure Seed Jobs</h2>
 
 <p>Jenkins Seed Jobs are configured using <code>Jenkins.spec.seedJobs</code> section from your custom resource manifest:</p>
-
 <pre><code>apiVersion: jenkins.io/v1alpha2
 kind: Jenkins
 metadata:
@@ -782,12 +769,10 @@ metadata:
 spec:
   seedJobs:
   - id: jenkins-operator
-    targets: &quot;cicd/jobs/*.jenkins&quot;
-    description: &quot;Jenkins Operator repository&quot;
+    targets: "cicd/jobs/*.jenkins"
+    description: "Jenkins Operator repository"
     repositoryBranch: master
-    repositoryUrl: https://github.com/jenkinsci/kubernetes-operator.git
-</code></pre>
-
+    repositoryUrl: https://github.com/jenkinsci/kubernetes-operator.git</code></pre>
 <p><strong>Jenkins Operator</strong> will automatically discover and configure all the seed jobs.</p>
 
 <p>You can verify if deploy keys were successfully configured in the Jenkins <strong>Credentials</strong> tab.</p>
@@ -822,7 +807,6 @@ $ ssh-keygen -p -f &lt;filename&gt; -m pem</code></pre></div>
 <h4 id="configure-ssh-authentication">Configure SSH authentication</h4>
 
 <p>Configure a seed job like this:</p>
-
 <pre><code>apiVersion: jenkins.io/v1alpha2
 kind: Jenkins
 metadata:
@@ -832,14 +816,11 @@ spec:
   - id: jenkins-operator-ssh
     credentialType: basicSSHUserPrivateKey
     credentialID: k8s-ssh
-    targets: &quot;cicd/jobs/*.jenkins&quot;
-    description: &quot;Jenkins Operator repository&quot;
+    targets: "cicd/jobs/*.jenkins"
+    description: "Jenkins Operator repository"
     repositoryBranch: master
-    repositoryUrl: ssh://git@github.com:jenkinsci/kubernetes-operator.git
-</code></pre>
-
+    repositoryUrl: ssh://git@github.com:jenkinsci/kubernetes-operator.git</code></pre>
 <p>and create a Kubernetes Secret (name of secret should be the same from <code>credentialID</code> field):</p>
-
 <pre><code>apiVersion: v1
 kind: Secret
 metadata:
@@ -850,13 +831,10 @@ stringData:
     MIIJKAIBAAKCAgEAxxDpleJjMCN5nusfW/AtBAZhx8UVVlhhhIKXvQ+dFODQIdzO
     oDXybs1zVHWOj31zqbbJnsfsVZ9Uf3p9k6xpJ3WFY9b85WasqTDN1xmSd6swD4N8
     ...
-  username: github_user_name
-</code></pre>
-
+  username: github_user_name</code></pre>
 <h3 id="username-password-authentication">Username &amp; password authentication</h3>
 
 <p>Configure the seed job like:</p>
-
 <pre><code>apiVersion: jenkins.io/v1alpha2
 kind: Jenkins
 metadata:
@@ -866,23 +844,18 @@ spec:
   - id: jenkins-operator-user-pass
     credentialType: usernamePassword
     credentialID: k8s-user-pass
-    targets: &quot;cicd/jobs/*.jenkins&quot;
-    description: &quot;Jenkins Operator repository&quot;
+    targets: "cicd/jobs/*.jenkins"
+    description: "Jenkins Operator repository"
     repositoryBranch: master
-    repositoryUrl: https://github.com/jenkinsci/kubernetes-operator.git
-</code></pre>
-
+    repositoryUrl: https://github.com/jenkinsci/kubernetes-operator.git</code></pre>
 <p>and create a Kubernetes Secret (name of secret should be the same from <code>credentialID</code> field):</p>
-
 <pre><code>apiVersion: v1
 kind: Secret
 metadata:
   name: k8s-user-pass
 stringData:
   username: github_user_name
-  password: password_or_token
-</code></pre>
-
+  password: password_or_token</code></pre>
 <h2 id="http-proxy-for-downloading-plugins">HTTP Proxy for downloading plugins</h2>
 
 <p>To use forwarding proxy with an operator to download plugins you need to add the following environment variable to Jenkins Custom Resource (CR), e.g.:</p>
@@ -899,7 +872,7 @@ stringData:
 
 <p>To pull a Docker Image from private repository you can use <code>imagePullSecrets</code>.</p>
 
-<p>Please follow the instructions on <a href="https://kubernetes.io/docs/concepts/containers/images/?origin_team=T42NTAGHM#creating-a-secret-with-a-docker-config" target="_blank">creating a secret with a docker config</a>.</p>
+<p>Please follow the instructions on <a href="https://kubernetes.io/docs/concepts/containers/images/?origin_team=T42NTAGHM#creating-a-secret-with-a-docker-config">creating a secret with a docker config</a>.</p>
 
 <h3 id="docker-hub-configuration">Docker Hub Configuration</h3>
 
@@ -912,61 +885,58 @@ stringData:
 <p>After modifications, it needs to be encoded as a Base64 value before setting the <code>.dockerconfigjson</code> key.</p>
 
 <p>Example config file to modify and use:</p>
-
 <pre><code>{
-    &quot;auths&quot;:{
-        &quot;https://index.docker.io/v1/&quot;:{
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+    "auths":{
+        "https://index.docker.io/v1/":{
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         },
-        &quot;auth.docker.io&quot;:{
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+        "auth.docker.io":{
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         },
-        &quot;registry.docker.io&quot;:{
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+        "registry.docker.io":{
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         },
-        &quot;docker.io&quot;:{
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+        "docker.io":{
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         },
-        &quot;https://registry-1.docker.io/v2/&quot;: {
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+        "https://registry-1.docker.io/v2/": {
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         },
-        &quot;registry-1.docker.io/v2/&quot;: {
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+        "registry-1.docker.io/v2/": {
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         },
-        &quot;registry-1.docker.io&quot;: {
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+        "registry-1.docker.io": {
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         },
-        &quot;https://registry-1.docker.io&quot;: {
-            &quot;username&quot;:&quot;user&quot;,
-            &quot;password&quot;:&quot;password&quot;,
-            &quot;email&quot;:&quot;yourdockeremail@gmail.com&quot;,
-            &quot;auth&quot;:&quot;base64 of string user:password&quot;
+        "https://registry-1.docker.io": {
+            "username":"user",
+            "password":"password",
+            "email":"yourdockeremail@gmail.com",
+            "auth":"base64 of string user:password"
         }
     }
-}
-</code></pre>
-
+}</code></pre>
 	
 	
 	<div class="text-muted mt-5 pt-3 border-top">Last modified December 20, 2019
