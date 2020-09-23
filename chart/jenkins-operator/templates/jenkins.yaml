@@ -7,6 +7,9 @@ metadata:
   {{- with .Values.jenkins.labels }}
   labels: {{ toYaml . | nindent 4 }}
   {{- end }}
+  {{- with .Values.jenkins.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   configurationAsCode:
     configurations:
@@ -67,6 +70,9 @@ spec:
   master:
     {{- with .Values.jenkins.labels }}
     labels: {{ toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.jenkins.annotations }}
+    annotations: {{ toYaml . | nindent 6 }}
     {{- end }}
     {{- with .Values.jenkins.basePlugins }}
     basePlugins: {{ toYaml . | nindent 4 }}
@@ -133,4 +139,4 @@ spec:
   {{- with .Values.jenkins.seedJobs }}
   seedJobs: {{- toYaml . | nindent 4 }}
   {{- end }}
-{{- end }}
+  {{- end }}
