@@ -56,5 +56,11 @@ To install, you need only to type these commands:
 
 ```bash
 $ helm repo add jenkins https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart
-$ helm install jenkins/jenkins-operator
+$ helm install <name> jenkins/jenkins-operator
+```
+
+To add custom labels and annotations, you can use `values.yaml` file or pass them into `helm install` command, e.g.:
+
+```bash
+$ helm install <name> jenkins/jenkins-operator --set jenkins.labels.LabelKey=LabelValue,jenkins.annotations.AnnotationKey=AnnotationValue
 ```
