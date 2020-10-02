@@ -52,11 +52,17 @@ Now **Jenkins Operator** should be up and running in the `default` namespace.
 
 There is a option to use Helm to install the operator. It requires the Helm 3+ for deployment.
 
+Create a namespace for the operator:
+
+```bash
+$ kubectl create -n <your-namespace>
+```
+
 To install, you need only to type these commands:
 
 ```bash
 $ helm repo add jenkins https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart
-$ helm install <name> jenkins/jenkins-operator
+$ helm install <name> jenkins/jenkins-operator -n <your-namespace>
 ```
 
 To add custom labels and annotations, you can use `values.yaml` file or pass them into `helm install` command, e.g.:
@@ -64,3 +70,769 @@ To add custom labels and annotations, you can use `values.yaml` file or pass the
 ```bash
 $ helm install <name> jenkins/jenkins-operator --set jenkins.labels.LabelKey=LabelValue,jenkins.annotations.AnnotationKey=AnnotationValue
 ```
+You can further customize Jenkins using `values.yaml`:
+
+## Jenkins instance configuration
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Field</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>jenkins</code>
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+<tr>
+<td></td>
+<td>
+<code>enabled</code></br>
+</td>
+<td>
+true
+</td>
+<td>
+Enabled can enable or disable the Jenkins instance. 
+Set to false if you have configured CR already and/or you want to deploy an operator only.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>apiVersion</code></br>
+</td>
+<td>jenkins.io/v1alpha2</td>
+<td>
+Version of the CR manifest. The recommended and default value is <code>jenkins.io/v1alpha2</code>.
+<a href="#github.io/kubernetes-operator/docs/getting-started/v0.1.x/migration-guide-v1alpha1-to-v1alpha2/">More info</a>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>name</code></br>
+</td>
+<td>
+jenkins
+</td>
+<td>
+Name of resource. The pod name will be <code>jenkins-&lt;name&gt;</code> (name will be set as suffix).
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>namespace</code>
+</td>
+<td>
+default
+</td>
+<td>
+Namespace the resources will be deployed to. It's not recommended to use default namespace. 
+Create new namespace for jenkins (e.g. <code>kubectl create -n jenkins</code>)
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>labels</code>
+</td>
+<td>
+{}
+</td>
+<td>
+Labels are injected into metadata labels field.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>annotations</code>
+</td>
+<td>
+{}
+</td>
+<td>
+Annotations are injected into metadata annotations field.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>image</code>
+</td>
+<td>
+jenkins/jenkins:lts
+</td>
+<td>
+Image is the name (and tag) of the Jenkins instance.
+It's recommended to use LTS (tag: "lts") version.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>env</code>
+</td>
+<td>
+[]
+</td>
+<td>
+Env contains jenkins container environment variables.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>imagePullPolicy</code>
+</td>
+<td>
+Always
+</td>
+<td>
+Defines policy for pulling images
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>priorityClassName</code>
+</td>
+<td>
+""
+</td>
+<td>
+PriorityClassName indicates the importance of a Pod relative to other Pods.
+<a href="https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/">More info</a>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>disableCSRFProtection</code>
+</td>
+<td>
+false
+</td>
+<td>
+disableCSRFProtection can enable or disable operator built-in CSRF protection.
+Set it to true if you are using OpenShift Jenkins Plugin.
+<a href="https://github.com/jenkinsci/kubernetes-operator/pull/193">More info</a>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>imagePullSecrets</code>
+</td>
+<td>
+[]
+</td>
+<td>
+Used if you want to pull images from private repository
+<a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#pulling-docker-images-from-private-repositories">More info</a>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>notifications</code>
+</td>
+<td>
+[]
+</td>
+<td>
+Notifications is feature that notify user about Jenkins reconcilation status
+<a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/notifications/">More info</a>  
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>basePlugins</code>
+</td>
+<td>
+<pre>
+- name: kubernetes
+  version: "1.25.2"
+- name: workflow-job
+  version: "2.39"
+- name: workflow-aggregator
+  version: "2.6"
+- name: git
+  version: "4.2.2"
+- name: job-dsl
+  version: "1.77"
+- name: configuration-as-code
+  version: "1.38"
+- name: kubernetes-credentials
+        -provider
+  version: "0.13"
+</pre>
+</td>
+<td>
+Plugins installed and required by the operator
+shouldn't contain plugins defined by user
+You can change their versions here
+<a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/customization/#install-plugins">More info</a>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>plugins</code>
+</td>
+<td>
+[]
+</td>
+<td>
+Plugins required by the user. You can define plugins here.
+<a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/customization/#install-plugins">More info</a>
+Example:
+<pre>
+plugins:
+ - name: simple-theme-plugin
+   version: 0.5.1
+</pre>  
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>seedJobs</code>
+</td>
+<td>
+[]
+</td>
+<td>
+Placeholder for jenkins seed jobs
+For seed job creation tutorial, check:<br /> <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#prepare-job-definitions-and-pipelines">Prepare seed jobs</a>
+<br /><a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#configure-seed-jobs">Configure seed jobs</a>
+<br />Example:
+<code>
+<pre>
+seedJobs:
+- id: jenkins-operator
+  targets: "cicd/jobs/*.jenkins"
+  description: "Jenkins Operator repository"
+  repositoryBranch: master
+  repositoryUrl: 
+  - https://github.com/jenkinsci/kubernetes-operator.git
+</pre>
+</code>  
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>resources</code>
+</td>
+<td>
+<pre>
+limits:
+  cpu: 1500m
+  memory: 3Gi
+requests:
+  cpu: 1
+  memory: 500M
+</pre>
+</td>
+<td>
+Resource limit/request for Jenkins
+<a href="https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container">More info</a>
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>volumes</code>
+</td>
+<td>
+<pre>
+- name: backup
+  persistentVolumeClaim:
+    claimName: jenkins-backup
+</pre>
+</td>
+<td>
+Volumes used by Jenkins
+By default, we are only using PVC volume for storing backups.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>volumeMounts</code>
+</td>
+<td>
+[]
+</td>
+<td>
+volumeMounts are mounts for Jenkins pod.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>securityContext</code>
+</td>
+<td>
+runAsUser: 1000
+fsGroup: 1000
+</td>
+<td>
+SecurityContext for pod.
+</td>
+</tr>
+<tr>
+<td></td>
+<td>
+<code>
+backup
+</code>
+</td>
+<td>
+</td>
+<td>
+Backup is section for configuring operator's backup feature
+By default backup feature is enabled and pre-configured
+This section simplifies the configuration described here: <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/">Configure backup and restore</a>
+For customization tips see <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/custom-backup-and-restore/">Custom backup and restore</a>
+</td>
+</tr>
+<tr>
+<td>
+</td>
+<td>
+<code>configuration</code>
+</td>
+<td>
+</td>
+<td>
+Section where we can configure Jenkins instance. 
+See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/customization/">Customization</a> for details
+</td>
+</tr>
+</tbody>
+</table>
+
+### Configuring operator deployment
+
+<table aria-colspan="4">
+<thead aria-colspan="4">
+<tr>
+<th></th>
+<th>Field</th>
+<th>Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody aria-colspan="4">
+<tr></tr>
+<tr>
+<td colspan="1">
+<code>operator</code>
+</td>
+<td colspan="3">
+<p>operator is section for configuring operator deployment</p>
+<table>
+<tr>
+<td>
+<code>replicaCount</code></br>
+</td>
+<td>
+1
+</td>
+<td>
+Number of Replicas.
+</td>
+</tr>
+<tr>
+<td>
+<code>image</code>
+</td>
+<td>
+virtuslab/jenkins-operator:v0.4.0
+</td>
+<td>
+Name (and tag) of the Jenkins Operator image.
+</td>
+</tr>
+<tr>
+<td>
+<code>imagePullPolicy</code>
+</td>
+<td>
+IfNotPresent
+</td>
+<td>
+Defines policy for pulling images.
+</td>
+</tr>
+<tr>
+<td>
+imagePullSecrets
+</td>
+<td>
+[]
+</td>
+<td>
+Used if you want to pull images from private repository.
+</td>
+</tr>
+<tr>
+<td>
+<code>nameOverride</code>
+</td>
+<td>
+""
+</td>
+<td>
+nameOverride overrides the app name.
+</td>
+</tr>
+<tr>
+<td>
+fullnameOverride
+</td>
+<td>
+""
+</td>
+<td>
+fullnameOverride overrides the deployment name
+</td>
+</tr>
+<tr>
+    <td>
+    resources
+    </td>
+    <td>
+    {}
+    </td>
+    <td>
+    </td>
+</tr>
+<tr>
+    <td>
+    nodeSelector
+    </td>
+    <td>
+    {}
+    </td>
+    <td>
+    </td>
+</tr>
+<tr>
+    <td>
+    tolerations
+    </td>
+    <td>
+    {}
+    </td>
+    <td>
+    </td>
+</tr>
+<tr>
+    <td>
+    affinity
+    </td>
+    <td>
+    {}
+    </td>
+    <td>
+    </td>
+</tr>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+
+
+
+<h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Backup">Backup
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
+</p>
+<p>
+Backup defines configuration of Jenkins backup.
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th colspan="2">Default value</th>
+<th>Description</th>
+</tr>
+</thead>
+    <tbody>
+        <tr>
+            <td>
+                <code>enabled</code>
+            </td>
+            <td colspan="2">
+                true
+            </td>
+            <td>
+                Enabled is enable/disable switch for backup feature.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>image</code>
+            </td>
+            <td colspan="2">
+                virtuslab/jenkins-operator-backup-pvc:v0.0.8
+            </td>
+            <td>
+                Image used by backup feature.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>containerName</code>
+            </td>
+            <td colspan="2">
+                backup
+            </td>
+            <td>
+                Backup container name.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>interval</code>
+            </td>
+            <td colspan="2">
+                30
+            </td>
+            <td>
+                Defines how often make backup in seconds.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>makeBackupBeforePodDeletion</code>
+            </td>
+            <td colspan="2">
+                true
+            </td>
+            <td>
+                When enabled will make backup before pod deletion.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>backupCommand</code>
+            </td>
+            <td colspan="2">
+                /home/user/bin/backup.sh
+            </td>
+            <td>
+                Backup container command.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>restoreCommand</code>
+            <td colspan="2">
+                /home/user/bin/restore.sh
+            </td>
+            <td colspan="2">
+                Backup restore command.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <code>pvc</code>
+            </td>           
+            <td>
+            </td>               
+            <td>
+            </td>            
+            <td>
+                Persistent Volume Claim Kubernetes resource
+            </td>
+        </tr>
+        <tr>
+            <td>
+                </td>
+            <td>
+                <code>enabled</code>
+            </td>
+            <td>
+                true
+            </td>
+            </td>
+            <td>
+                Enable/disable switch for PVC
+            </td>
+        </tr>
+        <tr>
+        <td></td>
+            <td>
+                <code>size</code>
+            </td>
+            <td>
+                5Gi
+            </td>
+            <td>
+                Size of PVC
+            </td>
+        </tr>
+        <tr>
+        <td></td>
+            <td>
+                <code>className</code>
+            </td>
+            <td>
+                ""
+            </td>
+            <td>
+                StorageClassName for PVC  
+                <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1">More info</a>
+            </td>
+        </tr>
+         <tr>
+            <td>
+                <code>env</code>
+            </td>          
+            <td colspan="2">
+<pre>
+- name: BACKUP_DIR
+  value: /backup
+- name: JENKINS_HOME
+  value: /jenkins-home
+- name: BACKUP_COUNT
+  value: "3"
+</pre>
+            </td>
+                <td>
+                    Contains container environment variables. 
+                    PVC backup provider handles these variables:<br />
+                    BACKUP_DIR - path for storing backup files (default: "/backup")<br />
+                    JENKINS_HOME - path to jenkins home (default: "/jenkins-home")<br />
+                    BACKUP_COUNT - define how much recent backups will be kept<br />
+                </td>
+            </td>
+        </tr>
+        <tr>
+        <td>
+            volumeMounts
+        </td>
+        <td colspan="2">
+<pre>
+- name: jenkins-home
+  mountPath: /jenkins-home
+- mountPath: /backup
+  name: backup
+</pre>
+        </td>
+        <td>
+            Holds the mount points for volumes.
+        </td>
+        </tr>
+    </tbody>
+</table>
+ 
+ 
+ <h4 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Configuration">Configuration
+ </h3>
+ <p>
+ (<em>Appears on:</em>
+ <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
+ </p>
+ <p>
+Configuration is section where we can configure Jenkins instance
+ </p>
+
+
+ <table>
+ <thead>
+ <tr>
+ <th>Field</th>
+ <th>Default value</th>
+ <th>Description</th>
+ </tr>
+ </thead>
+     <tbody>
+         <tr>
+             <td>
+                 <code>configurationAsCode</code>
+             </td>
+             <td>
+                 {}
+             </td>
+             <td>
+             ConfigurationAsCode defines configuration of Jenkins customization via Configuration as Code Jenkins plugin.
+Example:<br />
+<pre>
+- configMapName: jenkins-casc
+  content: {}
+</pre>
+             </td>
+         </tr>
+         <tr>
+             <td>
+                 <code>groovyScripts</code>
+             </td>
+             <td>
+                 {}
+             </td>
+             <td>
+             GroovyScripts defines configuration of Jenkins customization via groovy scripts.
+             Example:<br />
+<pre>
+- configMapName: jenkins-gs
+  content: {}
+</pre>
+             </td>
+         </tr>
+         <tr>
+             <td>
+                 <code>secretRefName</code>
+             </td>
+             <td>
+                 ""
+             </td>
+             <td>
+                 secretRefName of existing secret (previously created).
+             </td>
+         </tr>
+         <tr>
+             <td>
+                 <code>secretData</code>
+             </td>
+             <td>
+                 {}
+             </td>
+             <td>
+                 If secretRefName is empty, secretData creates new secret and fills with data provided in secretData.
+             </td>
+         </tr>
+     </tbody>
+ </table>
+ 
+ 
+ 
+  # See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details
+  #service:
+  # slave Jenkins service
+  # See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details
+  #slaveService:
+
+
