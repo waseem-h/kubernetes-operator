@@ -26,7 +26,7 @@
 " />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://jenkinsci.github.io/kubernetes-operator/docs/installation/" />
-<meta property="og:updated_time" content="2019-08-05T00:00:00+00:00" /><meta property="og:site_name" content="Jenkins Operator" />
+<meta property="og:updated_time" content="2020-10-05T00:00:00+00:00" /><meta property="og:site_name" content="Jenkins Operator" />
 <meta itemprop="name" content="Installation">
 <meta itemprop="description" content="How to install Jenkins Operator
 "><meta name="twitter:card" content="summary"/>
@@ -990,6 +990,16 @@ SecurityContext for pod.
 </td>
 </tr>
 <tr>
+<td><code>service</code></td>
+<td>not implemented</td>
+<td>Http Jenkins service. See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details.</td>
+</tr>
+<tr>
+<td><code>slaveService</code></td>
+<td>not implemented</td>
+<td>Slave Jenkins service. See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details.</td>
+</tr>
+<tr>
 <td>
 <code>
 backup
@@ -1089,7 +1099,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                 <td>
-                imagePullSecrets
+                <code>imagePullSecrets</code>
                 </td>
                 <td>
                 []
@@ -1111,7 +1121,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                 <td>
-                fullnameOverride
+                <code>fullnameOverride</code>
                 </td>
                 <td>
                 ""
@@ -1122,7 +1132,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    resources
+                    <code>resources</code>
                     </td>
                     <td>
                     {}
@@ -1132,7 +1142,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    nodeSelector
+                    <code>nodeSelector</code>
                     </td>
                     <td>
                     {}
@@ -1142,7 +1152,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    tolerations
+                    <code>tolerations</code>
                     </td>
                     <td>
                     {}
@@ -1152,7 +1162,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    affinity
+                    <code>affinity</code>
                     </td>
                     <td>
                     {}
@@ -1345,7 +1355,7 @@ Backup defines configuration of Jenkins backup.
         </tr>
         <tr>
         <td>
-            volumeMounts
+            <code>volumeMounts</code>
         </td>
         <td>
 <pre>
@@ -1435,12 +1445,6 @@ Example:<br />
          </tr>
      </tbody>
  </table></p>
-
-<p># See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service</a> for details
-  #service:
-  # slave Jenkins service
-  # See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service">https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service</a> for details
-  #slaveService:</p>
 
         <div class="section-index">
     
@@ -1554,7 +1558,7 @@ Example:<br />
 
 	
 	
-	<div class="text-muted mt-5 pt-3 border-top">Last modified August 5, 2019
+	<div class="text-muted mt-5 pt-3 border-top">Last modified October 5, 2020
 </div>
 </div>
 

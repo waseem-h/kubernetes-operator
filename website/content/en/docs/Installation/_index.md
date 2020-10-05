@@ -2,7 +2,7 @@
 title: "Installation"
 linkTitle: "Installation"
 weight: 1
-date: 2019-08-05
+date: 2020-10-05
 description: >
   How to install Jenkins Operator
 ---
@@ -73,7 +73,6 @@ $ helm install <name> jenkins/jenkins-operator -n <your-namespace> --set jenkins
 You can further customize Jenkins using `values.yaml`:
 <h3 id="JenkinsConfiguration">Jenkins instance configuration
 </h3>
-### 
 
 <table aria-colspan="4">
 <thead aria-colspan="4">
@@ -375,6 +374,16 @@ SecurityContext for pod.
 </td>
 </tr>
 <tr>
+<td><code>service</code></td>
+<td>not implemented</td>
+<td>Http Jenkins service. See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details.</td>
+</tr>
+<tr>
+<td><code>slaveService</code></td>
+<td>not implemented</td>
+<td>Slave Jenkins service. See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details.</td>
+</tr>
+<tr>
 <td>
 <code>
 backup
@@ -474,7 +483,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                 <td>
-                imagePullSecrets
+                <code>imagePullSecrets</code>
                 </td>
                 <td>
                 []
@@ -496,7 +505,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                 <td>
-                fullnameOverride
+                <code>fullnameOverride</code>
                 </td>
                 <td>
                 ""
@@ -507,7 +516,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    resources
+                    <code>resources</code>
                     </td>
                     <td>
                     {}
@@ -517,7 +526,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    nodeSelector
+                    <code>nodeSelector</code>
                     </td>
                     <td>
                     {}
@@ -527,7 +536,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    tolerations
+                    <code>tolerations</code>
                     </td>
                     <td>
                     {}
@@ -537,7 +546,7 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
                 </tr>
                 <tr>
                     <td>
-                    affinity
+                    <code>affinity</code>
                     </td>
                     <td>
                     {}
@@ -732,7 +741,7 @@ Backup defines configuration of Jenkins backup.
         </tr>
         <tr>
         <td>
-            volumeMounts
+            <code>volumeMounts</code>
         </td>
         <td>
 <pre>
@@ -821,13 +830,4 @@ Example:<br />
          </tr>
      </tbody>
  </table>
- 
- 
- 
-  # See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details
-  #service:
-  # slave Jenkins service
-  # See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Service for details
-  #slaveService:
-
 
