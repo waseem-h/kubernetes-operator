@@ -68,14 +68,15 @@ $ helm install <name> jenkins/jenkins-operator -n <your-namespace>
 To add custom labels and annotations, you can use `values.yaml` file or pass them into `helm install` command, e.g.:
 
 ```bash
-$ helm install <name> jenkins/jenkins-operator --set jenkins.labels.LabelKey=LabelValue,jenkins.annotations.AnnotationKey=AnnotationValue
+$ helm install <name> jenkins/jenkins-operator -n <your-namespace> --set jenkins.labels.LabelKey=LabelValue,jenkins.annotations.AnnotationKey=AnnotationValue
 ```
 You can further customize Jenkins using `values.yaml`:
+<h3 id="JenkinsConfiguration">Jenkins instance configuration
+</h3>
+### 
 
-## Jenkins instance configuration
-
-<table>
-<thead>
+<table aria-colspan="4">
+<thead aria-colspan="4">
 <tr>
 <th></th>
 <th>Field</th>
@@ -83,21 +84,18 @@ You can further customize Jenkins using `values.yaml`:
 <th>Description</th>
 </tr>
 </thead>
-<tbody>
+<tbody aria-colspan="4">
+<tr></tr>
 <tr>
-<td>
+<td colspan="1">
 <code>jenkins</code>
 </td>
-<td>
-</td>
-<td>
-</td>
-<td>
-</td>
+<td colspan="3">
+<p>operator is section for configuring operator deployment</p>
+<table>
 <tr>
-<td></td>
 <td>
-<code>enabled</code></br>
+<code>enabled</code>
 </td>
 <td>
 true
@@ -108,9 +106,8 @@ Set to false if you have configured CR already and/or you want to deploy an oper
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
-<code>apiVersion</code></br>
+<code>apiVersion</code>
 </td>
 <td>jenkins.io/v1alpha2</td>
 <td>
@@ -119,9 +116,8 @@ Version of the CR manifest. The recommended and default value is <code>jenkins.i
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
-<code>name</code></br>
+<code>name</code>
 </td>
 <td>
 jenkins
@@ -131,7 +127,6 @@ Name of resource. The pod name will be <code>jenkins-&lt;name&gt;</code> (name w
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>namespace</code>
 </td>
@@ -144,7 +139,6 @@ Create new namespace for jenkins (e.g. <code>kubectl create -n jenkins</code>)
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>labels</code>
 </td>
@@ -156,7 +150,6 @@ Labels are injected into metadata labels field.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>annotations</code>
 </td>
@@ -168,7 +161,6 @@ Annotations are injected into metadata annotations field.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>image</code>
 </td>
@@ -181,7 +173,6 @@ It's recommended to use LTS (tag: "lts") version.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>env</code>
 </td>
@@ -193,7 +184,6 @@ Env contains jenkins container environment variables.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>imagePullPolicy</code>
 </td>
@@ -205,7 +195,6 @@ Defines policy for pulling images
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>priorityClassName</code>
 </td>
@@ -218,7 +207,6 @@ PriorityClassName indicates the importance of a Pod relative to other Pods.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>disableCSRFProtection</code>
 </td>
@@ -232,7 +220,6 @@ Set it to true if you are using OpenShift Jenkins Plugin.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>imagePullSecrets</code>
 </td>
@@ -245,7 +232,6 @@ Used if you want to pull images from private repository
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>notifications</code>
 </td>
@@ -258,7 +244,6 @@ Notifications is feature that notify user about Jenkins reconcilation status
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>basePlugins</code>
 </td>
@@ -289,7 +274,6 @@ You can change their versions here
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>plugins</code>
 </td>
@@ -308,7 +292,6 @@ plugins:
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>seedJobs</code>
 </td>
@@ -334,7 +317,6 @@ seedJobs:
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>resources</code>
 </td>
@@ -354,7 +336,6 @@ Resource limit/request for Jenkins
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>volumes</code>
 </td>
@@ -371,7 +352,6 @@ By default, we are only using PVC volume for storing backups.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>volumeMounts</code>
 </td>
@@ -383,7 +363,6 @@ volumeMounts are mounts for Jenkins pod.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>securityContext</code>
 </td>
@@ -396,11 +375,17 @@ SecurityContext for pod.
 </td>
 </tr>
 <tr>
-<td></td>
 <td>
 <code>
 backup
 </code>
+<p>
+<em>
+<a href="#Backup">
+Backup
+</a>
+</em>
+</p>
 </td>
 <td>
 </td>
@@ -413,15 +398,22 @@ For customization tips see <a href="https://jenkinsci.github.io/kubernetes-opera
 </tr>
 <tr>
 <td>
-</td>
-<td>
 <code>configuration</code>
+<p>
+<em>
+<a href="#Configuration">
+Configuration
+</a>
+</em>
+</p>
 </td>
-<td>
-</td>
+<td></td>
 <td>
 Section where we can configure Jenkins instance. 
 See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/customization/">Customization</a> for details
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>
@@ -430,142 +422,142 @@ See <a href="https://jenkinsci.github.io/kubernetes-operator/docs/getting-starte
 ### Configuring operator deployment
 
 <table aria-colspan="4">
-<thead aria-colspan="4">
-<tr>
-<th></th>
-<th>Field</th>
-<th>Default value</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody aria-colspan="4">
-<tr></tr>
-<tr>
-<td colspan="1">
-<code>operator</code>
-</td>
-<td colspan="3">
-<p>operator is section for configuring operator deployment</p>
-<table>
-<tr>
-<td>
-<code>replicaCount</code></br>
-</td>
-<td>
-1
-</td>
-<td>
-Number of Replicas.
-</td>
-</tr>
-<tr>
-<td>
-<code>image</code>
-</td>
-<td>
-virtuslab/jenkins-operator:v0.4.0
-</td>
-<td>
-Name (and tag) of the Jenkins Operator image.
-</td>
-</tr>
-<tr>
-<td>
-<code>imagePullPolicy</code>
-</td>
-<td>
-IfNotPresent
-</td>
-<td>
-Defines policy for pulling images.
-</td>
-</tr>
-<tr>
-<td>
-imagePullSecrets
-</td>
-<td>
-[]
-</td>
-<td>
-Used if you want to pull images from private repository.
-</td>
-</tr>
-<tr>
-<td>
-<code>nameOverride</code>
-</td>
-<td>
-""
-</td>
-<td>
-nameOverride overrides the app name.
-</td>
-</tr>
-<tr>
-<td>
-fullnameOverride
-</td>
-<td>
-""
-</td>
-<td>
-fullnameOverride overrides the deployment name
-</td>
-</tr>
-<tr>
-    <td>
-    resources
-    </td>
-    <td>
-    {}
-    </td>
-    <td>
-    </td>
-</tr>
-<tr>
-    <td>
-    nodeSelector
-    </td>
-    <td>
-    {}
-    </td>
-    <td>
-    </td>
-</tr>
-<tr>
-    <td>
-    tolerations
-    </td>
-    <td>
-    {}
-    </td>
-    <td>
-    </td>
-</tr>
-<tr>
-    <td>
-    affinity
-    </td>
-    <td>
-    {}
-    </td>
-    <td>
-    </td>
-</tr>
+    <thead aria-colspan="4">
+        <tr>
+            <th></th>
+            <th>Field</th>
+            <th>Default value</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody aria-colspan="4">
+        <tr></tr>
+        <tr>
+            <td colspan="1">
+            <code>operator</code>
+            </td>
+            <td colspan="3">
+            <p>operator is section for configuring operator deployment</p>
+                <table>
+                <tr>
+                <td>
+                <code>replicaCount</code></br>
+                </td>
+                <td>
+                1
+                </td>
+                <td>
+                Number of Replicas.
+                </td>
+                </tr>
+                <tr>
+                <td>
+                <code>image</code>
+                </td>
+                <td>
+                virtuslab/jenkins-operator:v0.4.0
+                </td>
+                <td>
+                Name (and tag) of the Jenkins Operator image.
+                </td>
+                </tr>
+                <tr>
+                <td>
+                <code>imagePullPolicy</code>
+                </td>
+                <td>
+                IfNotPresent
+                </td>
+                <td>
+                Defines policy for pulling images.
+                </td>
+                </tr>
+                <tr>
+                <td>
+                imagePullSecrets
+                </td>
+                <td>
+                []
+                </td>
+                <td>
+                Used if you want to pull images from private repository.
+                </td>
+                </tr>
+                <tr>
+                <td>
+                <code>nameOverride</code>
+                </td>
+                <td>
+                ""
+                </td>
+                <td>
+                nameOverride overrides the app name.
+                </td>
+                </tr>
+                <tr>
+                <td>
+                fullnameOverride
+                </td>
+                <td>
+                ""
+                </td>
+                <td>
+                fullnameOverride overrides the deployment name
+                </td>
+                </tr>
+                <tr>
+                    <td>
+                    resources
+                    </td>
+                    <td>
+                    {}
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    nodeSelector
+                    </td>
+                    <td>
+                    {}
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    tolerations
+                    </td>
+                    <td>
+                    {}
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                    affinity
+                    </td>
+                    <td>
+                    {}
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+                </table>
+            </td>
+        </tr>
+    </tbody>
 </table>
-</td>
-</tr>
-</tbody>
-</table>
 
 
 
-<h3 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Backup">Backup
+<h3 id="Backup">Backup
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
+<a href="#JenkinsConfiguration">JenkinsConfiguration</a>)
 </p>
 <p>
 Backup defines configuration of Jenkins backup.
@@ -575,7 +567,7 @@ Backup defines configuration of Jenkins backup.
 <thead>
 <tr>
 <th>Field</th>
-<th colspan="2">Default value</th>
+<th>Default value</th>
 <th>Description</th>
 </tr>
 </thead>
@@ -584,7 +576,7 @@ Backup defines configuration of Jenkins backup.
             <td>
                 <code>enabled</code>
             </td>
-            <td colspan="2">
+            <td>
                 true
             </td>
             <td>
@@ -595,7 +587,7 @@ Backup defines configuration of Jenkins backup.
             <td>
                 <code>image</code>
             </td>
-            <td colspan="2">
+            <td>
                 virtuslab/jenkins-operator-backup-pvc:v0.0.8
             </td>
             <td>
@@ -606,7 +598,7 @@ Backup defines configuration of Jenkins backup.
             <td>
                 <code>containerName</code>
             </td>
-            <td colspan="2">
+            <td>
                 backup
             </td>
             <td>
@@ -617,7 +609,7 @@ Backup defines configuration of Jenkins backup.
             <td>
                 <code>interval</code>
             </td>
-            <td colspan="2">
+            <td>
                 30
             </td>
             <td>
@@ -628,7 +620,7 @@ Backup defines configuration of Jenkins backup.
             <td>
                 <code>makeBackupBeforePodDeletion</code>
             </td>
-            <td colspan="2">
+            <td>
                 true
             </td>
             <td>
@@ -639,7 +631,7 @@ Backup defines configuration of Jenkins backup.
             <td>
                 <code>backupCommand</code>
             </td>
-            <td colspan="2">
+            <td>
                 /home/user/bin/backup.sh
             </td>
             <td>
@@ -649,69 +641,77 @@ Backup defines configuration of Jenkins backup.
         <tr>
             <td>
                 <code>restoreCommand</code>
-            <td colspan="2">
+            </td>
+            <td>
                 /home/user/bin/restore.sh
             </td>
-            <td colspan="2">
+            <td>
                 Backup restore command.
             </td>
         </tr>
         <tr>
             <td>
                 <code>pvc</code>
-            </td>           
-            <td>
-            </td>               
-            <td>
-            </td>            
-            <td>
-                Persistent Volume Claim Kubernetes resource
-            </td>
-        </tr>
-        <tr>
-            <td>
-                </td>
-            <td>
-                <code>enabled</code>
-            </td>
-            <td>
-                true
-            </td>
-            </td>
-            <td>
-                Enable/disable switch for PVC
-            </td>
-        </tr>
-        <tr>
-        <td></td>
-            <td>
-                <code>size</code>
-            </td>
-            <td>
-                5Gi
-            </td>
-            <td>
-                Size of PVC
-            </td>
-        </tr>
-        <tr>
-        <td></td>
-            <td>
-                <code>className</code>
-            </td>
-            <td>
-                ""
-            </td>
-            <td>
-                StorageClassName for PVC  
-                <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1">More info</a>
+            </td>                     
+            <td colspan="2">
+                <p>Persistent Volume Claim Kubernetes resource</p>
+                <br/>
+                <table colspan="2" style="width:100%">
+                <tbody>
+                    <tr>
+                       <td>
+                            <code>enabled</code>
+                        </td>
+                        <td>
+                            true
+                        </td>
+                        <td>
+                            Enable/disable switch for PVC                        
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>enabled</code>
+                        </td>
+                        <td>
+                            true
+                        </td>
+                        <td>
+                            Enable/disable switch for PVC
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>size</code>
+                        </td>
+                        <td>
+                            5Gi
+                        </td>
+                        <td>
+                            Size of PVC
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>className</code>
+                        </td>
+                        <td>
+                            ""
+                        </td>
+                        <td>
+                            StorageClassName for PVC  
+                            <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#class-1">More info</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </td>
         </tr>
          <tr>
             <td>
                 <code>env</code>
             </td>          
-            <td colspan="2">
+            <td>
 <pre>
 - name: BACKUP_DIR
   value: /backup
@@ -734,7 +734,7 @@ Backup defines configuration of Jenkins backup.
         <td>
             volumeMounts
         </td>
-        <td colspan="2">
+        <td>
 <pre>
 - name: jenkins-home
   mountPath: /jenkins-home
@@ -749,17 +749,12 @@ Backup defines configuration of Jenkins backup.
     </tbody>
 </table>
  
- 
- <h4 id="github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Configuration">Configuration
+ <h4 id="Configuration">Configuration
  </h3>
  <p>
  (<em>Appears on:</em>
- <a href="#github.com%2fjenkinsci%2fkubernetes-operator%2fpkg%2fapis%2fjenkins%2fv1alpha2.JenkinsSpec">JenkinsSpec</a>)
+ <a href="#JenkinsConfiguration">Jenkins instance configuration</a>)
  </p>
- <p>
-Configuration is section where we can configure Jenkins instance
- </p>
-
 
  <table>
  <thead>
