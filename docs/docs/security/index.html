@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="generator" content="Hugo 0.57.2" />
+<meta name="generator" content="Hugo 0.62.2" />
 
 <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
 
@@ -26,13 +26,10 @@
 " />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://jenkinsci.github.io/kubernetes-operator/docs/security/" />
-
 <meta property="og:updated_time" content="2019-08-05T00:00:00+00:00" /><meta property="og:site_name" content="Jenkins Operator" />
 <meta itemprop="name" content="Security">
 <meta itemprop="description" content="Jenkins security and hardening out of the box
-">
-
-<meta name="twitter:card" content="summary"/>
+"><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Security"/>
 <meta name="twitter:description" content="Jenkins security and hardening out of the box
 "/>
@@ -41,8 +38,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.76f9ae686f932b9aa67346ef8543e8a6b0302cb67aa119d21b053c31bc3f2448.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" as="style">
+<link href="/kubernetes-operator/scss/main.min.fd69987024ae657af26227407273d5b4d1046115af0e0182839a91bb3e30e830.css" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -693,7 +690,7 @@ Any namespace to which the <code>jenkins-operator</code> is deployed must be con
 possible permissions to any subject which can create a Pod in that namespace.</p>
 
 <p>To mitigate this issue <strong>Jenkins Operator</strong> should be deployed in one namespace and the Jenkins CR should be created in separate namespace.
-To achieve it change watch namespace in <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/deploy/operator.yaml#L25" target="_blank">https://github.com/jenkinsci/kubernetes-operator/blob/master/deploy/operator.yaml#L25</a></p>
+To achieve it change watch namespace in <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/deploy/operator.yaml#L25">https://github.com/jenkinsci/kubernetes-operator/blob/master/deploy/operator.yaml#L25</a></p>
 
 <h2 id="setup-jenkins-operator-and-jenkins-in-separated-namespaces">Setup Jenkins Operator and Jenkins in separated namespaces</h2>
 
@@ -724,7 +721,7 @@ $ kubectl -n jenkins apply -f role_binding_jenkins.yaml</code></pre></div>
 <div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ kubectl -n jenkins -n jenkins-operator apply -f deploy/operator.yaml</code></pre></div>
 <h2 id="report-a-security-vulnerability">Report a Security Vulnerability</h2>
 
-<p>If you find a vulnerability or any misconfiguration in Jenkins, please report it in the <a href="https://github.com/jenkinsci/kubernetes-operator/issues" target="_blank">issues</a>.</p>
+<p>If you find a vulnerability or any misconfiguration in Jenkins, please report it in the <a href="https://github.com/jenkinsci/kubernetes-operator/issues">issues</a>.</p>
 
         <div class="section-index">
     

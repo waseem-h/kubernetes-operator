@@ -13,9 +13,9 @@ This document explains how to setup your development environment.
 
 ## Prerequisites
 
-- [operator_sdk][operator_sdk] version v0.15.1
+- [operator_sdk][operator_sdk] version v0.17.0
 - [git][git_tool]
-- [go][go_tool] version v1.13+
+- [go][go_tool] version v1.14+
 - [goimports, golint, checkmake and staticcheck][install_dev_tools]
 - [minikube][minikube] version v1.1.0+ (preferred Hypervisor - [virtualbox][virtualbox])
 - [docker][docker_tool] version 17.03+
@@ -201,6 +201,12 @@ jenkins-example                           1/1     Running   0          15m
 seed-job-agent-example-56569459c9-l69qf   1/1     Running   0          12m
 
 ```
+
+Upon every next start of local **Jenkins Operator** switch first command with:
+```
+make minikube-start
+make minikube-run
+``` 
 
 ### Debug Jenkins Operator
 
