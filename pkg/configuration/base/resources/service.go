@@ -9,6 +9,7 @@ import (
 	stackerr "github.com/pkg/errors"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"net"
 	"strings"
@@ -18,7 +19,7 @@ import (
 const ServiceKind = "Service"
 
 // UpdateService returns new service with override fields from config
-func UpdateService(actual corev1.Service, config v1alpha2.Service) corev1.Service {
+func UpdateService(actual corev1.Service, config v1alpha2.Service, targetPort int32) corev1.Service {
 	actual.ObjectMeta.Annotations = config.Annotations
 	for key, value := range config.Labels {
 		actual.ObjectMeta.Labels[key] = value
@@ -30,6 +31,7 @@ func UpdateService(actual corev1.Service, config v1alpha2.Service) corev1.Servic
 		actual.Spec.Ports = []corev1.ServicePort{{}}
 	}
 	actual.Spec.Ports[0].Port = config.Port
+	actual.Spec.Ports[0].TargetPort = intstr.IntOrString{IntVal: targetPort, Type: intstr.Int}
 	if config.NodePort != 0 {
 		actual.Spec.Ports[0].NodePort = config.NodePort
 	}

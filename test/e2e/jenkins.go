@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
@@ -16,6 +17,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -235,4 +237,17 @@ func restartJenkinsMasterPod(t *testing.T, jenkins *v1alpha2.Jenkins) {
 		t.Fatal(err)
 	}
 	t.Log("Jenkins master pod has been restarted")
+}
+
+func getJenkinsService(t *testing.T, jenkins *v1alpha2.Jenkins, serviceKind string) *corev1.Service {
+	serviceName := constants.OperatorName + "-" + serviceKind + "-" + jenkins.ObjectMeta.Name
+	lo := metav1.ListOptions{
+		FieldSelector: fields.SelectorFromSet(fields.Set{"metadata.name": serviceName}).String(),
+	}
+	serviceList, err := framework.Global.KubeClient.CoreV1().Services(jenkins.Namespace).List(lo)
+
+	require.NoError(t, err)
+	require.Equal(t, 1, len(serviceList.Items), fmt.Sprintf("'%s' service not found", serviceName))
+
+	return &serviceList.Items[0]
 }

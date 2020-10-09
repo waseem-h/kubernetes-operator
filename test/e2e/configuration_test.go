@@ -10,6 +10,7 @@ import (
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
+	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 	"github.com/jenkinsci/kubernetes-operator/pkg/groovy"
 	"github.com/jenkinsci/kubernetes-operator/pkg/plugins"
 
@@ -20,6 +21,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const e2e = "e2e"
@@ -92,6 +94,7 @@ func TestConfiguration(t *testing.T) {
 	createKubernetesCredentialsProviderSecret(t, namespace, mySeedJob)
 	waitForJenkinsBaseConfigurationToComplete(t, jenkins)
 	verifyJenkinsMasterPodAttributes(t, jenkins)
+	verifyServices(t, jenkins)
 	jenkinsClient, cleanUpFunc := verifyJenkinsAPIConnection(t, jenkins, namespace)
 	defer cleanUpFunc()
 	verifyPlugins(t, jenkinsClient, jenkins)
@@ -368,6 +371,13 @@ if (!"%s".equals(Jenkins.instance.systemMessage)) {
 }`, systemMessage)
 	logs, err = jenkinsClient.ExecuteScript(checkConfigurationAsCode)
 	assert.NoError(t, err, logs)
+}
+
+func verifyServices(t *testing.T, jenkins *v1alpha2.Jenkins) {
+	jenkinsHTTPService := getJenkinsService(t, jenkins, "http")
+	jenkinsSlaveService := getJenkinsService(t, jenkins, "slave")
+	assert.Equal(t, intstr.IntOrString{IntVal: constants.DefaultHTTPPortInt32, Type: intstr.Int}, jenkinsHTTPService.Spec.Ports[0].TargetPort)
+	assert.Equal(t, intstr.IntOrString{IntVal: constants.DefaultSlavePortInt32, Type: intstr.Int}, jenkinsSlaveService.Spec.Ports[0].TargetPort)
 }
 
 func assertMapContainsElementsFromAnotherMap(t *testing.T, expected map[string]string, actual map[string]string) {
