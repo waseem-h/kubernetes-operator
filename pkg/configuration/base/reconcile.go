@@ -13,6 +13,7 @@ import (
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
+	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 	"github.com/jenkinsci/kubernetes-operator/pkg/groovy"
 	"github.com/jenkinsci/kubernetes-operator/pkg/log"
 	"github.com/jenkinsci/kubernetes-operator/pkg/notifications/reason"
@@ -175,12 +176,12 @@ func (r *ReconcileJenkinsBaseConfiguration) ensureResourcesRequiredForJenkinsPod
 	r.logger.V(log.VDebug).Info("Extra role bindings are present")
 
 	httpServiceName := resources.GetJenkinsHTTPServiceName(r.Configuration.Jenkins)
-	if err := r.createService(metaObject, httpServiceName, r.Configuration.Jenkins.Spec.Service); err != nil {
+	if err := r.createService(metaObject, httpServiceName, r.Configuration.Jenkins.Spec.Service, constants.DefaultHTTPPortInt32); err != nil {
 		return err
 	}
 	r.logger.V(log.VDebug).Info("Jenkins HTTP Service is present")
 
-	if err := r.createService(metaObject, resources.GetJenkinsSlavesServiceName(r.Configuration.Jenkins), r.Configuration.Jenkins.Spec.SlaveService); err != nil {
+	if err := r.createService(metaObject, resources.GetJenkinsSlavesServiceName(r.Configuration.Jenkins), r.Configuration.Jenkins.Spec.SlaveService, constants.DefaultSlavePortInt32); err != nil {
 		return err
 	}
 	r.logger.V(log.VDebug).Info("Jenkins slave Service is present")
