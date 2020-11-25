@@ -55,7 +55,7 @@ There is a option to use Helm to install the operator. It requires the Helm 3+ f
 Create a namespace for the operator:
 
 ```bash
-$ kubectl create -n <your-namespace>
+$ kubectl create namespace <your-namespace>
 ```
 
 To install, you need only to type these commands:
