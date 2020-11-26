@@ -1,7 +1,13 @@
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+# License 
 
+## Code   
+                     
+### Apache License
+
+Version 2.0, January 2004
+
+http://www.apache.org/licenses/
+                        
    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
    1. Definitions.
@@ -176,7 +182,6 @@
    END OF TERMS AND CONDITIONS
 
    APPENDIX: How to apply the Apache License to your work.
-
       To apply the Apache License to your work, attach the following
       boilerplate notice, with the fields enclosed by brackets "[]"
       replaced with your own identifying information. (Don't include
@@ -185,17 +190,24 @@
       file or class name and description of purpose be included on the
       same "printed page" as the copyright notice for easier
       identification within third-party archives.
-
    Copyright [yyyy] [name of copyright owner]
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
+   
+   http://www.apache.org/licenses/LICENSE-2.0
+   
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+## Content
+
+[Creative Commons Atribution-ShareAlike 4.0](Thttps://creativecommons.org/licenses/by-sa/4.0/) license applies, unless otherwise stated to the
+content created as part of this website, such as the Asciidoc or Markdown files
+inside of `website/content/`.
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
