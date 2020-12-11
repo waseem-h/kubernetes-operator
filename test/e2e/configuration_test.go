@@ -137,8 +137,8 @@ func TestPlugins(t *testing.T) {
 	require.NoError(t, err, job)
 	i, err := job.InvokeSimple(map[string]string{})
 	require.NoError(t, err, i)
-
-	waitForJobToFinish(t, job, 2*time.Second, 2*time.Minute)
+	// FIXME: waitForJobToFinish use
+	time.Sleep(80 * time.Second) // wait for the build to complete
 
 	job, err = jenkinsClient.GetJob(jobID)
 	require.NoError(t, err, job)

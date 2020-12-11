@@ -677,6 +677,7 @@ func (in *Plugin) DeepCopy() *Plugin {
 func (in *Restore) DeepCopyInto(out *Restore) {
 	*out = *in
 	in.Action.DeepCopyInto(&out.Action)
+	in.GetLatestAction.DeepCopyInto(&out.GetLatestAction)
 	return
 }
 

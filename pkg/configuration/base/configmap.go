@@ -24,7 +24,7 @@ func (r *ReconcileJenkinsBaseConfiguration) createInitConfigurationConfigMap(met
 }
 
 func (r *ReconcileJenkinsBaseConfiguration) createBaseConfigurationConfigMap(meta metav1.ObjectMeta) error {
-	configMap, err := resources.NewBaseConfigurationConfigMap(meta, r.Configuration.Jenkins)
+	configMap, err := resources.NewBaseConfigurationConfigMap(meta, r.Configuration.Jenkins, r.KubernetesClusterDomain)
 	if err != nil {
 		return err
 	}

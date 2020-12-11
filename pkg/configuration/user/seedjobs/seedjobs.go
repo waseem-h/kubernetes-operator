@@ -370,7 +370,7 @@ func (s *seedJobs) createAgent(jenkinsClient jenkinsclient.Jenkins, k8sClient cl
 		return err
 	}
 
-	deployment, err := agentDeployment(jenkinsManifest, namespace, agentName, secret)
+	deployment, err := agentDeployment(jenkinsManifest, namespace, agentName, secret, s.KubernetesClusterDomain)
 	if err != nil {
 		return err
 	}
@@ -392,14 +392,19 @@ func agentDeploymentName(jenkins v1alpha2.Jenkins, agentName string) string {
 	return fmt.Sprintf("%s-%s", agentName, jenkins.Name)
 }
 
-func agentDeployment(jenkins *v1alpha2.Jenkins, namespace string, agentName string, secret string) (*appsv1.Deployment, error) {
-	jenkinsSlavesServiceFQDN, err := resources.GetJenkinsSlavesServiceFQDN(jenkins)
+func agentDeployment(jenkins *v1alpha2.Jenkins, namespace string, agentName string, secret string, kubernetesDomainName string) (*appsv1.Deployment, error) {
+	jenkinsSlavesServiceFQDN, err := resources.GetJenkinsSlavesServiceFQDN(jenkins, kubernetesDomainName)
 	if err != nil {
 		return nil, err
 	}
-	jenkinsHTTPServiceFQDN, err := resources.GetJenkinsHTTPServiceFQDN(jenkins)
+	jenkinsHTTPServiceFQDN, err := resources.GetJenkinsHTTPServiceFQDN(jenkins, kubernetesDomainName)
 	if err != nil {
 		return nil, err
+	}
+
+	suffix := ""
+	if prefix, ok := resources.GetJenkinsOpts(*jenkins)["prefix"]; ok {
+		suffix = prefix
 	}
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -443,10 +448,10 @@ func agentDeployment(jenkins *v1alpha2.Jenkins, namespace string, agentName stri
 								},
 								{
 									Name: "JENKINS_URL",
-									Value: fmt.Sprintf("http://%s:%d",
+									Value: fmt.Sprintf("http://%s:%d%s",
 										jenkinsHTTPServiceFQDN,
 										jenkins.Spec.Service.Port,
-									),
+										suffix),
 								},
 								{
 									Name:  "JENKINS_AGENT_WORKDIR",

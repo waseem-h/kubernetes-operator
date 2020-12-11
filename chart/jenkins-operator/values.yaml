@@ -29,7 +29,7 @@ jenkins:
   # image is the name (and tag) of the Jenkins instance
   # Default: jenkins/jenkins:lts
   # It's recommended to use LTS (tag: "lts") version
-  image: jenkins/jenkins:lts
+  image: jenkins/jenkins:2.249.3-lts-alpine
 
   # env contains jenkins container environment variables
   env: []
@@ -63,34 +63,34 @@ jenkins:
   #
   # basePlugins:
   # - name: kubernetes
-  #   version: 1.18.3
+  #   version: 1.27.6
   # - name: workflow-job
-  #   version: "2.34"
+  #   version: "2.40"
   # - name: workflow-aggregator
   #   version: "2.6"
   # - name: git
-  #   version: 3.12.0
+  #   version: 4.4.5
   # - name: job-dsl
-  #   version: "1.76"
+  #   version: "1.77"
   # - name: configuration-as-code
-  #   version: "1.29"
+  #   version: "1.46"
   # - name: kubernetes-credentials-provider
-  #   version: 0.12.1
+  #   version: 0.15
   basePlugins:
     - name: kubernetes
-      version: "1.25.2"
+      version: "1.27.6"
     - name: workflow-job
-      version: "2.39"
+      version: "2.40"
     - name: workflow-aggregator
       version: "2.6"
     - name: git
-      version: "4.2.2"
+      version: "4.4.5"
     - name: job-dsl
       version: "1.77"
     - name: configuration-as-code
-      version: "1.38"
+      version: "1.46"
     - name: kubernetes-credentials-provider
-      version: "0.13"
+      version: "0.15"
 
   # plugins are plugins required by the user
   # You can define plugins here
@@ -100,7 +100,7 @@ jenkins:
   #
   # plugins:
   # - name: simple-theme-plugin
-  #   version: 0.5.1
+  #   version: "0.6"
   plugins: []
 
   # seedJobs is placeholder for jenkins seed jobs
@@ -159,7 +159,7 @@ jenkins:
 
     # image used by backup feature
     # By default using prebuilt backup PVC image by VirtusLab
-    image: virtuslab/jenkins-operator-backup-pvc:v0.0.8
+    image: virtuslab/jenkins-operator-backup-pvc:v0.1.0
 
     # containerName is backup container name
     containerName: backup
@@ -177,6 +177,9 @@ jenkins:
     # restoreCommand is backup restore command
     restoreCommand:
       - /home/user/bin/restore.sh
+
+    getLatestAction:
+      - /home/user/bin/get-latest.sh
 
     # pvc is Persistent Volume Claim Kubernetes resource
     pvc:

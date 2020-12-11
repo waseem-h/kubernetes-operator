@@ -21,6 +21,7 @@ type ReconcileJenkins struct {
 	clientSet                    kubernetes.Clientset
 	config                       rest.Config
 	notificationEvents           *chan event.Event
+	KubernetesClusterDomain      string
 }
 
 func (r *ReconcileJenkins) newReconcilierConfiguration(jenkins *v1alpha2.Jenkins) configuration.Configuration {
@@ -32,12 +33,13 @@ func (r *ReconcileJenkins) newReconcilierConfiguration(jenkins *v1alpha2.Jenkins
 		Scheme:                       r.scheme,
 		Config:                       &r.config,
 		JenkinsAPIConnectionSettings: r.jenkinsAPIConnectionSettings,
+		KubernetesClusterDomain:      r.KubernetesClusterDomain,
 	}
 	return config
 }
 
 // newReconciler returns a newReconcilierConfiguration reconcile.Reconciler.
-func newReconciler(mgr manager.Manager, jenkinsAPIConnectionSettings jenkinsclient.JenkinsAPIConnectionSettings, clientSet kubernetes.Clientset, config rest.Config, notificationEvents *chan event.Event) reconcile.Reconciler {
+func newReconciler(mgr manager.Manager, jenkinsAPIConnectionSettings jenkinsclient.JenkinsAPIConnectionSettings, kubernetesClusterDomain string, clientSet kubernetes.Clientset, config rest.Config, notificationEvents *chan event.Event) reconcile.Reconciler {
 	return &ReconcileJenkins{
 		client:                       mgr.GetClient(),
 		scheme:                       mgr.GetScheme(),
@@ -45,5 +47,6 @@ func newReconciler(mgr manager.Manager, jenkinsAPIConnectionSettings jenkinsclie
 		clientSet:                    clientSet,
 		config:                       config,
 		notificationEvents:           notificationEvents,
+		KubernetesClusterDomain:      kubernetesClusterDomain,
 	}
 }

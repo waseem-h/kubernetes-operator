@@ -13,7 +13,6 @@ import (
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
 
-	"github.com/bndr/gojenkins"
 	framework "github.com/operator-framework/operator-sdk/pkg/test"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -33,28 +32,6 @@ var (
 
 // checkConditionFunc is used to check if a condition for the jenkins CR is set
 type checkConditionFunc func(*v1alpha2.Jenkins, error) bool
-
-func waitForJobToFinish(t *testing.T, job *gojenkins.Job, tick, timeout time.Duration) {
-	err := try.Until(func() (end bool, err error) {
-		t.Logf("Waiting for job `%s` to finish", job.GetName())
-		running, err := job.IsRunning()
-		if err != nil {
-			return false, err
-		}
-
-		queued, err := job.IsQueued()
-		if err != nil {
-			return false, err
-		}
-
-		if !running && !queued {
-			return true, nil
-		}
-
-		return false, nil
-	}, tick, timeout)
-	require.NoError(t, err)
-}
 
 func waitForJenkinsBaseConfigurationToComplete(t *testing.T, jenkins *v1alpha2.Jenkins) {
 	t.Log("Waiting for Jenkins base configuration to complete")

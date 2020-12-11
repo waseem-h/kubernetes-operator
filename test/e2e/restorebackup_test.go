@@ -42,13 +42,24 @@ func TestBackupAndRestore(t *testing.T) {
 	// FIXME: waitForJobToFinish use
 	time.Sleep(60 * time.Second) // wait for the build to complete
 
+	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
+	lastDoneBackup := jenkins.Status.LastBackup
 	restartJenkinsMasterPod(t, jenkins)
 	waitForRecreateJenkinsMasterPod(t, jenkins)
 	waitForJenkinsUserConfigurationToComplete(t, jenkins)
+	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
+	assert.Equal(t, lastDoneBackup, jenkins.Status.RestoredBackup)
 	jenkinsClient2, cleanUpFunc2 := verifyJenkinsAPIConnection(t, jenkins, namespace)
 	defer cleanUpFunc2()
 	waitForJob(t, jenkinsClient2, jobID)
 	verifyJobBuildsAfterRestoreBackup(t, jenkinsClient2, jobID)
+
+	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
+	lastDoneBackup = jenkins.Status.LastBackup
+	resetJenkinsStatus(t, jenkins)
+	waitForJenkinsUserConfigurationToComplete(t, jenkins)
+	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
+	assert.Equal(t, lastDoneBackup, jenkins.Status.RestoredBackup)
 }
 
 func waitForJob(t *testing.T, jenkinsClient client.Jenkins, jobID string) {
@@ -106,6 +117,11 @@ func createJenkinsWithBackupAndRestoreConfigured(t *testing.T, name, namespace s
 			},
 			Restore: v1alpha2.Restore{
 				ContainerName: containerName,
+				GetLatestAction: v1alpha2.Handler{
+					Exec: &corev1.ExecAction{
+						Command: []string{"/home/user/bin/get-latest.sh"},
+					},
+				},
 				Action: v1alpha2.Handler{
 					Exec: &corev1.ExecAction{
 						Command: []string{"/home/user/bin/restore.sh"},
@@ -125,7 +141,7 @@ func createJenkinsWithBackupAndRestoreConfigured(t *testing.T, name, namespace s
 					},
 					{
 						Name:            containerName,
-						Image:           "virtuslab/jenkins-operator-backup-pvc:v0.0.6",
+						Image:           "virtuslab/jenkins-operator-backup-pvc:v0.1.0",
 						ImagePullPolicy: corev1.PullIfNotPresent,
 						Env: []corev1.EnvVar{
 							{
@@ -190,4 +206,11 @@ func createJenkinsWithBackupAndRestoreConfigured(t *testing.T, name, namespace s
 	require.NoError(t, err)
 
 	return jenkins
+}
+
+func resetJenkinsStatus(t *testing.T, jenkins *v1alpha2.Jenkins) {
+	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
+	jenkins.Status = v1alpha2.JenkinsStatus{}
+	err := framework.Global.Client.Update(context.TODO(), jenkins)
+	require.NoError(t, err)
 }
