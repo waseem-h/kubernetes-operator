@@ -72,6 +72,7 @@ func main() {
 	port := pflag.Int("jenkins-api-port", 0, "The port on which Jenkins API is running. Note: If you want to use nodePort don't set this setting and --jenkins-api-use-nodeport must be true.")
 	useNodePort := pflag.Bool("jenkins-api-use-nodeport", false, "Connect to Jenkins API using the service nodePort instead of service port. If you want to set this as true - don't set --jenkins-api-port.")
 	debug := pflag.Bool("debug", false, "Set log level to debug")
+	kubernetesClusterDomain := pflag.String("cluster-domain", "cluster.local", "Use custom domain name instead of 'cluster.local'.")
 	pflag.Parse()
 
 	log.SetupLogger(*debug)
@@ -136,8 +137,13 @@ func main() {
 		fatal(errors.Wrap(err, "invalid command line parameters"), *debug)
 	}
 
+	// validate kubernetes cluster domain
+	if *kubernetesClusterDomain == "" {
+		fatal(errors.Wrap(err, "Kubernetes cluster domain can't be empty"), *debug)
+	}
+
 	// setup Jenkins controller
-	if err := jenkins.Add(mgr, jenkinsAPIConnectionSettings, *clientSet, *cfg, &c); err != nil {
+	if err := jenkins.Add(mgr, jenkinsAPIConnectionSettings, *kubernetesClusterDomain, *clientSet, *cfg, &c); err != nil {
 		fatal(errors.Wrap(err, "failed to setup controllers"), *debug)
 	}
 	// setup JenkinsImage controller

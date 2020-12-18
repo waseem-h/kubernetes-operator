@@ -50,8 +50,8 @@ func GetJenkinsSlavesServiceName(jenkins *v1alpha2.Jenkins) string {
 }
 
 // GetJenkinsHTTPServiceFQDN returns Kubernetes service FQDN used for expose Jenkins HTTP endpoint
-func GetJenkinsHTTPServiceFQDN(jenkins *v1alpha2.Jenkins) (string, error) {
-	clusterDomain, err := getClusterDomain()
+func GetJenkinsHTTPServiceFQDN(jenkins *v1alpha2.Jenkins, kubernetesClusterDomain string) (string, error) {
+	clusterDomain, err := getClusterDomain(kubernetesClusterDomain)
 	if err != nil {
 		return "", err
 	}
@@ -60,8 +60,8 @@ func GetJenkinsHTTPServiceFQDN(jenkins *v1alpha2.Jenkins) (string, error) {
 }
 
 // GetJenkinsSlavesServiceFQDN returns Kubernetes service FQDN used for expose Jenkins slave endpoint
-func GetJenkinsSlavesServiceFQDN(jenkins *v1alpha2.Jenkins) (string, error) {
-	clusterDomain, err := getClusterDomain()
+func GetJenkinsSlavesServiceFQDN(jenkins *v1alpha2.Jenkins, kubernetesClusterDomain string) (string, error) {
+	clusterDomain, err := getClusterDomain(kubernetesClusterDomain)
 	if err != nil {
 		return "", err
 	}
@@ -70,12 +70,12 @@ func GetJenkinsSlavesServiceFQDN(jenkins *v1alpha2.Jenkins) (string, error) {
 }
 
 // GetClusterDomain returns Kubernetes cluster domain, default to "cluster.local"
-func getClusterDomain() (string, error) {
-	clusterDomain := "cluster.local"
-
-	if ok, err := isRunningInCluster(); !ok {
-		return clusterDomain, nil
-	} else if err != nil {
+func getClusterDomain(kubernetesClusterDomain string) (string, error) {
+	isRunningInCluster, err := isRunningInCluster()
+	if !isRunningInCluster {
+		return kubernetesClusterDomain, nil
+	}
+	if err != nil {
 		return "", nil
 	}
 
@@ -86,11 +86,11 @@ func getClusterDomain() (string, error) {
 		return "", stackerr.WithStack(err)
 	}
 
-	clusterDomain = strings.TrimPrefix(cname, "kubernetes.default.svc")
-	clusterDomain = strings.TrimPrefix(clusterDomain, ".")
-	clusterDomain = strings.TrimSuffix(clusterDomain, ".")
+	kubernetesClusterDomain = strings.TrimPrefix(cname, "kubernetes.default.svc")
+	kubernetesClusterDomain = strings.TrimPrefix(kubernetesClusterDomain, ".")
+	kubernetesClusterDomain = strings.TrimSuffix(kubernetesClusterDomain, ".")
 
-	return clusterDomain, nil
+	return kubernetesClusterDomain, nil
 }
 
 func isRunningInCluster() (bool, error) {
@@ -99,7 +99,7 @@ func isRunningInCluster() (bool, error) {
 		if err == k8sutil.ErrNoNamespace || err == k8sutil.ErrRunLocal {
 			return false, nil
 		}
-		return true, nil
+		return false, stackerr.WithStack(err)
 	}
-	return false, stackerr.WithStack(err)
+	return true, nil
 }

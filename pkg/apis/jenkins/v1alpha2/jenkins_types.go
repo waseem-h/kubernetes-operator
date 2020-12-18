@@ -626,6 +626,11 @@ type Restore struct {
 	// Action defines action which performs restore backup in restore container sidecar
 	Action Handler `json:"action"`
 
+	// GetLatestAction defines action which returns the latest backup number. If there is no backup "-1" should be
+	// returned.
+	// +optional
+	GetLatestAction Handler `json:"getLatestAction"`
+
 	// RecoveryOnce if want to restore specific backup set this field and then Jenkins will be restarted and desired backup will be restored
 	// +optional
 	RecoveryOnce uint64 `json:"recoveryOnce,omitempty"`

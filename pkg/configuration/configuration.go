@@ -36,6 +36,7 @@ type Configuration struct {
 	Scheme                       *runtime.Scheme
 	Config                       *rest.Config
 	JenkinsAPIConnectionSettings jenkinsclient.JenkinsAPIConnectionSettings
+	KubernetesClusterDomain      string
 }
 
 // RestartJenkinsMasterPod terminate Jenkins master pod and notifies about it.
