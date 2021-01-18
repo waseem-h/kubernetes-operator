@@ -1,10 +1,10 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Jenkins Operator – Latest (v0.4.x)</title>
+    <title>Jenkins Operator – Latest (v0.5.x)</title>
     <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/</link>
     <description>Recent Hugo news from gohugo.io</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 13 Apr 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 Jan 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://jenkinsci.github.io/kubernetes-operator/img/hugo.png</url>
       <title>GoHugo.io</title>
@@ -22,7 +22,7 @@
     <item>
       <title>Docs: Deploy Jenkins</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/deploy-jenkins/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/deploy-jenkins/</guid>
       <description>
@@ -94,7 +94,7 @@ kubectl get secret jenkins-operator-credentials-&amp;lt;cr_name&amp;gt; -o &lt;s
     <item>
       <title>Docs: Configuration</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/</guid>
       <description>
@@ -377,7 +377,7 @@ stringData:
     <item>
       <title>Docs: Customization</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/customization/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/customization/</guid>
       <description>
@@ -556,7 +556,7 @@ The secrets are loaded to &lt;code&gt;secrets&lt;/code&gt; map.&lt;/p&gt;
     <item>
       <title>Docs: AKS</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/aks/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/aks/</guid>
       <description>
@@ -580,7 +580,7 @@ restart of a Jenkins pod over and over again.&lt;/p&gt;
     <item>
       <title>Docs: Configure backup and restore</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/</guid>
       <description>
@@ -662,7 +662,7 @@ restart of a Jenkins pod over and over again.&lt;/p&gt;
     <item>
       <title>Docs: Custom Backup and Restore Providers</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/custom-backup-and-restore/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/custom-backup-and-restore/</guid>
       <description>
@@ -845,7 +845,7 @@ the number of backups under control, e.g. Cloud Formation fragment:&lt;/p&gt;
     <item>
       <title>Docs: Notifications</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/notifications/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/notifications/</guid>
       <description>
@@ -1050,7 +1050,7 @@ OpenShift oauth authentication. By default, the jenkins http service is named
     <item>
       <title>Docs: Diagnostics</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/diagnostics/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/diagnostics/</guid>
       <description>
@@ -1077,7 +1077,7 @@ kubectl apply -f deploy/operator.yaml&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
     <item>
       <title>Docs: Schema</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/</link>
-      <pubDate>Mon, 13 Apr 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
       <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/schema/</guid>
       <description>
@@ -2375,19 +2375,19 @@ More info: &lt;a href=&#34;https://kubernetes.io/docs/concepts/storage/volumes&#
 &lt;p&gt;BasePlugins contains plugins required by operator
 Defaults to :
 - name: kubernetes
-version: 1.25.2
+version: &amp;ldquo;1.28.6&amp;rdquo;
 - name: workflow-job
-version: &amp;ldquo;2.39&amp;rdquo;
+version: &amp;ldquo;2.40&amp;rdquo;
 - name: workflow-aggregator
 version: &amp;ldquo;2.6&amp;rdquo;
 - name: git
-version: 4.2.2
+version: &amp;ldquo;4.5.0&amp;rdquo;
 - name: job-dsl
 version: &amp;ldquo;1.77&amp;rdquo;
 - name: configuration-as-code
-version: &amp;ldquo;1.38&amp;rdquo;
+version: &amp;ldquo;1.46&amp;rdquo;
 - name: kubernetes-credentials-provider
-version: 0.13&lt;/p&gt;
+version: &amp;ldquo;0.15&amp;rdquo;&lt;/p&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -3120,6 +3120,21 @@ Handler
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td&gt;
+&lt;code&gt;getLatestAction&lt;/code&gt;&lt;/br&gt;
+&lt;em&gt;
+&lt;a href=&#34;#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Handler&#34;&gt;
+Handler
+&lt;/a&gt;
+&lt;/em&gt;
+&lt;/td&gt;
+&lt;td&gt;
+&lt;em&gt;(Optional)&lt;/em&gt;
+&lt;p&gt;GetLatestAction defines action which returns the latest backup number. If there is no backup &amp;ldquo;-1&amp;rdquo; should be
+returned.&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;
 &lt;code&gt;recoveryOnce&lt;/code&gt;&lt;/br&gt;
 &lt;em&gt;
 uint64
@@ -3703,7 +3718,7 @@ SecretKeySelector
 &lt;hr/&gt;
 &lt;p&gt;&lt;em&gt;
 Generated with &lt;code&gt;gen-crd-api-reference-docs&lt;/code&gt;
-on git commit &lt;code&gt;1c853e69&lt;/code&gt;.
+on git commit &lt;code&gt;fe81e5a&lt;/code&gt;.
 &lt;/em&gt;&lt;/p&gt;
 
       </description>
