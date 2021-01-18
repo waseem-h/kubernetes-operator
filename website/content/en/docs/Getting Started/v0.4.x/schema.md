@@ -2,7 +2,7 @@
 title: "Schema"
 linkTitle: "Schema"
 weight: 40
-date: 2021-01-18
+date: 2020-04-13
 description: >
   API Schema definitions for Jenkins CRD
 ---
@@ -1295,19 +1295,19 @@ More info: <a href="https://kubernetes.io/docs/concepts/storage/volumes">https:/
 <p>BasePlugins contains plugins required by operator
 Defaults to :
 - name: kubernetes
-version: &ldquo;1.28.6&rdquo;
+version: 1.25.2
 - name: workflow-job
-version: &ldquo;2.40&rdquo;
+version: &ldquo;2.39&rdquo;
 - name: workflow-aggregator
 version: &ldquo;2.6&rdquo;
 - name: git
-version: &ldquo;4.5.0&rdquo;
+version: 4.2.2
 - name: job-dsl
 version: &ldquo;1.77&rdquo;
 - name: configuration-as-code
-version: &ldquo;1.46&rdquo;
+version: &ldquo;1.38&rdquo;
 - name: kubernetes-credentials-provider
-version: &ldquo;0.15&rdquo;</p>
+version: 0.13</p>
 </td>
 </tr>
 <tr>
@@ -2040,21 +2040,6 @@ Handler
 </tr>
 <tr>
 <td>
-<code>getLatestAction</code></br>
-<em>
-<a href="#github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2.Handler">
-Handler
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>GetLatestAction defines action which returns the latest backup number. If there is no backup &ldquo;-1&rdquo; should be
-returned.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>recoveryOnce</code></br>
 <em>
 uint64
@@ -2638,5 +2623,5 @@ SecretKeySelector
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>
-on git commit <code>fe81e5a</code>.
+on git commit <code>1c853e69</code>.
 </em></p>
