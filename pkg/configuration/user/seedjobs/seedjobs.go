@@ -8,9 +8,8 @@ import (
 	"reflect"
 	"text/template"
 
-	"github.com/go-logr/logr"
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	"github.com/jenkinsci/kubernetes-operator/internal/render"
-	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
@@ -18,6 +17,8 @@ import (
 	"github.com/jenkinsci/kubernetes-operator/pkg/groovy"
 	"github.com/jenkinsci/kubernetes-operator/pkg/log"
 	"github.com/jenkinsci/kubernetes-operator/pkg/notifications/reason"
+
+	"github.com/go-logr/logr"
 	stackerr "github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -228,7 +229,7 @@ func (s *seedJobs) EnsureSeedJobs(jenkins *v1alpha2.Jenkins) (done bool, err err
 	seedJobIDs := s.getAllSeedJobIDs(*jenkins)
 	if !reflect.DeepEqual(seedJobIDs, jenkins.Status.CreatedSeedJobs) {
 		jenkins.Status.CreatedSeedJobs = seedJobIDs
-		return false, stackerr.WithStack(s.Client.Update(context.TODO(), jenkins))
+		return false, stackerr.WithStack(s.Client.Status().Update(context.TODO(), jenkins))
 	}
 
 	return true, nil
@@ -267,8 +268,15 @@ func (s *seedJobs) createJobs(jenkins *v1alpha2.Jenkins) (requeue bool, err erro
 		}
 
 		hash := sha256.New()
-		hash.Write([]byte(groovyScript))
-		hash.Write([]byte(credentialValue))
+		_, err = hash.Write([]byte(groovyScript))
+		if err != nil {
+			return true, err
+		}
+		_, err = hash.Write([]byte(credentialValue))
+		if err != nil {
+			return true, err
+		}
+
 		requeue, err := groovyClient.EnsureSingle(seedJob.ID, fmt.Sprintf("%s.groovy", seedJob.ID), base64.URLEncoding.EncodeToString(hash.Sum(nil)), groovyScript)
 		if err != nil {
 			return true, err

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration"
 
 	"github.com/stretchr/testify/assert"
@@ -57,6 +57,10 @@ func TestValidateSeedJobs(t *testing.T) {
 		Name:      "deploy-keys",
 		Namespace: "default",
 	}
+	jenkinsObjectMeta := metav1.ObjectMeta{
+		Name:      "cr",
+		Namespace: "default",
+	}
 	t.Run("Valid with public repository and without private key", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
 			Spec: v1alpha2.JenkinsSpec{
@@ -73,7 +77,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -102,7 +106,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -120,6 +124,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Valid with private key and secret", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -141,7 +146,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				PrivateKeySecretKey: []byte(fakePrivateKey),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -160,6 +165,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Invalid private key in secret", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -181,7 +187,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				PrivateKeySecretKey: []byte(fakeInvalidPrivateKey),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -201,6 +207,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Invalid with PrivateKey and empty Secret data", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -222,7 +229,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				PrivateKeySecretKey: []byte(""),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -256,7 +263,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -286,7 +293,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -316,7 +323,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -346,7 +353,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -364,6 +371,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Valid with username and password", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -385,7 +393,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				PasswordSecretKey: []byte("some-password"),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -404,6 +412,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Invalid with empty username", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -425,7 +434,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				PasswordSecretKey: []byte("some-password"),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -445,6 +454,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Invalid with empty password", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -466,7 +476,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				PasswordSecretKey: []byte(""),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -486,6 +496,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Invalid without username", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -506,7 +517,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				PasswordSecretKey: []byte("some-password"),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -526,6 +537,7 @@ func TestValidateSeedJobs(t *testing.T) {
 	})
 	t.Run("Invalid without password", func(t *testing.T) {
 		jenkins := v1alpha2.Jenkins{
+			ObjectMeta: jenkinsObjectMeta,
 			Spec: v1alpha2.JenkinsSpec{
 				SeedJobs: []v1alpha2.SeedJob{
 					{
@@ -546,7 +558,7 @@ func TestValidateSeedJobs(t *testing.T) {
 				UsernameSecretKey: []byte("some-username"),
 			},
 		}
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 		err := fakeClient.Create(context.TODO(), secret)
 		assert.NoError(t, err)
 
@@ -581,7 +593,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -615,7 +627,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -647,7 +659,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -685,7 +697,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -717,7 +729,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,
@@ -755,7 +767,7 @@ func TestValidateSeedJobs(t *testing.T) {
 			},
 		}
 
-		fakeClient := fake.NewFakeClient()
+		fakeClient := fake.NewClientBuilder().Build()
 
 		config := configuration.Configuration{
 			Client:        fakeClient,

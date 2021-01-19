@@ -3,7 +3,8 @@ package resources
 import (
 	"fmt"
 
-	jenkinsv1alpha2 "github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -32,7 +33,7 @@ RUN install-plugins.sh %s `
 var log = logf.Log.WithName("controller_jenkinsimage")
 
 // NewBuilderPod returns a busybox pod with the same name/namespace as the cr.
-func NewBuilderPod(cr *jenkinsv1alpha2.JenkinsImage) *corev1.Pod {
+func NewBuilderPod(cr *v1alpha2.JenkinsImage) *corev1.Pod {
 	name := fmt.Sprintf(NameWithSuffixFormat, cr.Name, BuilderSuffix)
 	args := []string{BuilderDockerfileArg, BuilderContextDirArg, BuilderPushArg, BuilderDigestFileArg}
 	volumes := getVolumes(cr)
@@ -59,7 +60,7 @@ func NewBuilderPod(cr *jenkinsv1alpha2.JenkinsImage) *corev1.Pod {
 }
 
 // NewDockerfileConfigMap returns a busybox pod with the same name/namespace as the cr.
-func NewDockerfileConfigMap(cr *jenkinsv1alpha2.JenkinsImage) *corev1.ConfigMap {
+func NewDockerfileConfigMap(cr *v1alpha2.JenkinsImage) *corev1.ConfigMap {
 	dockerfileContent := fmt.Sprintf(DockerfileTemplate, getDefaultedBaseImage(cr), getPluginsList(cr))
 	name := fmt.Sprintf(NameWithSuffixFormat, cr.Name, DockerfileNameSuffix)
 	data := map[string]string{DockerfileName: dockerfileContent}
@@ -73,7 +74,7 @@ func NewDockerfileConfigMap(cr *jenkinsv1alpha2.JenkinsImage) *corev1.ConfigMap 
 	return dockerfile
 }
 
-func getPluginsList(cr *jenkinsv1alpha2.JenkinsImage) string {
+func getPluginsList(cr *v1alpha2.JenkinsImage) string {
 	logger := log.WithName("jenkinsimage_getPluginsList")
 	plugins := ""
 	for _, v := range cr.Spec.Plugins {
@@ -83,14 +84,14 @@ func getPluginsList(cr *jenkinsv1alpha2.JenkinsImage) string {
 	return plugins
 }
 
-func getDefaultedBaseImage(cr *jenkinsv1alpha2.JenkinsImage) string {
+func getDefaultedBaseImage(cr *v1alpha2.JenkinsImage) string {
 	if len(cr.Spec.BaseImage.Name) != 0 {
 		return cr.Spec.BaseImage.Name
 	}
 	return JenkinsImageDefaultBaseImage
 }
 
-func getVolumes(cr *jenkinsv1alpha2.JenkinsImage) []corev1.Volume {
+func getVolumes(cr *v1alpha2.JenkinsImage) []corev1.Volume {
 	name := fmt.Sprintf(NameWithSuffixFormat, cr.Name, DockerfileStorageSuffix)
 	storage := corev1.Volume{
 		Name: name,
@@ -112,7 +113,7 @@ func getVolumes(cr *jenkinsv1alpha2.JenkinsImage) []corev1.Volume {
 	return volumes
 }
 
-func getVolumesMounts(cr *jenkinsv1alpha2.JenkinsImage) []corev1.VolumeMount {
+func getVolumesMounts(cr *v1alpha2.JenkinsImage) []corev1.VolumeMount {
 	name := fmt.Sprintf(NameWithSuffixFormat, cr.Name, DockerfileStorageSuffix)
 	storage := corev1.VolumeMount{
 		Name:      name,
