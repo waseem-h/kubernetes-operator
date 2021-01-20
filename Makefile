@@ -173,7 +173,7 @@ install: ## Installs the executable
 .PHONY: run
 run: export WATCH_NAMESPACE = $(NAMESPACE)
 run: export OPERATOR_NAME = $(NAME)
-run: fmt vet manifests install build ## Run the executable, you can use EXTRA_ARGS
+run: fmt vet manifests install-crds build ## Run the executable, you can use EXTRA_ARGS
 	@echo "+ $@"
 ifeq ($(KUBERNETES_PROVIDER),minikube)
 	kubectl config use-context $(KUBECTL_CONTEXT)
@@ -422,7 +422,7 @@ generate-docs: ## Re-generate docs directory from the website directory
 ##################### FROM OPERATOR SDK ########################
 #TODO rename
 # Install CRDs into a cluster
-install: manifests kustomize
+install-crds: manifests kustomize
 	$(KUSTOMIZE) build config/crd | kubectl apply -f -
 
 # Uninstall CRDs from a cluster
@@ -473,3 +473,10 @@ bundle: manifests kustomize
 .PHONY: bundle-build
 bundle-build:
 	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+
+#FIXME temporary target for running tests (test used above for go test)
+ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+testing: generate fmt vet manifests
+	mkdir -p ${ENVTEST_ASSETS_DIR}
+	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0/hack/setup-envtest.sh
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out

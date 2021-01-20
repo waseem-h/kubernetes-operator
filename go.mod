@@ -10,6 +10,8 @@ require (
 	github.com/go-logr/zapr v0.2.0
 	github.com/golang/mock v1.4.1
 	github.com/mailgun/mailgun-go/v3 v3.6.4
+	github.com/onsi/ginkgo v1.14.1
+	github.com/onsi/gomega v1.10.2
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/openshift/api v3.9.0+incompatible
 	github.com/pkg/errors v0.9.1
@@ -20,7 +22,6 @@ require (
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
-	k8s.io/cli-runtime v0.20.2 // indirect
 	k8s.io/client-go v0.20.2
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920
 	sigs.k8s.io/controller-runtime v0.7.0
