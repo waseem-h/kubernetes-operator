@@ -3,25 +3,24 @@ package e2e
 import (
 	"context"
 	"fmt"
-	"testing"
 
-	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
 	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 
-	framework "github.com/operator-framework/operator-sdk/pkg/test"
-	"github.com/stretchr/testify/require"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -29,31 +28,25 @@ const (
 	userConfigurationSecretName    = "user-secret"
 )
 
-func getJenkins(t *testing.T, namespace, name string) *v1alpha2.Jenkins {
+func getJenkins(namespace, name string) *v1alpha2.Jenkins {
 	jenkins := &v1alpha2.Jenkins{}
 	namespaceName := types.NamespacedName{Namespace: namespace, Name: name}
-	if err := framework.Global.Client.Get(context.TODO(), namespaceName, jenkins); err != nil {
-		t.Fatal(err)
-	}
-
+	Expect(k8sClient.Get(context.TODO(), namespaceName, jenkins)).Should(Succeed())
 	return jenkins
 }
 
-func getJenkinsMasterPod(t *testing.T, jenkins *v1alpha2.Jenkins) *corev1.Pod {
-	lo := metav1.ListOptions{
-		LabelSelector: labels.SelectorFromSet(resources.GetJenkinsMasterPodLabels(*jenkins)).String(),
+func getJenkinsMasterPod(jenkins *v1alpha2.Jenkins) *corev1.Pod {
+	lo := &client.ListOptions{
+		LabelSelector: labels.SelectorFromSet(resources.GetJenkinsMasterPodLabels(*jenkins)),
+		Namespace:     jenkins.Namespace,
 	}
-	podList, err := framework.Global.KubeClient.CoreV1().Pods(jenkins.ObjectMeta.Namespace).List(lo)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(podList.Items) != 1 {
-		t.Fatalf("Jenkins pod not found, pod list: %+v", podList)
-	}
-	return &podList.Items[0]
+	pods := &corev1.PodList{}
+	Expect(k8sClient.List(context.TODO(), pods, lo)).Should(Succeed())
+	Expect(pods.Items).Should(HaveLen(1), fmt.Sprintf("Jenkins pod not found, pod list: %+v", pods.Items))
+	return &pods.Items[0]
 }
 
-func createJenkinsCR(t *testing.T, name, namespace string, seedJob *[]v1alpha2.SeedJob, groovyScripts v1alpha2.GroovyScripts, casc v1alpha2.ConfigurationAsCode, priorityClassName string) *v1alpha2.Jenkins {
+func createJenkinsCR(name, namespace string, seedJob *[]v1alpha2.SeedJob, groovyScripts v1alpha2.GroovyScripts, casc v1alpha2.ConfigurationAsCode, priorityClassName string) *v1alpha2.Jenkins {
 	var seedJobs []v1alpha2.SeedJob
 	if seedJob != nil {
 		seedJobs = append(seedJobs, *seedJob...)
@@ -90,6 +83,8 @@ func createJenkinsCR(t *testing.T, name, namespace string, seedJob *[]v1alpha2.S
 							InitialDelaySeconds: int32(80),
 							TimeoutSeconds:      int32(4),
 							FailureThreshold:    int32(10),
+							SuccessThreshold:    int32(1),
+							PeriodSeconds:       int32(1),
 						},
 						LivenessProbe: &corev1.Probe{
 							Handler: corev1.Handler{
@@ -102,6 +97,8 @@ func createJenkinsCR(t *testing.T, name, namespace string, seedJob *[]v1alpha2.S
 							InitialDelaySeconds: int32(80),
 							TimeoutSeconds:      int32(4),
 							FailureThreshold:    int32(10),
+							SuccessThreshold:    int32(1),
+							PeriodSeconds:       int32(1),
 						},
 						VolumeMounts: []corev1.VolumeMount{
 							{
@@ -146,25 +143,23 @@ func createJenkinsCR(t *testing.T, name, namespace string, seedJob *[]v1alpha2.S
 			Name:     resources.GetResourceName(jenkins),
 		},
 	}
-	updateJenkinsCR(t, jenkins)
+	updateJenkinsCR(jenkins)
 
-	t.Logf("Jenkins CR %+v", *jenkins)
-	if err := framework.Global.Client.Create(context.TODO(), jenkins, nil); err != nil {
-		t.Fatal(err)
-	}
+	_, _ = fmt.Fprintf(GinkgoWriter, "Jenkins CR %+v\n", *jenkins)
+
+	Expect(k8sClient.Create(context.TODO(), jenkins)).Should(Succeed())
 
 	return jenkins
 }
 
-func createJenkinsAPIClientFromServiceAccount(t *testing.T, jenkins *v1alpha2.Jenkins, jenkinsAPIURL string) (jenkinsclient.Jenkins, error) {
-	t.Log("Creating Jenkins API client from service account")
+func createJenkinsAPIClientFromServiceAccount(jenkins *v1alpha2.Jenkins, jenkinsAPIURL string) (jenkinsclient.Jenkins, error) {
 	podName := resources.GetJenkinsMasterPodName(jenkins)
 
-	clientSet, err := kubernetes.NewForConfig(framework.Global.KubeConfig)
+	clientSet, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		return nil, err
 	}
-	config := configuration.Configuration{Jenkins: jenkins, ClientSet: *clientSet, Config: framework.Global.KubeConfig}
+	config := configuration.Configuration{Jenkins: jenkins, ClientSet: *clientSet, Config: cfg}
 	r := base.New(config, jenkinsclient.JenkinsAPIConnectionSettings{})
 
 	token, _, err := r.Configuration.Exec(podName, resources.JenkinsMasterContainerName, []string{"cat", "/var/run/secrets/kubernetes.io/serviceaccount/token"})
@@ -175,12 +170,12 @@ func createJenkinsAPIClientFromServiceAccount(t *testing.T, jenkins *v1alpha2.Je
 	return jenkinsclient.NewBearerTokenAuthorization(jenkinsAPIURL, token.String())
 }
 
-func createJenkinsAPIClientFromSecret(t *testing.T, jenkins *v1alpha2.Jenkins, jenkinsAPIURL string) (jenkinsclient.Jenkins, error) {
-	t.Log("Creating Jenkins API client from secret")
+func createJenkinsAPIClientFromSecret(jenkins *v1alpha2.Jenkins, jenkinsAPIURL string) (jenkinsclient.Jenkins, error) {
+	_, _ = fmt.Fprintf(GinkgoWriter, "Creating Jenkins API client from secret\n")
 
 	adminSecret := &corev1.Secret{}
 	namespaceName := types.NamespacedName{Namespace: jenkins.Namespace, Name: resources.GetOperatorCredentialsSecretName(jenkins)}
-	if err := framework.Global.Client.Get(context.TODO(), namespaceName, adminSecret); err != nil {
+	if err := k8sClient.Get(context.TODO(), namespaceName, adminSecret); err != nil {
 		return nil, err
 	}
 
@@ -191,19 +186,19 @@ func createJenkinsAPIClientFromSecret(t *testing.T, jenkins *v1alpha2.Jenkins, j
 	)
 }
 
-func verifyJenkinsAPIConnection(t *testing.T, jenkins *v1alpha2.Jenkins, namespace string) (jenkinsclient.Jenkins, func()) {
+func verifyJenkinsAPIConnection(jenkins *v1alpha2.Jenkins, namespace string) (jenkinsclient.Jenkins, func()) {
+	By("establishing Jenkins API connection")
+
 	var service corev1.Service
-	err := framework.Global.Client.Get(context.TODO(), types.NamespacedName{
+	err := k8sClient.Get(context.TODO(), types.NamespacedName{
 		Namespace: jenkins.Namespace,
 		Name:      resources.GetJenkinsHTTPServiceName(jenkins),
 	}, &service)
-	require.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 
 	podName := resources.GetJenkinsMasterPodName(jenkins)
-	port, cleanUpFunc, waitFunc, portForwardFunc, err := setupPortForwardToPod(t, namespace, podName, int(constants.DefaultHTTPPortInt32))
-	if err != nil {
-		t.Fatal(err)
-	}
+	port, cleanUpFunc, waitFunc, portForwardFunc, err := setupPortForwardToPod(namespace, podName, int(constants.DefaultHTTPPortInt32))
+	Expect(err).NotTo(HaveOccurred())
 	go portForwardFunc()
 	waitFunc()
 
@@ -213,41 +208,33 @@ func verifyJenkinsAPIConnection(t *testing.T, jenkins *v1alpha2.Jenkins, namespa
 		UseNodePort: false,
 	}.BuildJenkinsAPIUrl(service.Name, service.Namespace, service.Spec.Ports[0].Port, service.Spec.Ports[0].NodePort)
 
-	var client jenkinsclient.Jenkins
+	var jenkinsClient jenkinsclient.Jenkins
 	if jenkins.Spec.JenkinsAPISettings.AuthorizationStrategy == v1alpha2.ServiceAccountAuthorizationStrategy {
-		client, err = createJenkinsAPIClientFromServiceAccount(t, jenkins, jenkinsAPIURL)
+		jenkinsClient, err = createJenkinsAPIClientFromServiceAccount(jenkins, jenkinsAPIURL)
 	} else {
-		client, err = createJenkinsAPIClientFromSecret(t, jenkins, jenkinsAPIURL)
+		jenkinsClient, err = createJenkinsAPIClientFromSecret(jenkins, jenkinsAPIURL)
 	}
 
 	if err != nil {
 		defer cleanUpFunc()
-		t.Fatal(err)
+		Fail(err.Error())
 	}
 
-	t.Log("I can establish connection to Jenkins API")
-	return client, cleanUpFunc
+	_, _ = fmt.Fprintf(GinkgoWriter, "I can establish connection to Jenkins API\n")
+	return jenkinsClient, cleanUpFunc
 }
 
-func restartJenkinsMasterPod(t *testing.T, jenkins *v1alpha2.Jenkins) {
-	t.Log("Restarting Jenkins master pod")
-	jenkinsPod := getJenkinsMasterPod(t, jenkins)
-	err := framework.Global.Client.Delete(context.TODO(), jenkinsPod)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Log("Jenkins master pod has been restarted")
-}
+/*func restartJenkinsMasterPod(jenkins *v1alpha2.Jenkins) {
+	_, _ = fmt.Fprintf(GinkgoWriter, "Restarting Jenkins master pod")
+	jenkinsPod := getJenkinsMasterPod(jenkins)
+	Expect(k8sClient.Delete(context.TODO(), jenkinsPod)).Should(Succeed())
+	_, _ = fmt.Fprintf(GinkgoWriter, "Jenkins master pod has been restarted")
+}*/
 
-func getJenkinsService(t *testing.T, jenkins *v1alpha2.Jenkins, serviceKind string) *corev1.Service {
+func getJenkinsService(jenkins *v1alpha2.Jenkins, serviceKind string) *corev1.Service {
+	service := &corev1.Service{}
 	serviceName := constants.OperatorName + "-" + serviceKind + "-" + jenkins.ObjectMeta.Name
-	lo := metav1.ListOptions{
-		FieldSelector: fields.SelectorFromSet(fields.Set{"metadata.name": serviceName}).String(),
-	}
-	serviceList, err := framework.Global.KubeClient.CoreV1().Services(jenkins.Namespace).List(lo)
+	Expect(k8sClient.Get(context.TODO(), client.ObjectKey{Name: serviceName, Namespace: jenkins.Namespace}, service)).Should(Succeed())
 
-	require.NoError(t, err)
-	require.Equal(t, 1, len(serviceList.Items), fmt.Sprintf("'%s' service not found", serviceName))
-
-	return &serviceList.Items[0]
+	return service
 }

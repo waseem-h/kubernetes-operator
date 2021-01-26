@@ -2,24 +2,19 @@ package e2e
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"testing"
 	"text/template"
 	"time"
 
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	"github.com/jenkinsci/kubernetes-operator/internal/render"
 	"github.com/jenkinsci/kubernetes-operator/internal/try"
-	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/user/seedjobs"
 	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 
-	framework "github.com/operator-framework/operator-sdk/pkg/test"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -32,11 +27,12 @@ type seedJobConfig struct {
 	PrivateKey string   `json:"privateKey,omitempty"`
 }
 
-type seedJobsConfig struct {
+/*type seedJobsConfig struct {
 	SeedJobs []seedJobConfig `json:"seedJobs,omitempty"`
-}
+}*/
 
-func TestSeedJobs(t *testing.T) {
+// FIXME
+/*func TestSeedJobs(t *testing.T) {
 	t.Parallel()
 	if seedJobConfigurationFile == nil || len(*seedJobConfigurationFile) == 0 {
 		t.Skipf("Skipping test because flag '%+v' is not set", seedJobConfigurationFile)
@@ -81,8 +77,9 @@ func loadSeedJobsConfig(t *testing.T) seedJobsConfig {
 	assert.NotEmpty(t, result.SeedJobs)
 	return result
 }
+*/
 
-func createKubernetesCredentialsProviderSecret(t *testing.T, namespace string, config seedJobConfig) {
+func createKubernetesCredentialsProviderSecret(namespace string, config seedJobConfig) {
 	if config.JenkinsCredentialType == v1alpha2.NoJenkinsCredentialCredentialType {
 		return
 	}
@@ -105,31 +102,32 @@ func createKubernetesCredentialsProviderSecret(t *testing.T, namespace string, c
 		},
 	}
 
-	err := framework.Global.Client.Create(context.TODO(), secret, nil)
-	require.NoError(t, err)
+	Expect(k8sClient.Create(context.TODO(), secret)).Should(Succeed())
 }
 
-func verifyJenkinsSeedJobs(t *testing.T, jenkinsClient jenkinsclient.Jenkins, seedJobs []seedJobConfig) {
+func verifyJenkinsSeedJobs(jenkinsClient jenkinsclient.Jenkins, seedJobs []seedJobConfig) {
+	By("creating Jenkins jobs by seed jobs")
+
 	var err error
 	for _, seedJob := range seedJobs {
 		if seedJob.JenkinsCredentialType == v1alpha2.BasicSSHCredentialType || seedJob.JenkinsCredentialType == v1alpha2.UsernamePasswordCredentialType {
 			err = verifyIfJenkinsCredentialExists(jenkinsClient, seedJob.CredentialID)
-			assert.NoErrorf(t, err, "Jenkins credential '%s' not created for seed job ID '%s'", seedJob.CredentialID, seedJob.ID)
+			Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("Jenkins credential '%s' not created for seed job ID '%s'", seedJob.CredentialID, seedJob.ID))
 		}
 
-		verifySeedJobProperties(t, jenkinsClient, seedJob)
+		verifySeedJobProperties(jenkinsClient, seedJob)
 
 		for _, requireJobName := range seedJob.JobNames {
 			err = try.Until(func() (end bool, err error) {
 				_, err = jenkinsClient.GetJob(requireJobName)
 				return err == nil, err
 			}, time.Second*2, time.Minute*2)
-			assert.NoErrorf(t, err, "Jenkins job '%s' not created by seed job ID '%s'", requireJobName, seedJob.ID)
+			Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("Jenkins job '%s' not created by seed job ID '%s'", requireJobName, seedJob.ID))
 		}
 	}
 }
 
-func verifySeedJobProperties(t *testing.T, jenkinsClient jenkinsclient.Jenkins, seedJob seedJobConfig) {
+func verifySeedJobProperties(jenkinsClient jenkinsclient.Jenkins, seedJob seedJobConfig) {
 	data := struct {
 		ID                    string
 		CredentialID          string
@@ -163,10 +161,10 @@ func verifySeedJobProperties(t *testing.T, jenkinsClient jenkinsclient.Jenkins, 
 	}
 
 	groovyScript, err := render.Render(verifySeedJobPropertiesGroovyScriptTemplate, data)
-	assert.NoError(t, err, groovyScript)
+	Expect(err).NotTo(HaveOccurred(), groovyScript)
 
 	logs, err := jenkinsClient.ExecuteScript(groovyScript)
-	assert.NoError(t, err, logs, groovyScript)
+	Expect(err).NotTo(HaveOccurred(), logs, groovyScript)
 }
 
 func verifyIfJenkinsCredentialExists(jenkinsClient jenkinsclient.Jenkins, credentialName string) error {

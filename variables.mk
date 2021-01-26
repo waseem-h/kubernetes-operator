@@ -1,5 +1,4 @@
-# Set POSIX sh for maximum interoperability
-SHELL := /bin/sh
+SHELL := /bin/bash
 PATH  := $(GOPATH)/bin:$(PATH)
 
 OSFLAG 				:=
@@ -60,7 +59,7 @@ GO_LDFLAGS_STATIC=-ldflags "-w $(CTIMEVAR) -extldflags -static"
 GOOSARCHES = linux/amd64
 
 PACKAGES = $(shell go list -f '{{.ImportPath}}/' ./... | grep -v vendor)
-PACKAGES_FOR_UNIT_TESTS = $(shell go list -f '{{.ImportPath}}/' ./... | grep -v vendor | grep -v e2e)
+PACKAGES_FOR_UNIT_TESTS = $(shell go list -f '{{.ImportPath}}/' ./... | grep -v vendor | grep -v e2e | grep -v controllers)
 
 # Run all the e2e tests by default
 E2E_TEST_SELECTOR ?= .*
@@ -94,3 +93,5 @@ GOBIN=$(shell go env GOPATH)/bin
 else
 GOBIN=$(shell go env GOBIN)
 endif
+
+ENVTEST_ASSETS_DIR=$(shell pwd)/testbin

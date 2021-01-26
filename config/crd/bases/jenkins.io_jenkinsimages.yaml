@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: jenkinsimages.jenkins.io.jenkins.io
+  name: jenkinsimages.jenkins.io
 spec:
-  group: jenkins.io.jenkins.io
+  group: jenkins.io
   names:
     kind: JenkinsImage
     listKind: JenkinsImageList

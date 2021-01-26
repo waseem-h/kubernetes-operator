@@ -15,6 +15,8 @@ func NewSimpleProbe(uri string, port string, scheme corev1.URIScheme, initialDel
 			},
 		},
 		InitialDelaySeconds: initialDelaySeconds,
+		SuccessThreshold:    int32(1),
+		PeriodSeconds:       int32(1),
 	}
 }
 

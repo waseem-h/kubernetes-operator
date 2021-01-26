@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: jenkins.jenkins.io.jenkins.io
+  name: jenkins.jenkins.io
 spec:
-  group: jenkins.io.jenkins.io
+  group: jenkins.io
   names:
     kind: Jenkins
     listKind: JenkinsList
@@ -38,7 +38,7 @@ spec:
             properties:
               backup:
                 description: 'Backup defines configuration of Jenkins backup More
-                  info: https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore'
+                  info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/'
                 properties:
                   action:
                     description: Action defines action which performs backup in backup
@@ -157,11 +157,11 @@ spec:
                     type: object
                   basePlugins:
                     description: 'BasePlugins contains plugins required by operator
-                      Defaults to : - name: kubernetes version: 1.15.7 - name: workflow-job
-                      version: "2.39" - name: workflow-aggregator version: "2.6" -
-                      name: git version: 3.10.0 - name: job-dsl version: "1.74" -
-                      name: configuration-as-code version: "1.19" - name: kubernetes-credentials-provider
-                      version: 0.12.1'
+                      Defaults to : - name: kubernetes version: "1.28.6" - name: workflow-job
+                      version: "2.40" - name: workflow-aggregator version: "2.6" -
+                      name: git version: "4.5.0" - name: job-dsl version: "1.77" -
+                      name: configuration-as-code version: "1.46" - name: kubernetes-credentials-provider
+                      version: "0.15"'
                     items:
                       description: Plugin defines Jenkins plugin.
                       properties:
@@ -1184,7 +1184,7 @@ spec:
                           support fsGroup based ownership(and permissions). It will
                           have no effect on ephemeral volume types such as: secret,
                           configmaps and emptydir. Valid values are "OnRootMismatch"
-                          and "Always". If not specified defaults to "Always".'
+                          and "Always". If not specified, "Always" is used.'
                         type: string
                       runAsGroup:
                         description: The GID to run the entrypoint of the container
@@ -1817,22 +1817,16 @@ spec:
                                     dataSource:
                                       description: 'This field can be used to specify
                                         either: * An existing VolumeSnapshot object
-                                        (snapshot.storage.k8s.io/VolumeSnapshot -
-                                        Beta) * An existing PVC (PersistentVolumeClaim)
-                                        * An existing custom resource/object that
-                                        implements data population (Alpha) In order
-                                        to use VolumeSnapshot object types, the appropriate
-                                        feature gate must be enabled (VolumeSnapshotDataSource
-                                        or AnyVolumeDataSource) If the provisioner
-                                        or an external controller can support the
-                                        specified data source, it will create a new
-                                        volume based on the contents of the specified
-                                        data source. If the specified data source
-                                        is not supported, the volume will not be created
-                                        and the failure will be reported as an event.
-                                        In the future, we plan to support more data
-                                        source types and the behavior of the provisioner
-                                        may change.'
+                                        (snapshot.storage.k8s.io/VolumeSnapshot) *
+                                        An existing PVC (PersistentVolumeClaim) *
+                                        An existing custom resource that implements
+                                        data population (Alpha) In order to use custom
+                                        resource types that implement data population,
+                                        the AnyVolumeDataSource feature gate must
+                                        be enabled. If the provisioner or an external
+                                        controller can support the specified data
+                                        source, it will create a new volume based
+                                        on the contents of the specified data source.'
                                       properties:
                                         apiGroup:
                                           description: APIGroup is the group for the
@@ -2560,8 +2554,6 @@ spec:
                                     type: object
                                 type: object
                               type: array
-                          required:
-                          - sources
                           type: object
                         quobyte:
                           description: Quobyte represents a Quobyte mount on the host
@@ -3030,7 +3022,7 @@ spec:
                 type: array
               restore:
                 description: 'Backup defines configuration of Jenkins backup restore
-                  More info: https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-backup-and-restore'
+                  More info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/'
                 properties:
                   action:
                     description: Action defines action which performs restore backup
@@ -3112,10 +3104,10 @@ spec:
                 type: array
               seedJobs:
                 description: 'SeedJobs defines list of Jenkins Seed Job configurations
-                  More info: https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines'
+                  More info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration#configure-seed-jobs-and-pipelines'
                 items:
                   description: 'SeedJob defines configuration for seed job More info:
-                    https://github.com/jenkinsci/kubernetes-operator/blob/master/docs/getting-started.md#configure-seed-jobs-and-pipelines.'
+                    https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#configure-seed-jobs-and-pipelines.'
                   properties:
                     additionalClasspath:
                       description: AdditionalClasspath is setting for Job DSL API
@@ -3209,7 +3201,7 @@ spec:
                       will restrict traffic through the cloud-provider load-balancer
                       will be restricted to the specified client IPs. This field will
                       be ignored if the cloud-provider does not support the feature."
-                      More info: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/'
+                      More info: https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#restricting-cloud-metadata-api-access'
                     items:
                       type: string
                     type: array
@@ -3290,7 +3282,7 @@ spec:
                       will restrict traffic through the cloud-provider load-balancer
                       will be restricted to the specified client IPs. This field will
                       be ignored if the cloud-provider does not support the feature."
-                      More info: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/'
+                      More info: https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#restricting-cloud-metadata-api-access'
                     items:
                       type: string
                     type: array

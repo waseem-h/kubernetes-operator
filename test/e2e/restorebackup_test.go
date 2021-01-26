@@ -1,5 +1,7 @@
 package e2e
 
+// TODO
+/*
 import (
 	"context"
 	"testing"
@@ -214,3 +216,4 @@ func resetJenkinsStatus(t *testing.T, jenkins *v1alpha2.Jenkins) {
 	err := framework.Global.Client.Update(context.TODO(), jenkins)
 	require.NoError(t, err)
 }
+*/

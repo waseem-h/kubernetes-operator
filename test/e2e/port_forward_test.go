@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"os"
 	"strings"
-	"testing"
 
-	framework "github.com/operator-framework/operator-sdk/pkg/test"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
@@ -49,11 +49,9 @@ func getFreePort() (int, error) {
 	return l.Addr().(*net.TCPAddr).Port, nil
 }
 
-func setupPortForwardToPod(t *testing.T, namespace, podName string, podPort int) (port int, cleanUpFunc func(), waitFunc func(), portForwardFunc func(), err error) {
+func setupPortForwardToPod(namespace, podName string, podPort int) (port int, cleanUpFunc func(), waitFunc func(), portForwardFunc func(), err error) {
 	port, err = getFreePort()
-	if err != nil {
-		t.Fatal(err)
-	}
+	Expect(err).NotTo(HaveOccurred())
 
 	stream := genericclioptions.IOStreams{
 		In:     os.Stdin,
@@ -68,7 +66,7 @@ func setupPortForwardToPod(t *testing.T, namespace, podName string, podPort int)
 	readyCh := make(chan struct{})
 
 	req := portForwardToPodRequest{
-		config: framework.Global.KubeConfig,
+		config: cfg,
 		pod: v1.Pod{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      podName,
@@ -83,9 +81,9 @@ func setupPortForwardToPod(t *testing.T, namespace, podName string, podPort int)
 	}
 
 	waitFunc = func() {
-		t.Log("Waiting for the port-forward.")
+		_, _ = fmt.Fprintf(GinkgoWriter, "Waiting for the port-forward.\n")
 		<-readyCh
-		t.Log("The port-forward is established.")
+		_, _ = fmt.Fprintf(GinkgoWriter, "The port-forward is established.\n")
 	}
 
 	portForwardFunc = func() {
@@ -96,7 +94,7 @@ func setupPortForwardToPod(t *testing.T, namespace, podName string, podPort int)
 	}
 
 	cleanUpFunc = func() {
-		t.Log("Closing port-forward")
+		_, _ = fmt.Fprintf(GinkgoWriter, "Closing port-forward\n")
 		close(stopCh)
 	}
 

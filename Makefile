@@ -89,47 +89,10 @@ test: ## Runs the go tests
 	@RUNNING_TESTS=1 go test -tags "$(BUILDTAGS) cgo" $(PACKAGES_FOR_UNIT_TESTS)
 
 .PHONY: e2e
-CURRENT_DIRECTORY := $(shell pwd)
-e2e: container-runtime-build ## Runs e2e tests, you can use EXTRA_ARGS
+e2e: deepcopy-gen ## Runs e2e tests, you can use EXTRA_ARGS
 	@echo "+ $@"
-	@echo "Docker image: $(DOCKER_REGISTRY):$(GITCOMMIT)"
-ifeq ($(KUBERNETES_PROVIDER),minikube)
-	kubectl config use-context $(KUBECTL_CONTEXT)
-endif
-ifeq ($(KUBERNETES_PROVIDER),crc)
-	oc project $(CRC_OC_PROJECT)
-endif
-	cp deploy/service_account.yaml deploy/namespace-init.yaml
-	cat deploy/role.yaml >> deploy/namespace-init.yaml
-	cat deploy/role_binding.yaml >> deploy/namespace-init.yaml
-	cat deploy/operator.yaml >> deploy/namespace-init.yaml
-ifeq ($(OSFLAG), LINUX)
-ifeq ($(IMAGE_PULL_MODE), remote)
-	sed -i 's|\(image:\).*|\1 $(DOCKER_ORGANIZATION)/$(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-	sed -i 's|\(imagePullPolicy\): IfNotPresent|\1: Always|g' deploy/namespace-init.yaml
-else
-	sed -i 's|\(image:\).*|\1 $(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-endif
-ifeq ($(KUBERNETES_PROVIDER),minikube)
-	sed -i 's|\(imagePullPolicy\): IfNotPresent|\1: Never|g' deploy/namespace-init.yaml
-endif
-endif
-
-ifeq ($(OSFLAG), OSX)
-ifeq ($(IMAGE_PULL_MODE), remote)
-	sed -i '' 's|\(image:\).*|\1 $(DOCKER_ORGANIZATION)/$(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-	sed -i '' 's|\(imagePullPolicy\): IfNotPresent|\1: Always|g' deploy/namespace-init.yaml
-else
-	sed -i '' 's|\(image:\).*|\1 $(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-endif
-ifeq ($(KUBERNETES_PROVIDER),minikube)
-	sed -i '' 's|\(imagePullPolicy\): IfNotPresent|\1: Never|g' deploy/namespace-init.yaml
-endif
-endif
-
 	RUNNING_TESTS=1 go test -parallel=1 "./test/e2e/" -tags "$(BUILDTAGS) cgo" -v -timeout 60m -run "$(E2E_TEST_SELECTOR)" \
-		-root=$(CURRENT_DIRECTORY) -kubeconfig=$(HOME)/.kube/config -globalMan deploy/crds/jenkins_$(API_VERSION)_jenkins_crd.yaml \
-		-namespacedMan deploy/namespace-init.yaml $(TEST_ARGS)
+		$(TEST_ARGS)
 
 .PHONY: vet
 vet: ## Verifies `go vet` passes
@@ -420,7 +383,6 @@ generate-docs: ## Re-generate docs directory from the website directory
 	hugo -s website -d ../docs
 
 ##################### FROM OPERATOR SDK ########################
-#TODO rename
 # Install CRDs into a cluster
 install-crds: manifests kustomize
 	$(KUSTOMIZE) build config/crd | kubectl apply -f -
@@ -474,9 +436,8 @@ bundle: manifests kustomize
 bundle-build:
 	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
 
-#FIXME temporary target for running tests (test used above for go test)
-ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
-testing: generate fmt vet manifests
+# Download kubebuilder
+kubebuilder:
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0/hack/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR);

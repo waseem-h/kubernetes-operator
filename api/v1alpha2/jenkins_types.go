@@ -674,7 +674,3 @@ type GroovyScripts struct {
 type ConfigurationAsCode struct {
 	Customization `json:",inline"`
 }
-
-func init() {
-	SchemeBuilder.Register(&Jenkins{}, &JenkinsList{})
-}
