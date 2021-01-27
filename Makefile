@@ -201,13 +201,13 @@ container-runtime-login: ## Log in into the Docker repository
 	@echo "+ $@"
 
 .PHONY: container-runtime-build
-container-runtime-build: check-env ## Build the container
+container-runtime-build: check-env deepcopy-gen ## Build the container
 	@echo "+ $@"
 	$(CONTAINER_RUNTIME_COMMAND) build \
 	--build-arg GO_VERSION=$(GO_VERSION) \
-	--build-arg OPERATOR_SDK_VERSION=$(OPERATOR_SDK_VERSION) \
+	--build-arg CTIMEVAR="$(CTIMEVAR)" \
 	-t $(DOCKER_REGISTRY):$(GITCOMMIT) . \
-	--file build/Dockerfile $(CONTAINER_RUNTIME_EXTRA_ARGS)
+	--file Dockerfile $(CONTAINER_RUNTIME_EXTRA_ARGS)
 
 .PHONY: container-runtime-images
 container-runtime-images: ## List all local containers
