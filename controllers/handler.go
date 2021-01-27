@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"fmt"
+	"reflect"
 
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 	"github.com/jenkinsci/kubernetes-operator/pkg/log"
 
@@ -10,6 +12,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/event"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
@@ -72,8 +75,7 @@ func (e *enqueueRequestForJenkins) getOwnerReconcileRequests(object metav1.Objec
 	return nil
 }
 
-// FIXME unused
-/*type jenkinsDecorator struct {
+type jenkinsDecorator struct {
 	handler handler.EventHandler
 }
 
@@ -95,4 +97,4 @@ func (e *jenkinsDecorator) Delete(evt event.DeleteEvent, q workqueue.RateLimitin
 
 func (e *jenkinsDecorator) Generic(evt event.GenericEvent, q workqueue.RateLimitingInterface) {
 	e.handler.Generic(evt, q)
-}*/
+}

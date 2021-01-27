@@ -90,9 +90,9 @@ jenkins.save()
 func checkIfAuthorizationStrategyUnsecuredIsSet(t *testing.T, jenkinsClient jenkinsclient.Jenkins) {
 	logs, err := jenkinsClient.ExecuteScript(`
 	import hudson.security.*
-	  
+
 	def jenkins = jenkins.model.Jenkins.getInstance()
-	
+
 	if (!(jenkins.getAuthorizationStrategy() instanceof AuthorizationStrategy.Unsecured)) {
 	  throw new Exception('AuthorizationStrategy.Unsecured is not set')
 	}

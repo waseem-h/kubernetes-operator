@@ -2,6 +2,7 @@ package e2e
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"path/filepath"
 	"testing"
@@ -35,7 +36,17 @@ var (
 	cfg       *rest.Config
 	k8sClient client.Client
 	testEnv   *envtest.Environment
+
+	hostname    *string
+	port        *int
+	useNodePort *bool
 )
+
+func init() {
+	hostname = flag.String("jenkins-api-hostname", "", "Hostname or IP of Jenkins API. It can be service name, node IP or localhost.")
+	port = flag.Int("jenkins-api-port", 0, "The port on which Jenkins API is running. Note: If you want to use nodePort don't set this setting and --jenkins-api-use-nodeport must be true.")
+	useNodePort = flag.Bool("jenkins-api-use-nodeport", false, "Connect to Jenkins API using the service nodePort instead of service port. If you want to set this as true - don't set --jenkins-api-port.")
+}
 
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -83,8 +94,9 @@ var _ = BeforeSuite(func(done Done) {
 	go notifications.Listen(notificationEvents, events, k8sClient)
 
 	jenkinsAPIConnectionSettings := jenkinsClient.JenkinsAPIConnectionSettings{
-		Hostname:    "192.168.99.100", // FIXME minikube ip
-		UseNodePort: true,
+		Hostname:    *hostname,
+		UseNodePort: *useNodePort,
+		Port:        *port,
 	}
 
 	err = (&controllers.JenkinsReconciler{

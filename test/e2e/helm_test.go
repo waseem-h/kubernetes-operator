@@ -68,4 +68,4 @@ func TestDeployHelmChart(t *testing.T) {
 	waitForJenkinsBaseConfigurationToComplete(t, jenkins)
 	waitForJenkinsUserConfigurationToComplete(t, jenkins)
 }
-/*
+*/

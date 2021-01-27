@@ -92,7 +92,7 @@ test: ## Runs the go tests
 e2e: deepcopy-gen ## Runs e2e tests, you can use EXTRA_ARGS
 	@echo "+ $@"
 	RUNNING_TESTS=1 go test -parallel=1 "./test/e2e/" -tags "$(BUILDTAGS) cgo" -v -timeout 60m -run "$(E2E_TEST_SELECTOR)" \
-		$(TEST_ARGS)
+		-jenkins-api-hostname=$(JENKINS_API_HOSTNAME) -jenkins-api-port=$(JENKINS_API_PORT) -jenkins-api-use-nodeport=$(JENKINS_API_USE_NODEPORT) $(E2E_TEST_ARGS)
 
 .PHONY: vet
 vet: ## Verifies `go vet` passes
