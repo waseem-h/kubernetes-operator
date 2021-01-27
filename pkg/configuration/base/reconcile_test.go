@@ -743,7 +743,6 @@ func TestEnsureExtraRBAC(t *testing.T) {
 		assert.Equal(t, jenkins.Spec.Roles[1], roleBindings.Items[2].RoleRef)
 	})
 	t.Run("delete one extra", func(t *testing.T) {
-		t.Skip() //FIXME
 		// given
 		fakeClient := fake.NewClientBuilder().Build()
 		err := v1alpha2.SchemeBuilder.AddToScheme(scheme.Scheme)
@@ -803,8 +802,8 @@ func TestEnsureExtraRBAC(t *testing.T) {
 		roleBindings, err := fetchAllRoleBindings(fakeClient)
 		assert.NoError(t, err)
 		assert.Equal(t, 3, len(roleBindings.Items))
-		assert.Equal(t, metaObject.Name, roleBindings.Items[1].Name)
-		assert.Equal(t, jenkins.Spec.Roles[0], roleBindings.Items[2].RoleRef)
+		assert.Equal(t, metaObject.Name, roleBindings.Items[0].Name)
+		assert.Equal(t, jenkins.Spec.Roles[0], roleBindings.Items[1].RoleRef)
 	})
 }
 
