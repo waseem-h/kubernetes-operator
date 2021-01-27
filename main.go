@@ -28,6 +28,7 @@ import (
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
 	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 	"github.com/jenkinsci/kubernetes-operator/pkg/event"
+	"github.com/jenkinsci/kubernetes-operator/pkg/log"
 	"github.com/jenkinsci/kubernetes-operator/pkg/notifications"
 	e "github.com/jenkinsci/kubernetes-operator/pkg/notifications/event"
 	"github.com/jenkinsci/kubernetes-operator/version"
@@ -55,9 +56,8 @@ var (
 	metricsHost       = "0.0.0.0"
 	metricsPort int32 = 8383
 	scheme            = runtime.NewScheme()
-	setupLog          = ctrl.Log.WithName("setup")
+	logger            = logf.Log.WithName("cmd")
 )
-var logger = logf.Log.WithName("cmd")
 
 func printInfo() {
 	logger.Info(fmt.Sprintf("Version: %s", version.Version))
@@ -91,26 +91,24 @@ func main() {
 	hostname := flag.String("jenkins-api-hostname", "", "Hostname or IP of Jenkins API. It can be service name, node IP or localhost.")
 	port := flag.Int("jenkins-api-port", 0, "The port on which Jenkins API is running. Note: If you want to use nodePort don't set this setting and --jenkins-api-use-nodeport must be true.")
 	useNodePort := flag.Bool("jenkins-api-use-nodeport", false, "Connect to Jenkins API using the service nodePort instead of service port. If you want to set this as true - don't set --jenkins-api-port.")
-	debug := flag.Bool("debug", false, "Set log level to debug")
 	kubernetesClusterDomain := flag.String("cluster-domain", "cluster.local", "Use custom domain name instead of 'cluster.local'.")
-	//TODO fix logs
 	opts := zap.Options{
 		Development: true,
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
+	debug := &opts.Development
+	log.Debug = *debug
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 	printInfo()
 
 	namespace, found := os.LookupEnv("WATCH_NAMESPACE")
 	if !found {
-		var err error
-		fatal(errors.Wrap(err, "failed to get watch namespace, please set up WATCH_NAMESPACE environment variable"), *debug)
+		fatal(errors.New("failed to get watch namespace, please set up WATCH_NAMESPACE environment variable"), *debug)
 	}
 	logger.Info(fmt.Sprintf("Watch namespace: %v", namespace))
 
-	//Config
 	// get a config to talk to the API server
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -126,8 +124,7 @@ func main() {
 		LeaderElectionID:       "c674355f.jenkins.io",
 	})
 	if err != nil {
-		setupLog.Error(err, "unable to start manager")
-		os.Exit(1)
+		fatal(errors.Wrap(err, "unable to start manager"), *debug)
 	}
 
 	// setup events
@@ -181,20 +178,15 @@ func main() {
 	// +kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("health", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up health check")
-		os.Exit(1)
+		fatal(errors.Wrap(err, "unable to set up health check"), *debug)
 	}
 	if err := mgr.AddReadyzCheck("check", healthz.Ping); err != nil {
-		setupLog.Error(err, "unable to set up ready check")
-		os.Exit(1)
+		fatal(errors.Wrap(err, "unable to set up ready check"), *debug)
 	}
 
-	logger.Info("Starting the Cmd.")
-
-	setupLog.Info("starting manager")
+	logger.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {
-		setupLog.Error(err, "problem running manager")
-		os.Exit(1)
+		fatal(errors.Wrap(err, "problem running manager"), *debug)
 	}
 }
 
@@ -204,5 +196,5 @@ func fatal(err error, debug bool) {
 	} else {
 		logger.Error(nil, fmt.Sprintf("%s", err))
 	}
-	os.Exit(-1)
+	os.Exit(1)
 }
