@@ -1,19 +1,3 @@
-/*
-Copyright 2021.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package v1alpha2
 
 import (
@@ -23,6 +7,7 @@ import (
 )
 
 // JenkinsSpec defines the desired state of Jenkins
+// +k8s:openapi-gen=true
 type JenkinsSpec struct {
 	// Master represents Jenkins master pod properties and Jenkins plugins.
 	// Every single change here requires a pod restart.
@@ -449,6 +434,7 @@ type Service struct {
 }
 
 // JenkinsStatus defines the observed state of Jenkins
+// +k8s:openapi-gen=true
 type JenkinsStatus struct {
 	// OperatorVersion is the operator version which manages this CR
 	// +optional
@@ -497,17 +483,24 @@ type JenkinsStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +genclient
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // Jenkins is the Schema for the jenkins API
+// +k8s:openapi-gen=true
 type Jenkins struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   JenkinsSpec   `json:"spec,omitempty"`
+	// Spec defines the desired state of the Jenkins
+	Spec JenkinsSpec `json:"spec,omitempty"`
+
+	// Status defines the observed state of Jenkins
 	Status JenkinsStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
+// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // JenkinsList contains a list of Jenkins
 type JenkinsList struct {
