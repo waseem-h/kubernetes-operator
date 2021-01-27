@@ -66,22 +66,22 @@ fmt: ## Verifies all files have been `gofmt`ed
 	@go fmt $(PACKAGES)
 
 .PHONY: lint
-HAS_GOLINT := $(shell which golangci-lint)
+HAS_GOLINT := $(shell which $(PROJECT_DIR)/bin/golangci-lint)
 lint: ## Verifies `golint` passes
 	@echo "+ $@"
 ifndef HAS_GOLINT
-	go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.26.0
+	$(call go-get-tool,$(PROJECT_DIR)/bin/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v1.26.0)
 endif
-	@golangci-lint run
+	@bin/golangci-lint run
 
 .PHONY: goimports
-HAS_GOIMPORTS := $(shell which goimports)
+HAS_GOIMPORTS := $(shell which $(PROJECT_DIR)/bin/goimports)
 goimports: ## Verifies `goimports` passes
 	@echo "+ $@"
 ifndef HAS_GOIMPORTS
-	go get -u golang.org/x/tools/cmd/goimports
+	$(call go-get-tool,$(PROJECT_DIR)/bin/goimports,golang.org/x/tools/cmd/goimports@v0.1.0)
 endif
-	@goimports -l -e $(shell find . -type f -name '*.go' -not -path "./vendor/*")
+	@bin/goimports -l -e $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: test
 test: ## Runs the go tests
@@ -99,19 +99,20 @@ vet: ## Verifies `go vet` passes
 	@echo "+ $@"
 	@go vet $(PACKAGES)
 
-#FIXME download to tmp not locally
 .PHONY: staticcheck
-HAS_STATICCHECK := $(shell which staticcheck)
+HAS_STATICCHECK := $(shell which $(PROJECT_DIR)/bin/staticcheck)
 PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
 staticcheck: ## Verifies `staticcheck` passes
 	@echo "+ $@"
 ifndef HAS_STATICCHECK
-	wget -O staticcheck_$(PLATFORM)_amd64.tar.gz https://github.com/dominikh/go-tools/releases/download/2020.1.3/staticcheck_$(PLATFORM)_amd64.tar.gz
-	tar zxvf staticcheck_$(PLATFORM)_amd64.tar.gz
-	mkdir -p $(GOPATH)/bin
-	mv staticcheck/staticcheck $(GOPATH)/bin
+	$(eval TMP_DIR := $(shell mktemp -d))
+	wget -O $(TMP_DIR)/staticcheck_$(PLATFORM)_amd64.tar.gz https://github.com/dominikh/go-tools/releases/download/2020.1.3/staticcheck_$(PLATFORM)_amd64.tar.gz
+	tar zxvf $(TMP_DIR)/staticcheck_$(PLATFORM)_amd64.tar.gz -C $(TMP_DIR)
+	mkdir -p $(PROJECT_DIR)/bin
+	mv $(TMP_DIR)/staticcheck/staticcheck $(PROJECT_DIR)/bin
+	rm -rf $(TMP_DIR)
 endif
-	@staticcheck $(PACKAGES)
+	@$(PROJECT_DIR)/bin/staticcheck $(PACKAGES)
 
 .PHONY: cover
 cover: ## Runs go test with coverage
@@ -410,7 +411,6 @@ kustomize:
 	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
 
 # go-get-tool will 'go get' any package $2 and install it to $1.
-PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))
 define go-get-tool
 @[ -f $(1) ] || { \
 set -e ;\

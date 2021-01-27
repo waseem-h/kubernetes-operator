@@ -95,3 +95,5 @@ GOBIN=$(shell go env GOBIN)
 endif
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+
+PROJECT_DIR := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))

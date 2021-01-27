@@ -69,7 +69,7 @@ func printInfo() {
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(v1alpha2.AddToScheme(scheme))
-	utilruntime.Must(routev1.AddToScheme(scheme)) // FIXME optional
+	utilruntime.Must(routev1.AddToScheme(scheme))
 	utilruntime.Must(corev1.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
