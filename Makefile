@@ -313,12 +313,21 @@ crc-start: check-crc ## Start CodeReady Containers Kubernetes cluster
 	@echo "+ $@"
 	crc start
 
+.PHONY: sembump
+HAS_SEMBUMP := $(shell which $(PROJECT_DIR)/bin/sembump)
+PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
+sembump: # Download sembump locally if necessary
+	@echo "+ $@"
+ifndef HAS_SEMBUMP
+	wget -O $(PROJECT_DIR)/bin/sembump https://github.com/justintout/sembump/releases/download/v0.1.0/sembump-$(PLATFORM)-amd64
+	chmod +x $(PROJECT_DIR)/bin/sembump
+endif
+
 .PHONY: bump-version
 BUMP := patch
-bump-version: ## Bump the version in the version file. Set BUMP to [ patch | major | minor ]
+bump-version: sembump ## Bump the version in the version file. Set BUMP to [ patch | major | minor ]
 	@echo "+ $@"
-	#@go get -u github.com/jessfraz/junk/sembump # update sembump tool FIXME
-	$(eval NEW_VERSION=$(shell sembump --kind $(BUMP) $(VERSION)))
+	$(eval NEW_VERSION=$(shell bin/sembump --kind $(BUMP) $(VERSION)))
 	@echo "Bumping VERSION.txt from $(VERSION) to $(NEW_VERSION)"
 	echo $(NEW_VERSION) > VERSION.txt
 	@echo "Updating version from $(VERSION) to $(NEW_VERSION) in README.md"
@@ -377,11 +386,16 @@ helm-deploy: helm-package
 	helm repo index chart/ --url https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart/jenkins-operator/
 	cd chart/ && mv jenkins-operator-*.tgz jenkins-operator
 
+# Download hugo locally if necessary
+HUGO = $(shell pwd)/bin/hugo
+hugo:
+	$(call go-get-tool,$(HUGO),github.com/gohugoio/hugo@v0.62.2)
+
 .PHONY: generate-docs
-generate-docs: ## Re-generate docs directory from the website directory
+generate-docs: hugo ## Re-generate docs directory from the website directory
 	@echo "+ $@"
 	rm -rf docs || echo "Cannot remove docs dir, ignoring"
-	hugo -s website -d ../docs
+	bin/hugo -s website -d ../docs
 
 ##################### FROM OPERATOR SDK ########################
 # Install CRDs into a cluster
@@ -389,8 +403,17 @@ install-crds: manifests kustomize
 	$(KUSTOMIZE) build config/crd | kubectl apply -f -
 
 # Uninstall CRDs from a cluster
-uninstall: manifests kustomize
+uninstall-crds: manifests kustomize
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
+
+# Deploy controller in the configured Kubernetes cluster in ~/.kube/config
+deploy: manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(DOCKER_REGISTRY):$(GITCOMMIT)
+	$(KUSTOMIZE) build config/default | kubectl apply -f -
+
+# UnDeploy controller from the configured Kubernetes cluster in ~/.kube/config
+undeploy:
+	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
@@ -423,13 +446,23 @@ rm -rf $$TMP_DIR ;\
 }
 endef
 
+.PHONY: operator-sdk
+HAS_OPERATOR_SDK := $(shell which $(PROJECT_DIR)/bin/operator-sdk)
+PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
+operator-sdk: # Download operator-sdk locally if necessary
+	@echo "+ $@"
+ifndef HAS_OPERATOR_SDK
+	wget -O $(PROJECT_DIR)/bin/operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v1.3.0/operator-sdk_$(PLATFORM)_amd64
+	chmod +x $(PROJECT_DIR)/bin/operator-sdk
+endif
+
 # Generate bundle manifests and metadata, then validate generated files.
 .PHONY: bundle
-bundle: manifests kustomize
-	operator-sdk generate kustomize manifests -q
-	cd config/manager && $(KUSTOMIZE) edit set image controller=$(IMG)
-	$(KUSTOMIZE) build config/manifests | operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
-	operator-sdk bundle validate ./bundle
+bundle: manifests operator-sdk kustomize
+	bin/operator-sdk generate kustomize manifests -q
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(DOCKER_ORGANIZATION)/$(DOCKER_REGISTRY):$(VERSION_TAG)
+	$(KUSTOMIZE) build config/manifests | bin/operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
+	bin/operator-sdk bundle validate ./bundle
 
 # Build the bundle image.
 .PHONY: bundle-build
