@@ -168,13 +168,6 @@ func main() {
 		fatal(errors.Wrap(err, "unable to create Jenkins controller"), *debug)
 	}
 
-	if err = (&controllers.JenkinsImageReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		fatal(errors.Wrap(err, "unable to create Jenkins controller"), *debug)
-	}
-
 	// +kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("health", healthz.Ping); err != nil {

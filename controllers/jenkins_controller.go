@@ -359,7 +359,7 @@ func (r *JenkinsReconciler) setDefaults(jenkins *v1alpha2.Jenkins) (requeue bool
 	if jenkinsContainer.ReadinessProbe == nil {
 		logger.Info("Setting default Jenkins readinessProbe")
 		changed = true
-		jenkinsContainer.ReadinessProbe = resources.NewProbe(containerProbeURI, containerProbePortName, corev1.URISchemeHTTP, 30, 1, 3)
+		jenkinsContainer.ReadinessProbe = resources.NewProbe(containerProbeURI, containerProbePortName, corev1.URISchemeHTTP, 60, 1, 10)
 	}
 	if jenkinsContainer.LivenessProbe == nil {
 		logger.Info("Setting default Jenkins livenessProbe")
