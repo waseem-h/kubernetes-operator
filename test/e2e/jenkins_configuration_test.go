@@ -139,3 +139,58 @@ var _ = Describe("Jenkins controller priority class", func() {
 		})
 	})
 })
+
+var _ = Describe("Jenkins controller plugins test", func() {
+
+	const (
+		jenkinsCRName     = e2e
+		priorityClassName = ""
+		jobID             = "k8s-e2e"
+	)
+
+	var (
+		namespace *corev1.Namespace
+		jenkins   *v1alpha2.Jenkins
+		mySeedJob = seedJobConfig{
+			SeedJob: v1alpha2.SeedJob{
+				ID:                    "jenkins-operator",
+				CredentialID:          "jenkins-operator",
+				JenkinsCredentialType: v1alpha2.NoJenkinsCredentialCredentialType,
+				Targets:               "cicd/jobs/k8s.jenkins",
+				Description:           "Jenkins Operator repository",
+				RepositoryBranch:      "master",
+				RepositoryURL:         "https://github.com/jenkinsci/kubernetes-operator.git",
+			},
+		}
+		groovyScripts = v1alpha2.GroovyScripts{
+			Customization: v1alpha2.Customization{
+				Configurations: []v1alpha2.ConfigMapRef{},
+			},
+		}
+		casc = v1alpha2.ConfigurationAsCode{
+			Customization: v1alpha2.Customization{
+				Configurations: []v1alpha2.ConfigMapRef{},
+			},
+		}
+	)
+
+	BeforeEach(func() {
+		namespace = createNamespace()
+		jenkins = createJenkinsCRSafe(jenkinsCRName, namespace.Name, &[]v1alpha2.SeedJob{mySeedJob.SeedJob}, groovyScripts, casc, priorityClassName)
+	})
+
+	AfterEach(func() {
+		destroyNamespace(namespace)
+	})
+
+	Context("when deploying CR with a SeedJob to cluster", func() {
+		It("runs kubernetes plugin job successfully", func() {
+			waitForJenkinsUserConfigurationToComplete(jenkins)
+			jenkinsClient, cleanUpFunc := verifyJenkinsAPIConnection(jenkins, namespace.Name)
+			defer cleanUpFunc()
+			waitForJobCreation(jenkinsClient, jobID)
+			verifyJobCanBeRun(jenkinsClient, jobID)
+			verifyJobHasBeenRunCorrectly(jenkinsClient, jobID)
+		})
+	})
+})

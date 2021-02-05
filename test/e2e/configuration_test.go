@@ -23,49 +23,6 @@ import (
 
 const e2e = "e2e"
 
-// FIXME
-/*func TestPlugins(t *testing.T) {
-	t.Parallel()
-	namespace, ctx := setupTest(t)
-	// Deletes test namespace
-	defer showLogsAndCleanup(t, ctx)
-
-	jobID := "k8s-e2e"
-
-	priorityClassName := ""
-	seedJobs := &[]v1alpha2.SeedJob{
-		{
-			ID:                    "jenkins-operator",
-			CredentialID:          "jenkins-operator",
-			JenkinsCredentialType: v1alpha2.NoJenkinsCredentialCredentialType,
-			Targets:               "cicd/jobs/k8s.jenkins",
-			Description:           "Jenkins Operator repository",
-			RepositoryBranch:      "master",
-			RepositoryURL:         "https://github.com/jenkinsci/kubernetes-operator.git",
-		},
-	}
-
-	jenkins := createJenkinsCR(t, "k8s-e2e", namespace, seedJobs, v1alpha2.GroovyScripts{}, v1alpha2.ConfigurationAsCode{}, priorityClassName)
-	waitForJenkinsUserConfigurationToComplete(t, jenkins)
-
-	jenkinsClient, cleanUpFunc := verifyJenkinsAPIConnection(t, jenkins, namespace)
-	defer cleanUpFunc()
-	waitForJob(t, jenkinsClient, jobID)
-	job, err := jenkinsClient.GetJob(jobID)
-
-	require.NoError(t, err, job)
-	i, err := job.InvokeSimple(map[string]string{})
-	require.NoError(t, err, i)
-	// FIXME: waitForJobToFinish use
-	time.Sleep(100 * time.Second) // wait for the build to complete
-
-	job, err = jenkinsClient.GetJob(jobID)
-	require.NoError(t, err, job)
-	build, err := job.GetLastBuild()
-	require.NoError(t, err)
-	assert.True(t, build.IsGood())
-}*/
-
 func createUserConfigurationSecret(namespace string, stringData map[string]string) {
 	By("creating user configuration secret")
 

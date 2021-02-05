@@ -211,14 +211,6 @@ func (r *JenkinsReconciler) reconcile(request reconcile.Request) (reconcile.Resu
 		return reconcile.Result{Requeue: true}, jenkins, nil
 	}
 
-	requeue, err = r.handleDeprecatedData(jenkins)
-	if err != nil {
-		return reconcile.Result{}, jenkins, err
-	}
-	if requeue {
-		return reconcile.Result{Requeue: true}, jenkins, nil
-	}
-
 	config := r.newJenkinsReconcilier(jenkins)
 	// Reconcile base configuration
 	baseConfiguration := base.New(config, r.JenkinsAPIConnectionSettings)
@@ -367,7 +359,7 @@ func (r *JenkinsReconciler) setDefaults(jenkins *v1alpha2.Jenkins) (requeue bool
 	if jenkinsContainer.ReadinessProbe == nil {
 		logger.Info("Setting default Jenkins readinessProbe")
 		changed = true
-		jenkinsContainer.ReadinessProbe = resources.NewSimpleProbe(containerProbeURI, containerProbePortName, corev1.URISchemeHTTP, 30)
+		jenkinsContainer.ReadinessProbe = resources.NewProbe(containerProbeURI, containerProbePortName, corev1.URISchemeHTTP, 30, 1, 3)
 	}
 	if jenkinsContainer.LivenessProbe == nil {
 		logger.Info("Setting default Jenkins livenessProbe")
@@ -492,8 +484,4 @@ func basePlugins() (result []v1alpha2.Plugin) {
 		result = append(result, v1alpha2.Plugin{Name: value.Name, Version: value.Version})
 	}
 	return
-}
-
-func (r *JenkinsReconciler) handleDeprecatedData(_ *v1alpha2.Jenkins) (requeue bool, err error) {
-	return false, nil
 }

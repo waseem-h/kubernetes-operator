@@ -152,6 +152,112 @@ func createJenkinsCR(name, namespace string, seedJob *[]v1alpha2.SeedJob, groovy
 	return jenkins
 }
 
+func createJenkinsCRSafeRestart(name, namespace string, seedJob *[]v1alpha2.SeedJob, groovyScripts v1alpha2.GroovyScripts, casc v1alpha2.ConfigurationAsCode, priorityClassName string) *v1alpha2.Jenkins {
+	var seedJobs []v1alpha2.SeedJob
+	if seedJob != nil {
+		seedJobs = append(seedJobs, *seedJob...)
+	}
+
+	jenkins := &v1alpha2.Jenkins{
+		TypeMeta: v1alpha2.JenkinsTypeMeta(),
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: v1alpha2.JenkinsSpec{
+			GroovyScripts:       groovyScripts,
+			ConfigurationAsCode: casc,
+			Master: v1alpha2.JenkinsMaster{
+				Annotations: map[string]string{"test": "label"},
+				Containers: []v1alpha2.Container{
+					{
+						Name: resources.JenkinsMasterContainerName,
+						Env: []corev1.EnvVar{
+							{
+								Name:  "TEST_ENV",
+								Value: "test_env_value",
+							},
+						},
+						ReadinessProbe: &corev1.Probe{
+							Handler: corev1.Handler{
+								HTTPGet: &corev1.HTTPGetAction{
+									Path:   "/login",
+									Port:   intstr.FromString("http"),
+									Scheme: corev1.URISchemeHTTP,
+								},
+							},
+							InitialDelaySeconds: int32(80),
+							TimeoutSeconds:      int32(4),
+							FailureThreshold:    int32(10),
+							SuccessThreshold:    int32(1),
+							PeriodSeconds:       int32(1),
+						},
+						LivenessProbe: &corev1.Probe{
+							Handler: corev1.Handler{
+								HTTPGet: &corev1.HTTPGetAction{
+									Path:   "/login",
+									Port:   intstr.FromString("http"),
+									Scheme: corev1.URISchemeHTTP,
+								},
+							},
+							InitialDelaySeconds: int32(100),
+							TimeoutSeconds:      int32(5),
+							FailureThreshold:    int32(12),
+							SuccessThreshold:    int32(1),
+							PeriodSeconds:       int32(5),
+						},
+						VolumeMounts: []corev1.VolumeMount{
+							{
+								Name:      "plugins-cache",
+								MountPath: "/usr/share/jenkins/ref/plugins",
+							},
+						},
+					},
+					{
+						Name:  "envoyproxy",
+						Image: "envoyproxy/envoy-alpine:v1.14.1",
+					},
+				},
+				Plugins: []v1alpha2.Plugin{
+					{Name: "audit-trail", Version: "3.7"},
+					{Name: "simple-theme-plugin", Version: "0.6"},
+					{Name: "github", Version: "1.32.0"},
+					{Name: "devoptics", Version: "1.1905", DownloadURL: "https://jenkins-updates.cloudbees.com/download/plugins/devoptics/1.1905/devoptics.hpi"},
+				},
+				PriorityClassName: priorityClassName,
+				NodeSelector:      map[string]string{"kubernetes.io/os": "linux"},
+				Volumes: []corev1.Volume{
+					{
+						Name: "plugins-cache",
+						VolumeSource: corev1.VolumeSource{
+							EmptyDir: &corev1.EmptyDirVolumeSource{},
+						},
+					},
+				},
+			},
+			SeedJobs: seedJobs,
+			Service: v1alpha2.Service{
+				Type: corev1.ServiceTypeNodePort,
+				Port: constants.DefaultHTTPPortInt32,
+			},
+		},
+	}
+	jenkins.Spec.Roles = []rbacv1.RoleRef{
+		{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "Role",
+			Name:     resources.GetResourceName(jenkins),
+		},
+	}
+	updateJenkinsCR(jenkins)
+
+	_, _ = fmt.Fprintf(GinkgoWriter, "Jenkins CR %+v\n", *jenkins)
+
+	Expect(k8sClient.Create(context.TODO(), jenkins)).Should(Succeed())
+
+	return jenkins
+}
+
 func createJenkinsAPIClientFromServiceAccount(jenkins *v1alpha2.Jenkins, jenkinsAPIURL string) (jenkinsclient.Jenkins, error) {
 	podName := resources.GetJenkinsMasterPodName(jenkins)
 
@@ -224,12 +330,18 @@ func verifyJenkinsAPIConnection(jenkins *v1alpha2.Jenkins, namespace string) (je
 	return jenkinsClient, cleanUpFunc
 }
 
-/*func restartJenkinsMasterPod(jenkins *v1alpha2.Jenkins) {
-	_, _ = fmt.Fprintf(GinkgoWriter, "Restarting Jenkins master pod")
+func restartJenkinsMasterPod(jenkins *v1alpha2.Jenkins) {
+	_, _ = fmt.Fprintf(GinkgoWriter, "Restarting Jenkins master pod\n")
 	jenkinsPod := getJenkinsMasterPod(jenkins)
 	Expect(k8sClient.Delete(context.TODO(), jenkinsPod)).Should(Succeed())
-	_, _ = fmt.Fprintf(GinkgoWriter, "Jenkins master pod has been restarted")
-}*/
+
+	Eventually(func() (bool, error) {
+		jenkinsPod = getJenkinsMasterPod(jenkins)
+		return jenkinsPod.DeletionTimestamp != nil, nil
+	}, 30*retryInterval, retryInterval).Should(BeTrue())
+
+	_, _ = fmt.Fprintf(GinkgoWriter, "Jenkins master pod has been restarted\n")
+}
 
 func getJenkinsService(jenkins *v1alpha2.Jenkins, serviceKind string) *corev1.Service {
 	service := &corev1.Service{}

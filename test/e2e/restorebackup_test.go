@@ -1,21 +1,17 @@
 package e2e
 
-// TODO
-/*
 import (
 	"context"
-	"testing"
+	"fmt"
 	"time"
 
-	"github.com/jenkinsci/kubernetes-operator/internal/try"
-	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	"github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
 	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 
-	framework "github.com/operator-framework/operator-sdk/pkg/test"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -23,64 +19,33 @@ import (
 
 const pvcName = "pvc-jenkins"
 
-func TestBackupAndRestore(t *testing.T) {
-	t.Parallel()
-	namespace, ctx := setupTest(t)
+func waitForJobCreation(jenkinsClient client.Jenkins, jobID string) {
+	By("waiting for Jenkins job creation")
 
-	defer showLogsAndCleanup(t, ctx)
-
-	jobID := "e2e-jenkins-operator"
-	createPVC(t, namespace)
-	jenkins := createJenkinsWithBackupAndRestoreConfigured(t, "e2e", namespace)
-	waitForJenkinsUserConfigurationToComplete(t, jenkins)
-
-	jenkinsClient, cleanUpFunc := verifyJenkinsAPIConnection(t, jenkins, namespace)
-	defer cleanUpFunc()
-	waitForJob(t, jenkinsClient, jobID)
-	job, err := jenkinsClient.GetJob(jobID)
-	require.NoError(t, err, job)
-	i, err := job.InvokeSimple(map[string]string{})
-	require.NoError(t, err, i)
-	// FIXME: waitForJobToFinish use
-	time.Sleep(60 * time.Second) // wait for the build to complete
-
-	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
-	lastDoneBackup := jenkins.Status.LastBackup
-	restartJenkinsMasterPod(t, jenkins)
-	waitForRecreateJenkinsMasterPod(t, jenkins)
-	waitForJenkinsUserConfigurationToComplete(t, jenkins)
-	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
-	assert.Equal(t, lastDoneBackup, jenkins.Status.RestoredBackup)
-	jenkinsClient2, cleanUpFunc2 := verifyJenkinsAPIConnection(t, jenkins, namespace)
-	defer cleanUpFunc2()
-	waitForJob(t, jenkinsClient2, jobID)
-	verifyJobBuildsAfterRestoreBackup(t, jenkinsClient2, jobID)
-
-	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
-	lastDoneBackup = jenkins.Status.LastBackup
-	resetJenkinsStatus(t, jenkins)
-	waitForJenkinsUserConfigurationToComplete(t, jenkins)
-	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
-	assert.Equal(t, lastDoneBackup, jenkins.Status.RestoredBackup)
-}
-
-func waitForJob(t *testing.T, jenkinsClient client.Jenkins, jobID string) {
-	err := try.Until(func() (end bool, err error) {
+	var err error
+	Eventually(func() (bool, error) {
 		_, err = jenkinsClient.GetJob(jobID)
+		if err != nil {
+			return false, err
+		}
 		return err == nil, err
-	}, time.Second*2, time.Minute*3)
-	require.NoErrorf(t, err, "Jenkins job '%s' not created by seed job", jobID)
+	}, time.Minute*3, time.Second*2).Should(BeTrue())
+
+	Expect(err).NotTo(HaveOccurred())
 }
 
-func verifyJobBuildsAfterRestoreBackup(t *testing.T, jenkinsClient client.Jenkins, jobID string) {
+func verifyJobBuildsAfterRestoreBackup(jenkinsClient client.Jenkins, jobID string) {
+	By("checking if job builds after restoring backup")
+
 	job, err := jenkinsClient.GetJob(jobID)
-	require.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 	build, err := job.GetLastBuild()
-	require.NoError(t, err)
-	assert.Equal(t, int64(1), build.GetBuildNumber())
+	Expect(err).NotTo(HaveOccurred())
+
+	Expect(build.GetBuildNumber()).To(Equal(int64(1)))
 }
 
-func createPVC(t *testing.T, namespace string) {
+func createPVC(namespace string) {
 	pvc := &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      pvcName,
@@ -96,11 +61,10 @@ func createPVC(t *testing.T, namespace string) {
 		},
 	}
 
-	err := framework.Global.Client.Create(context.TODO(), pvc, nil)
-	require.NoError(t, err)
+	Expect(k8sClient.Create(context.TODO(), pvc)).Should(Succeed())
 }
 
-func createJenkinsWithBackupAndRestoreConfigured(t *testing.T, name, namespace string) *v1alpha2.Jenkins {
+func createJenkinsWithBackupAndRestoreConfigured(name, namespace string) *v1alpha2.Jenkins {
 	containerName := "backup"
 	jenkins := &v1alpha2.Jenkins{
 		TypeMeta: v1alpha2.JenkinsTypeMeta(),
@@ -128,6 +92,16 @@ func createJenkinsWithBackupAndRestoreConfigured(t *testing.T, name, namespace s
 					Exec: &corev1.ExecAction{
 						Command: []string{"/home/user/bin/restore.sh"},
 					},
+				},
+			},
+			GroovyScripts: v1alpha2.GroovyScripts{
+				Customization: v1alpha2.Customization{
+					Configurations: []v1alpha2.ConfigMapRef{},
+				},
+			},
+			ConfigurationAsCode: v1alpha2.ConfigurationAsCode{
+				Customization: v1alpha2.Customization{
+					Configurations: []v1alpha2.ConfigMapRef{},
 				},
 			},
 			Master: v1alpha2.JenkinsMaster{
@@ -201,19 +175,20 @@ func createJenkinsWithBackupAndRestoreConfigured(t *testing.T, name, namespace s
 			},
 		},
 	}
-	updateJenkinsCR(t, jenkins)
 
-	t.Logf("Jenkins CR %+v", *jenkins)
-	err := framework.Global.Client.Create(context.TODO(), jenkins, nil)
-	require.NoError(t, err)
+	updateJenkinsCR(jenkins)
+
+	_, _ = fmt.Fprintf(GinkgoWriter, "Jenkins CR %+v\n", *jenkins)
+
+	Expect(k8sClient.Create(context.TODO(), jenkins)).Should(Succeed())
 
 	return jenkins
 }
 
-func resetJenkinsStatus(t *testing.T, jenkins *v1alpha2.Jenkins) {
-	jenkins = getJenkins(t, jenkins.Namespace, jenkins.Name)
+func resetJenkinsStatus(jenkins *v1alpha2.Jenkins) {
+	By("resetting Jenkins status")
+
+	jenkins = getJenkins(jenkins.Namespace, jenkins.Name)
 	jenkins.Status = v1alpha2.JenkinsStatus{}
-	err := framework.Global.Client.Update(context.TODO(), jenkins)
-	require.NoError(t, err)
+	Expect(k8sClient.Status().Update(context.TODO(), jenkins)).Should(Succeed())
 }
-*/

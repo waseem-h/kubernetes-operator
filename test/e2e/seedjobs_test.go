@@ -13,6 +13,7 @@ import (
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/user/seedjobs"
 	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 
+	"github.com/bndr/gojenkins"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
@@ -27,12 +28,13 @@ type seedJobConfig struct {
 	PrivateKey string   `json:"privateKey,omitempty"`
 }
 
-/*type seedJobsConfig struct {
+/*
+type seedJobsConfig struct {
 	SeedJobs []seedJobConfig `json:"seedJobs,omitempty"`
-}*/
+}
 
 // FIXME
-/*func TestSeedJobs(t *testing.T) {
+func TestSeedJobs(t *testing.T) {
 	t.Parallel()
 	if seedJobConfigurationFile == nil || len(*seedJobConfigurationFile) == 0 {
 		t.Skipf("Skipping test because flag '%+v' is not set", seedJobConfigurationFile)
@@ -63,22 +65,22 @@ type seedJobConfig struct {
 	verifyJenkinsSeedJobs(t, jenkinsClient, seedJobsConfig.SeedJobs)
 }
 
-func loadSeedJobsConfig(t *testing.T) seedJobsConfig {
+func loadSeedJobsConfig() seedJobsConfig {
+	//seedJobConfigurationFile = flag.String(seedJobConfigurationParameterName, "", "path to seed job config")
 	jsonFile, err := os.Open(*seedJobConfigurationFile)
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 	defer func() { _ = jsonFile.Close() }()
 
 	byteValue, err := ioutil.ReadAll(jsonFile)
-	assert.NoError(t, err)
+	Expect(err).NotTo(HaveOccurred())
 
 	var result seedJobsConfig
 	err = json.Unmarshal(byteValue, &result)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, result.SeedJobs)
+	Expect(err).NotTo(HaveOccurred())
+	Expect(result.SeedJobs).NotTo(BeEmpty())
 	return result
 }
 */
-
 func createKubernetesCredentialsProviderSecret(namespace string, config seedJobConfig) {
 	if config.JenkinsCredentialType == v1alpha2.NoJenkinsCredentialCredentialType {
 		return
@@ -112,7 +114,7 @@ func verifyJenkinsSeedJobs(jenkinsClient jenkinsclient.Jenkins, seedJobs []seedJ
 	for _, seedJob := range seedJobs {
 		if seedJob.JenkinsCredentialType == v1alpha2.BasicSSHCredentialType || seedJob.JenkinsCredentialType == v1alpha2.UsernamePasswordCredentialType {
 			err = verifyIfJenkinsCredentialExists(jenkinsClient, seedJob.CredentialID)
-			Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("Jenkins credential '%s' not created for seed job ID '%s'", seedJob.CredentialID, seedJob.ID))
+			Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("Jenkins credential '%s' not created for seed job ID '%s'\n", seedJob.CredentialID, seedJob.ID))
 		}
 
 		verifySeedJobProperties(jenkinsClient, seedJob)
@@ -122,7 +124,7 @@ func verifyJenkinsSeedJobs(jenkinsClient jenkinsclient.Jenkins, seedJobs []seedJ
 				_, err = jenkinsClient.GetJob(requireJobName)
 				return err == nil, err
 			}, time.Second*2, time.Minute*2)
-			Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("Jenkins job '%s' not created by seed job ID '%s'", requireJobName, seedJob.ID))
+			Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("Jenkins job '%s' not created by seed job ID '%s'\n", requireJobName, seedJob.ID))
 		}
 	}
 }
@@ -292,3 +294,36 @@ for (BuildStep step : jobRef.getBuildersList()) {
 	}
 }
 `))
+
+func verifyJobCanBeRun(jenkinsClient jenkinsclient.Jenkins, jobID string) {
+	By("retrieving created Jenkins job")
+	job, err := jenkinsClient.GetJob(jobID)
+	Expect(err).To(BeNil())
+
+	By("running Jenkins job")
+	_, err = job.InvokeSimple(map[string]string{})
+	Expect(err).To(BeNil())
+
+	// FIXME: waitForJobToFinish use
+	By("waiting for the job to finish")
+	time.Sleep(100 * time.Second) // wait for the build to complete
+}
+func verifyJobHasBeenRunCorrectly(jenkinsClient jenkinsclient.Jenkins, jobID string) {
+	By("retrieving finished job")
+
+	var (
+		err   error
+		job   *gojenkins.Job
+		build *gojenkins.Build
+	)
+
+	Eventually(func() (bool, error) {
+		job, err = jenkinsClient.GetJob(jobID)
+		Expect(err).To(BeNil())
+		build, err = job.GetLastBuild()
+		Expect(err).To(BeNil())
+
+		By("evaluating correctness of the outcome")
+		return build.IsGood(), err
+	}, time.Duration(110)*retryInterval, retryInterval).Should(BeTrue())
+}
