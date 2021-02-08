@@ -101,7 +101,6 @@ vet: ## Verifies `go vet` passes
 
 .PHONY: staticcheck
 HAS_STATICCHECK := $(shell which $(PROJECT_DIR)/bin/staticcheck)
-PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
 staticcheck: ## Verifies `staticcheck` passes
 	@echo "+ $@"
 ifndef HAS_STATICCHECK
@@ -302,11 +301,21 @@ ifneq ($(KUBERNETES_PROVIDER),crc)
 	$(error KUBERNETES_PROVIDER not set to 'crc')
 endif
 
-.PHONY: minikube-start
-minikube-start: check-minikube ## Start minikube
+.PHONY: minikube
+HAS_MINIKUBE := $(shell which $(PROJECT_DIR)/bin/minikube)
+minikube: ## Download minikube if it's not present
 	@echo "+ $@"
-	@minikube status && exit 0 || \
-	minikube start --kubernetes-version $(MINIKUBE_KUBERNETES_VERSION) --dns-domain=$(CLUSTER_DOMAIN) --extra-config=kubelet.cluster-domain=$(CLUSTER_DOMAIN) --vm-driver=$(MINIKUBE_DRIVER) --memory 4096 --cpus 3
+ifndef HAS_MINIKUBE
+	mkdir -p $(PROJECT_DIR)/bin
+	wget -O $(PROJECT_DIR)/bin/minikube https://github.com/kubernetes/minikube/releases/download/v$(MINIKUBE_VERSION)/minikube-$(PLATFORM)-amd64
+	chmod +x $(PROJECT_DIR)/bin/minikube
+endif
+
+.PHONY: minikube-start
+minikube-start: minikube check-minikube ## Start minikube
+	@echo "+ $@"
+	bin/minikube status && exit 0 || \
+	bin/minikube start --kubernetes-version $(MINIKUBE_KUBERNETES_VERSION) --dns-domain=$(CLUSTER_DOMAIN) --extra-config=kubelet.cluster-domain=$(CLUSTER_DOMAIN) --vm-driver=$(MINIKUBE_DRIVER) --memory 4096 --cpus 3
 
 .PHONY: crc-start
 crc-start: check-crc ## Start CodeReady Containers Kubernetes cluster
@@ -315,7 +324,6 @@ crc-start: check-crc ## Start CodeReady Containers Kubernetes cluster
 
 .PHONY: sembump
 HAS_SEMBUMP := $(shell which $(PROJECT_DIR)/bin/sembump)
-PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
 sembump: # Download sembump locally if necessary
 	@echo "+ $@"
 ifndef HAS_SEMBUMP
@@ -448,7 +456,6 @@ endef
 
 .PHONY: operator-sdk
 HAS_OPERATOR_SDK := $(shell which $(PROJECT_DIR)/bin/operator-sdk)
-PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
 operator-sdk: # Download operator-sdk locally if necessary
 	@echo "+ $@"
 ifndef HAS_OPERATOR_SDK

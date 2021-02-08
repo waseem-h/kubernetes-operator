@@ -176,7 +176,7 @@ var _ = Describe("Jenkins controller plugins test", func() {
 
 	BeforeEach(func() {
 		namespace = createNamespace()
-		jenkins = createJenkinsCRSafe(jenkinsCRName, namespace.Name, &[]v1alpha2.SeedJob{mySeedJob.SeedJob}, groovyScripts, casc, priorityClassName)
+		jenkins = createJenkinsCR(jenkinsCRName, namespace.Name, &[]v1alpha2.SeedJob{mySeedJob.SeedJob}, groovyScripts, casc, priorityClassName)
 	})
 
 	AfterEach(func() {

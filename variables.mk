@@ -69,6 +69,7 @@ OPERATOR_ARGS ?= --jenkins-api-hostname=$(JENKINS_API_HOSTNAME) --jenkins-api-po
 
 .DEFAULT_GOAL := help
 
+PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
 ##################### FROM OPERATOR SDK ########################
 
 # Default bundle image tag
