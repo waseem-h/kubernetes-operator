@@ -315,7 +315,7 @@ endif
 minikube-start: minikube check-minikube ## Start minikube
 	@echo "+ $@"
 	bin/minikube status && exit 0 || \
-	bin/minikube start --kubernetes-version $(MINIKUBE_KUBERNETES_VERSION) --dns-domain=$(CLUSTER_DOMAIN) --extra-config=kubelet.cluster-domain=$(CLUSTER_DOMAIN) --vm-driver=$(MINIKUBE_DRIVER) --memory 4096 --cpus 3
+	bin/minikube start --kubernetes-version $(MINIKUBE_KUBERNETES_VERSION) --dns-domain=$(CLUSTER_DOMAIN) --extra-config=kubelet.cluster-domain=$(CLUSTER_DOMAIN) --driver=$(MINIKUBE_DRIVER) --memory 4096 --cpus $(CPUS_NUMBER)
 
 .PHONY: crc-start
 crc-start: check-crc ## Start CodeReady Containers Kubernetes cluster
@@ -405,6 +405,17 @@ generate-docs: hugo ## Re-generate docs directory from the website directory
 	rm -rf docs || echo "Cannot remove docs dir, ignoring"
 	bin/hugo -s website -d ../docs
 
+.PHONY: all-in-one-build
+FILENAME := config/all_in_one_$(API_VERSION).yaml
+all-in-one-build: ## Re-generate all-in-one yaml
+	@echo "+ $@"
+	> $(FILENAME)
+	cat config/rbac/leader_election_role.yaml >> $(FILENAME)
+	cat config/rbac/leader_election_role_binding.yaml >> $(FILENAME)
+	cat config/rbac/role.yaml >> $(FILENAME)
+	cat config/rbac/role_binding.yaml >> $(FILENAME)
+	cat config/manager/manager.yaml >> $(FILENAME)
+
 ##################### FROM OPERATOR SDK ########################
 # Install CRDs into a cluster
 install-crds: manifests kustomize
@@ -424,7 +435,7 @@ undeploy:
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
-manifests: controller-gen
+manifests: controller-gen all-in-one-build
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 # Generate code

@@ -69,7 +69,8 @@ OPERATOR_ARGS ?= --jenkins-api-hostname=$(JENKINS_API_HOSTNAME) --jenkins-api-po
 
 .DEFAULT_GOAL := help
 
-PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
+PLATFORM = $(shell echo $(UNAME_S) | tr A-Z a-z)
+CPUS_NUMBER = 3
 ##################### FROM OPERATOR SDK ########################
 
 # Default bundle image tag
