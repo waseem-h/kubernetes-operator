@@ -23,9 +23,9 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: jenkins-operator:305dbeda-dirty-dirty
+        image: virtuslab/jenkins-operator:v0.5.0
         name: jenkins-operator
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         securityContext:
           allowPrivilegeEscalation: false
         livenessProbe:
