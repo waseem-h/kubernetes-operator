@@ -1,74 +1,4 @@
-# Set POSIX sh for maximum interoperability
-SHELL := /bin/sh
-PATH  := $(GOPATH)/bin:$(PATH)
-
-OSFLAG 				:=
-ifeq ($(OS),Windows_NT)
-	OSFLAG = WIN32
-else
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		OSFLAG = LINUX
-	endif
-	ifeq ($(UNAME_S),Darwin)
-		OSFLAG = OSX
-	endif
-endif
-
-include config.base.env
-
-# Import config
-# You can change the default config with `make config="config_special.env" build`
-config ?= config.minikube.env
-include $(config)
-
-# Set an output prefix, which is the local directory if not specified
-PREFIX?=$(shell pwd)
-
-VERSION := $(shell cat VERSION.txt)
-GITCOMMIT := $(shell git rev-parse --short HEAD)
-GITBRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-GITUNTRACKEDCHANGES := $(shell git status --porcelain --untracked-files=no)
-GITIGNOREDBUTTRACKEDCHANGES := $(shell git ls-files -i --exclude-standard)
-ifneq ($(GITUNTRACKEDCHANGES),)
-    GITCOMMIT := $(GITCOMMIT)-dirty
-endif
-ifneq ($(GITIGNOREDBUTTRACKEDCHANGES),)
-    GITCOMMIT := $(GITCOMMIT)-dirty
-endif
-
-VERSION_TAG := $(VERSION)
-LATEST_TAG := latest
-BUILD_TAG := $(GITBRANCH)-$(GITCOMMIT)
-
-BUILD_PATH := ./cmd/manager
-
-# CONTAINER_RUNTIME_COMMAND is Container Runtime - it could be docker or podman
-CONTAINER_RUNTIME_COMMAND := docker
-
-# Set any default go build tags
-BUILDTAGS :=
-
-# Set the build dir, where built cross-compiled binaries will be output
-BUILDDIR := ${PREFIX}/cross
-
-CTIMEVAR=-X $(PKG)/version.GitCommit=$(GITCOMMIT) -X $(PKG)/version.Version=$(VERSION)
-GO_LDFLAGS=-ldflags "-w $(CTIMEVAR)"
-GO_LDFLAGS_STATIC=-ldflags "-w $(CTIMEVAR) -extldflags -static"
-
-# List the GOOS and GOARCH to build
-GOOSARCHES = linux/amd64
-
-PACKAGES = $(shell go list -f '{{.ImportPath}}/' ./... | grep -v vendor)
-PACKAGES_FOR_UNIT_TESTS = $(shell go list -f '{{.ImportPath}}/' ./... | grep -v vendor | grep -v e2e)
-
-# Run all the e2e tests by default
-E2E_TEST_SELECTOR ?= .*
-
-JENKINS_API_HOSTNAME := $(shell $(JENKINS_API_HOSTNAME_COMMAND) 2> /dev/null || echo "" )
-OPERATOR_ARGS ?= --jenkins-api-hostname=$(JENKINS_API_HOSTNAME) --jenkins-api-port=$(JENKINS_API_PORT) --jenkins-api-use-nodeport=$(JENKINS_API_USE_NODEPORT) --cluster-domain=$(CLUSTER_DOMAIN) $(OPERATOR_EXTRA_ARGS)
-
-.DEFAULT_GOAL := help
+include variables.mk
 
 .PHONY: all
 all: status checkmake clean build verify install container-runtime-build container-runtime-images ## Build the image
@@ -121,7 +51,7 @@ build: deepcopy-gen $(NAME) ## Builds a dynamic executable or package
 .PHONY: $(NAME)
 $(NAME): $(wildcard *.go) $(wildcard */*.go) VERSION.txt
 	@echo "+ $@"
-	CGO_ENABLED=0 go build -tags "$(BUILDTAGS)" ${GO_LDFLAGS} -o build/_output/bin/jenkins-operator $(BUILD_PATH)
+	CGO_ENABLED=0 go build -tags "$(BUILDTAGS)" ${GO_LDFLAGS} -o bin/manager $(BUILD_PATH)
 
 .PHONY: static
 static: ## Builds a static executable
@@ -136,22 +66,22 @@ fmt: ## Verifies all files have been `gofmt`ed
 	@go fmt $(PACKAGES)
 
 .PHONY: lint
-HAS_GOLINT := $(shell which golangci-lint)
+HAS_GOLINT := $(shell which $(PROJECT_DIR)/bin/golangci-lint)
 lint: ## Verifies `golint` passes
 	@echo "+ $@"
 ifndef HAS_GOLINT
-	go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.26.0
+	$(call go-get-tool,$(PROJECT_DIR)/bin/golangci-lint,github.com/golangci/golangci-lint/cmd/golangci-lint@v1.26.0)
 endif
-	@golangci-lint run
+	@bin/golangci-lint run
 
 .PHONY: goimports
-HAS_GOIMPORTS := $(shell which goimports)
+HAS_GOIMPORTS := $(shell which $(PROJECT_DIR)/bin/goimports)
 goimports: ## Verifies `goimports` passes
 	@echo "+ $@"
 ifndef HAS_GOIMPORTS
-	go get -u golang.org/x/tools/cmd/goimports
+	$(call go-get-tool,$(PROJECT_DIR)/bin/goimports,golang.org/x/tools/cmd/goimports@v0.1.0)
 endif
-	@goimports -l -e $(shell find . -type f -name '*.go' -not -path "./vendor/*")
+	@bin/goimports -l -e $(shell find . -type f -name '*.go' -not -path "./vendor/*")
 
 .PHONY: test
 test: ## Runs the go tests
@@ -159,47 +89,10 @@ test: ## Runs the go tests
 	@RUNNING_TESTS=1 go test -tags "$(BUILDTAGS) cgo" $(PACKAGES_FOR_UNIT_TESTS)
 
 .PHONY: e2e
-CURRENT_DIRECTORY := $(shell pwd)
-e2e: container-runtime-build ## Runs e2e tests, you can use EXTRA_ARGS
+e2e: deepcopy-gen ## Runs e2e tests, you can use EXTRA_ARGS
 	@echo "+ $@"
-	@echo "Docker image: $(DOCKER_REGISTRY):$(GITCOMMIT)"
-ifeq ($(KUBERNETES_PROVIDER),minikube)
-	kubectl config use-context $(KUBECTL_CONTEXT)
-endif
-ifeq ($(KUBERNETES_PROVIDER),crc)
-	oc project $(CRC_OC_PROJECT)
-endif
-	cp deploy/service_account.yaml deploy/namespace-init.yaml
-	cat deploy/role.yaml >> deploy/namespace-init.yaml
-	cat deploy/role_binding.yaml >> deploy/namespace-init.yaml
-	cat deploy/operator.yaml >> deploy/namespace-init.yaml
-ifeq ($(OSFLAG), LINUX)
-ifeq ($(IMAGE_PULL_MODE), remote)
-	sed -i 's|\(image:\).*|\1 $(DOCKER_ORGANIZATION)/$(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-	sed -i 's|\(imagePullPolicy\): IfNotPresent|\1: Always|g' deploy/namespace-init.yaml
-else
-	sed -i 's|\(image:\).*|\1 $(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-endif
-ifeq ($(KUBERNETES_PROVIDER),minikube)
-	sed -i 's|\(imagePullPolicy\): IfNotPresent|\1: Never|g' deploy/namespace-init.yaml
-endif
-endif
-
-ifeq ($(OSFLAG), OSX)
-ifeq ($(IMAGE_PULL_MODE), remote)
-	sed -i '' 's|\(image:\).*|\1 $(DOCKER_ORGANIZATION)/$(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-	sed -i '' 's|\(imagePullPolicy\): IfNotPresent|\1: Always|g' deploy/namespace-init.yaml
-else
-	sed -i '' 's|\(image:\).*|\1 $(DOCKER_REGISTRY):$(GITCOMMIT)|g' deploy/namespace-init.yaml
-endif
-ifeq ($(KUBERNETES_PROVIDER),minikube)
-	sed -i '' 's|\(imagePullPolicy\): IfNotPresent|\1: Never|g' deploy/namespace-init.yaml
-endif
-endif
-
 	RUNNING_TESTS=1 go test -parallel=1 "./test/e2e/" -tags "$(BUILDTAGS) cgo" -v -timeout 60m -run "$(E2E_TEST_SELECTOR)" \
-		-root=$(CURRENT_DIRECTORY) -kubeconfig=$(HOME)/.kube/config -globalMan deploy/crds/jenkins_$(API_VERSION)_jenkins_crd.yaml \
-		-namespacedMan deploy/namespace-init.yaml $(TEST_ARGS)
+		-jenkins-api-hostname=$(JENKINS_API_HOSTNAME) -jenkins-api-port=$(JENKINS_API_PORT) -jenkins-api-use-nodeport=$(JENKINS_API_USE_NODEPORT) $(E2E_TEST_ARGS)
 
 .PHONY: vet
 vet: ## Verifies `go vet` passes
@@ -207,17 +100,18 @@ vet: ## Verifies `go vet` passes
 	@go vet $(PACKAGES)
 
 .PHONY: staticcheck
-HAS_STATICCHECK := $(shell which staticcheck)
-PLATFORM  = $(shell echo $(UNAME_S) | tr A-Z a-z)
+HAS_STATICCHECK := $(shell which $(PROJECT_DIR)/bin/staticcheck)
 staticcheck: ## Verifies `staticcheck` passes
 	@echo "+ $@"
 ifndef HAS_STATICCHECK
-	wget -O staticcheck_$(PLATFORM)_amd64.tar.gz https://github.com/dominikh/go-tools/releases/download/2020.1.3/staticcheck_$(PLATFORM)_amd64.tar.gz
-	tar zxvf staticcheck_$(PLATFORM)_amd64.tar.gz
-	mkdir -p $(GOPATH)/bin
-	mv staticcheck/staticcheck $(GOPATH)/bin
+	$(eval TMP_DIR := $(shell mktemp -d))
+	wget -O $(TMP_DIR)/staticcheck_$(PLATFORM)_amd64.tar.gz https://github.com/dominikh/go-tools/releases/download/2020.1.3/staticcheck_$(PLATFORM)_amd64.tar.gz
+	tar zxvf $(TMP_DIR)/staticcheck_$(PLATFORM)_amd64.tar.gz -C $(TMP_DIR)
+	mkdir -p $(PROJECT_DIR)/bin
+	mv $(TMP_DIR)/staticcheck/staticcheck $(PROJECT_DIR)/bin
+	rm -rf $(TMP_DIR)
 endif
-	@staticcheck $(PACKAGES)
+	@$(PROJECT_DIR)/bin/staticcheck $(PACKAGES)
 
 .PHONY: cover
 cover: ## Runs go test with coverage
@@ -242,7 +136,7 @@ install: ## Installs the executable
 .PHONY: run
 run: export WATCH_NAMESPACE = $(NAMESPACE)
 run: export OPERATOR_NAME = $(NAME)
-run: build ## Run the executable, you can use EXTRA_ARGS
+run: fmt vet manifests install-crds build ## Run the executable, you can use EXTRA_ARGS
 	@echo "+ $@"
 ifeq ($(KUBERNETES_PROVIDER),minikube)
 	kubectl config use-context $(KUBECTL_CONTEXT)
@@ -250,10 +144,8 @@ endif
 ifeq ($(KUBERNETES_PROVIDER),crc)
 	oc project $(CRC_OC_PROJECT)
 endif
-	kubectl apply -f deploy/crds/jenkins_$(API_VERSION)_jenkins_crd.yaml
-	kubectl apply -f deploy/crds/jenkins_$(API_VERSION)_jenkinsimage_crd.yaml
 	@echo "Watching '$(WATCH_NAMESPACE)' namespace"
-	build/_output/bin/jenkins-operator $(OPERATOR_ARGS)
+	bin/manager $(OPERATOR_ARGS)
 
 .PHONY: clean
 clean: ## Cleanup any build binaries or packages
@@ -309,13 +201,13 @@ container-runtime-login: ## Log in into the Docker repository
 	@echo "+ $@"
 
 .PHONY: container-runtime-build
-container-runtime-build: check-env ## Build the container
+container-runtime-build: check-env deepcopy-gen ## Build the container
 	@echo "+ $@"
 	$(CONTAINER_RUNTIME_COMMAND) build \
 	--build-arg GO_VERSION=$(GO_VERSION) \
-	--build-arg OPERATOR_SDK_VERSION=$(OPERATOR_SDK_VERSION) \
+	--build-arg CTIMEVAR="$(CTIMEVAR)" \
 	-t $(DOCKER_REGISTRY):$(GITCOMMIT) . \
-	--file build/Dockerfile $(CONTAINER_RUNTIME_EXTRA_ARGS)
+	--file Dockerfile $(CONTAINER_RUNTIME_EXTRA_ARGS)
 
 .PHONY: container-runtime-images
 container-runtime-images: ## List all local containers
@@ -368,27 +260,18 @@ container-runtime-run: ## Run the container in docker, you can use EXTRA_ARGS
 .PHONY: minikube-run
 minikube-run: export WATCH_NAMESPACE = $(NAMESPACE)
 minikube-run: export OPERATOR_NAME = $(NAME)
-minikube-run: minikube-start ## Run the operator locally and use minikube as Kubernetes cluster, you can use OPERATOR_ARGS
+minikube-run: minikube-start run ## Run the operator locally and use minikube as Kubernetes cluster, you can use OPERATOR_ARGS
 	@echo "+ $@"
-	kubectl config use-context minikube
-	kubectl apply -f deploy/crds/jenkins_$(API_VERSION)_jenkins_crd.yaml
-	@echo "Watching '$(WATCH_NAMESPACE)' namespace"
-	build/_output/bin/jenkins-operator $(OPERATOR_ARGS)
 
 .PHONY: crc-run
 crc-run: export WATCH_NAMESPACE = $(NAMESPACE)
 crc-run: export OPERATOR_NAME = $(NAME)
-crc-run: crc-start ## Run the operator locally and use CodeReady Containers as Kubernetes cluster, you can use OPERATOR_ARGS
+crc-run: crc-start run ## Run the operator locally and use CodeReady Containers as Kubernetes cluster, you can use OPERATOR_ARGS
 	@echo "+ $@"
-	oc project $(CRC_OC_PROJECT)
-	kubectl apply -f deploy/crds/jenkins_$(API_VERSION)_jenkins_crd.yaml
-	@echo "Watching '$(WATCH_NAMESPACE)' namespace"
-	build/_output/bin/jenkins-operator $(OPERATOR_ARGS)
 
 .PHONY: deepcopy-gen
-deepcopy-gen: ## Generate deepcopy golang code
+deepcopy-gen: generate ## Generate deepcopy golang code
 	@echo "+ $@"
-	operator-sdk generate k8s
 
 .PHONY: scheme-doc-gen
 HAS_GEN_CRD_API_REFERENCE_DOCS := $(shell ls gen-crd-api-reference-docs 2> /dev/null)
@@ -400,7 +283,7 @@ ifndef HAS_GEN_CRD_API_REFERENCE_DOCS
 	@tar -C $(GEN_CRD_API) -zxf $(GEN_CRD_API)_linux_amd64.tar.gz
 	@rm $(GEN_CRD_API)_linux_amd64.tar.gz
 endif
-	$(GEN_CRD_API)/$(GEN_CRD_API) -config gen-crd-api-config.json -api-dir github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/$(API_VERSION) -template-dir $(GEN_CRD_API)/template -out-file documentation/$(VERSION)/jenkins-$(API_VERSION)-scheme.md
+	$(GEN_CRD_API)/$(GEN_CRD_API) -config gen-crd-api-config.json -api-dir $(PKG)/api/$(API_VERSION) -template-dir $(GEN_CRD_API)/template -out-file documentation/$(VERSION)/jenkins-$(API_VERSION)-scheme.md
 
 .PHONY: check-minikube
 check-minikube: ## Checks if KUBERNETES_PROVIDER is set to minikube
@@ -418,23 +301,41 @@ ifneq ($(KUBERNETES_PROVIDER),crc)
 	$(error KUBERNETES_PROVIDER not set to 'crc')
 endif
 
-.PHONY: minikube-start
-minikube-start: check-minikube ## Start minikube
+.PHONY: minikube
+HAS_MINIKUBE := $(shell which $(PROJECT_DIR)/bin/minikube)
+minikube: ## Download minikube if it's not present
 	@echo "+ $@"
-	@minikube status && exit 0 || \
-	minikube start --kubernetes-version $(MINIKUBE_KUBERNETES_VERSION) --dns-domain=$(CLUSTER_DOMAIN) --extra-config=kubelet.cluster-domain=$(CLUSTER_DOMAIN) --vm-driver=$(MINIKUBE_DRIVER) --memory 4096 --cpus 3
+ifndef HAS_MINIKUBE
+	mkdir -p $(PROJECT_DIR)/bin
+	wget -O $(PROJECT_DIR)/bin/minikube https://github.com/kubernetes/minikube/releases/download/v$(MINIKUBE_VERSION)/minikube-$(PLATFORM)-amd64
+	chmod +x $(PROJECT_DIR)/bin/minikube
+endif
+
+.PHONY: minikube-start
+minikube-start: minikube check-minikube ## Start minikube
+	@echo "+ $@"
+	bin/minikube status && exit 0 || \
+	bin/minikube start --kubernetes-version $(MINIKUBE_KUBERNETES_VERSION) --dns-domain=$(CLUSTER_DOMAIN) --extra-config=kubelet.cluster-domain=$(CLUSTER_DOMAIN) --driver=$(MINIKUBE_DRIVER) --memory 4096 --cpus $(CPUS_NUMBER)
 
 .PHONY: crc-start
 crc-start: check-crc ## Start CodeReady Containers Kubernetes cluster
 	@echo "+ $@"
 	crc start
 
+.PHONY: sembump
+HAS_SEMBUMP := $(shell which $(PROJECT_DIR)/bin/sembump)
+sembump: # Download sembump locally if necessary
+	@echo "+ $@"
+ifndef HAS_SEMBUMP
+	wget -O $(PROJECT_DIR)/bin/sembump https://github.com/justintout/sembump/releases/download/v0.1.0/sembump-$(PLATFORM)-amd64
+	chmod +x $(PROJECT_DIR)/bin/sembump
+endif
+
 .PHONY: bump-version
 BUMP := patch
-bump-version: ## Bump the version in the version file. Set BUMP to [ patch | major | minor ]
+bump-version: sembump ## Bump the version in the version file. Set BUMP to [ patch | major | minor ]
 	@echo "+ $@"
-	#@go get -u github.com/jessfraz/junk/sembump # update sembump tool FIXME
-	$(eval NEW_VERSION=$(shell sembump --kind $(BUMP) $(VERSION)))
+	$(eval NEW_VERSION=$(shell bin/sembump --kind $(BUMP) $(VERSION)))
 	@echo "Bumping VERSION.txt from $(VERSION) to $(NEW_VERSION)"
 	echo $(NEW_VERSION) > VERSION.txt
 	@echo "Updating version from $(VERSION) to $(NEW_VERSION) in README.md"
@@ -493,8 +394,101 @@ helm-deploy: helm-package
 	helm repo index chart/ --url https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart/jenkins-operator/
 	cd chart/ && mv jenkins-operator-*.tgz jenkins-operator
 
+# Download hugo locally if necessary
+HUGO = $(shell pwd)/bin/hugo
+hugo:
+	$(call go-get-tool,$(HUGO),github.com/gohugoio/hugo@v0.62.2)
+
 .PHONY: generate-docs
-generate-docs: ## Re-generate docs directory from the website directory
+generate-docs: hugo ## Re-generate docs directory from the website directory
 	@echo "+ $@"
 	rm -rf docs || echo "Cannot remove docs dir, ignoring"
-	hugo -s website -d ../docs
+	bin/hugo -s website -d ../docs
+
+.PHONY: all-in-one-build
+FILENAME := config/all_in_one_$(API_VERSION).yaml
+all-in-one-build: ## Re-generate all-in-one yaml
+	@echo "+ $@"
+	> $(FILENAME)
+	cat config/rbac/leader_election_role.yaml >> $(FILENAME)
+	cat config/rbac/leader_election_role_binding.yaml >> $(FILENAME)
+	cat config/rbac/role.yaml >> $(FILENAME)
+	cat config/rbac/role_binding.yaml >> $(FILENAME)
+	cat config/manager/manager.yaml >> $(FILENAME)
+
+##################### FROM OPERATOR SDK ########################
+# Install CRDs into a cluster
+install-crds: manifests kustomize
+	$(KUSTOMIZE) build config/crd | kubectl apply -f -
+
+# Uninstall CRDs from a cluster
+uninstall-crds: manifests kustomize
+	$(KUSTOMIZE) build config/crd | kubectl delete -f -
+
+# Deploy controller in the configured Kubernetes cluster in ~/.kube/config
+deploy: manifests kustomize
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(DOCKER_REGISTRY):$(GITCOMMIT)
+	$(KUSTOMIZE) build config/default | kubectl apply -f -
+
+# UnDeploy controller from the configured Kubernetes cluster in ~/.kube/config
+undeploy:
+	$(KUSTOMIZE) build config/default | kubectl delete -f -
+
+# Generate manifests e.g. CRD, RBAC etc.
+manifests: controller-gen all-in-one-build
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
+
+# Generate code
+generate: controller-gen
+	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+
+# Download controller-gen locally if necessary
+CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
+controller-gen:
+	$(call go-get-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v0.4.1)
+
+# Download kustomize locally if necessary
+KUSTOMIZE = $(shell pwd)/bin/kustomize
+kustomize:
+	$(call go-get-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v3.8.7)
+
+# go-get-tool will 'go get' any package $2 and install it to $1.
+define go-get-tool
+@[ -f $(1) ] || { \
+set -e ;\
+TMP_DIR=$$(mktemp -d) ;\
+cd $$TMP_DIR ;\
+go mod init tmp ;\
+echo "Downloading $(2)" ;\
+GOBIN=$(PROJECT_DIR)/bin go get $(2) ;\
+rm -rf $$TMP_DIR ;\
+}
+endef
+
+.PHONY: operator-sdk
+HAS_OPERATOR_SDK := $(shell which $(PROJECT_DIR)/bin/operator-sdk)
+operator-sdk: # Download operator-sdk locally if necessary
+	@echo "+ $@"
+ifndef HAS_OPERATOR_SDK
+	wget -O $(PROJECT_DIR)/bin/operator-sdk https://github.com/operator-framework/operator-sdk/releases/download/v1.3.0/operator-sdk_$(PLATFORM)_amd64
+	chmod +x $(PROJECT_DIR)/bin/operator-sdk
+endif
+
+# Generate bundle manifests and metadata, then validate generated files.
+.PHONY: bundle
+bundle: manifests operator-sdk kustomize
+	bin/operator-sdk generate kustomize manifests -q
+	cd config/manager && $(KUSTOMIZE) edit set image controller=$(DOCKER_ORGANIZATION)/$(DOCKER_REGISTRY):$(VERSION_TAG)
+	$(KUSTOMIZE) build config/manifests | bin/operator-sdk generate bundle -q --overwrite --version $(VERSION) $(BUNDLE_METADATA_OPTS)
+	bin/operator-sdk bundle validate ./bundle
+
+# Build the bundle image.
+.PHONY: bundle-build
+bundle-build:
+	docker build -f bundle.Dockerfile -t $(BUNDLE_IMG) .
+
+# Download kubebuilder
+kubebuilder:
+	mkdir -p ${ENVTEST_ASSETS_DIR}
+	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0/hack/setup-envtest.sh
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR);

@@ -152,6 +152,7 @@ items:
     restore:
       action: {}
       containerName: ""
+      getLatestAction: {}
     seedJobs:
     - additionalClasspath: ""
       bitbucketPushTrigger: false
@@ -244,7 +245,6 @@ Run e2e tests with minikube:
 
 ```bash
 make minikube-start
-eval $(minikube docker-env)
 make e2e
 ```
 

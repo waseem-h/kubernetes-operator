@@ -2,6 +2,8 @@
 
 package e2e
 
+// TODO
+/*
 import (
 	"fmt"
 	"os/exec"
@@ -66,3 +68,4 @@ func TestDeployHelmChart(t *testing.T) {
 	waitForJenkinsBaseConfigurationToComplete(t, jenkins)
 	waitForJenkinsUserConfigurationToComplete(t, jenkins)
 }
+*/

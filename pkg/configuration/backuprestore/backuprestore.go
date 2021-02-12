@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jenkinsci/kubernetes-operator/pkg/apis/jenkins/v1alpha2"
+	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	jenkinsclient "github.com/jenkinsci/kubernetes-operator/pkg/client"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
@@ -132,7 +132,7 @@ func (bar *BackupAndRestore) Restore(jenkinsClient jenkinsclient.Jenkins) error 
 		bar.logger.V(log.VDebug).Info("Skipping restore backup")
 		if jenkins.Status.PendingBackup == 0 {
 			jenkins.Status.PendingBackup = 1
-			return bar.Client.Update(context.TODO(), jenkins)
+			return bar.Client.Status().Update(context.TODO(), jenkins)
 		}
 		return nil
 	}
@@ -152,7 +152,7 @@ func (bar *BackupAndRestore) Restore(jenkinsClient jenkinsclient.Jenkins) error 
 			bar.logger.V(log.VDebug).Info("Skipping restore backup, get latest action returned -1")
 			jenkins.Status.LastBackup = 0
 			jenkins.Status.PendingBackup = 1
-			return bar.Client.Update(context.TODO(), jenkins)
+			return bar.Client.Status().Update(context.TODO(), jenkins)
 		}
 
 		backupNumber, err = strconv.ParseUint(backupNumberString, 10, 64)
@@ -180,11 +180,25 @@ func (bar *BackupAndRestore) Restore(jenkinsClient jenkinsclient.Jenkins) error 
 		if err != nil {
 			return err
 		}
-
+		//TODO fix me because we're doing two saves unatomically
 		jenkins.Spec.Restore.RecoveryOnce = 0
+		err = bar.Client.Update(context.TODO(), jenkins)
+		if err != nil {
+			return err
+		}
+		key := types.NamespacedName{
+			Namespace: jenkins.Namespace,
+			Name:      jenkins.Name,
+		}
+		err = bar.Client.Get(context.TODO(), key, jenkins)
+		if err != nil {
+			return err
+		}
+		bar.Configuration.Jenkins = jenkins
+
 		jenkins.Status.RestoredBackup = backupNumber
 		jenkins.Status.PendingBackup = backupNumber + 1
-		return bar.Client.Update(context.TODO(), jenkins)
+		return bar.Client.Status().Update(context.TODO(), jenkins)
 	}
 
 	return err
@@ -216,7 +230,7 @@ func (bar *BackupAndRestore) Backup(setBackupDoneBeforePodDeletion bool) error {
 		jenkins.Status.LastBackup = backupNumber
 		jenkins.Status.PendingBackup = backupNumber
 		jenkins.Status.BackupDoneBeforePodDeletion = setBackupDoneBeforePodDeletion
-		return bar.Client.Update(context.TODO(), jenkins)
+		return bar.Client.Status().Update(context.TODO(), jenkins)
 	}
 
 	return err
@@ -234,7 +248,7 @@ func triggerBackup(ticker *time.Ticker, k8sClient k8s.Client, logger logr.Logger
 		}
 		if jenkins.Status.LastBackup == jenkins.Status.PendingBackup {
 			jenkins.Status.PendingBackup++
-			err = k8sClient.Update(context.TODO(), jenkins)
+			err = k8sClient.Status().Update(context.TODO(), jenkins)
 			if err != nil {
 				logger.V(log.VWarn).Info(fmt.Sprintf("backup trigger, error when updating CR: %s", err))
 			}
