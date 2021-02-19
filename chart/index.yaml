@@ -3,6 +3,16 @@ entries:
   jenkins-operator:
   - apiVersion: v2
     appVersion: 0.5.0
+    created: "2021-02-19T12:36:08.931516+01:00"
+    description: Kubernetes native operator which fully manages Jenkins on Kubernetes
+    digest: 7a63ffab918dc012e0231cb362f16fa33d61b6db37a70b00b8c08ceb8cc90768
+    icon: https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/assets/jenkins-operator-icon.png
+    name: jenkins-operator
+    urls:
+    - https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart/jenkins-operator/jenkins-operator-0.4.3.tgz
+    version: 0.4.3
+  - apiVersion: v2
+    appVersion: 0.5.0
     created: "2021-02-04T08:33:21.964999+01:00"
     description: Kubernetes native operator which fully manages Jenkins on Kubernetes
     digest: f045e699339da7345a1b848c5a068ec932ee3da7dfccf8c1f62c4df67aca488e
@@ -238,4 +248,4 @@ entries:
     urls:
     - https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart/jenkins-operator/jenkins-operator-0.0.1.tgz
     version: 0.0.1
-generated: "2021-01-23T14:09:57.300862024+01:00"
+generated: "2021-02-19T12:36:08.928123+01:00"
