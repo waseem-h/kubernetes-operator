@@ -74,10 +74,6 @@ spec:
       exec:
         command:
         - /home/user/bin/backup.sh # this command is invoked on "backup" container to make backup, for example /home/user/bin/backup.sh <backup_number>, <backup_number> is passed by operator
-    getLatestAction:
-      exec:
-        command:
-        - /home/user/bin/get-latest.sh # this command is invoked on "backup" container to get last backup number before pod deletion. If you don't omit it in CR, you can lose data
     interval: 30 # how often make backup in seconds
     makeBackupBeforePodDeletion: true # make a backup before pod deletion
   restore:
@@ -86,5 +82,9 @@ spec:
       exec:
         command:
         - /home/user/bin/restore.sh # this command is invoked on "backup" container to make restore backup, for example /home/user/bin/restore.sh <backup_number>, <backup_number> is passed by operator
+    getLatestAction:
+      exec:
+        command:
+        - /home/user/bin/get-latest.sh # this command is invoked on "backup" container to get last backup number before pod deletion. If you don't omit it in CR, you can lose data
     #recoveryOnce: <backup_number> # if want to restore specific backup configure this field and then Jenkins will be restarted and desired backup will be restored
 ```
