@@ -51,6 +51,13 @@ spec:
         {{- with .Values.jenkins.backup.restoreCommand }}
         command: {{ toYaml . | nindent 8 }}
         {{- end }}
+    {{- if .Values.jenkins.backup.getLatestAction }}
+    getLatestAction:
+      exec:
+        {{- with .Values.jenkins.backup.getLatestAction }}
+        command: {{ toYaml . | nindent 8 }}
+        {{- end }}
+    {{- end }}
     {{- if .Values.jenkins.backup.recoveryOnce }}
     recoveryOnce: {{ .Values.jenkins.backup.recoveryOnce }}
     {{- end }}
