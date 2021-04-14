@@ -38,8 +38,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.6c58fba96b88d035ce071c346f084a9dc4dedee4e80eb3724fe530520541a4ec.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.6c58fba96b88d035ce071c346f084a9dc4dedee4e80eb3724fe530520541a4ec.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.scss" as="style">
+<link href="/kubernetes-operator/scss/main.scss" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -125,6 +125,29 @@
   <ul>
     <li class="collapse " id="kubernetes-operator-docs-installation">
       
+      
+      
+      
+      
+
+
+
+
+
+
+<ul class="td-sidebar-nav__section pr-md-3">
+  <li class="td-sidebar-nav__section-title">
+    <a  href="/kubernetes-operator/docs/installation/preview/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Installation - Preview</a>
+  </li>
+  <ul>
+    <li class="collapse " id="kubernetes-operator-docs-installation-preview">
+      
+      
+      
+    </li>
+  </ul>
+</ul>
+
       
       
     </li>
@@ -260,6 +283,89 @@
       
       
       <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-latest-schema" href="/kubernetes-operator/docs/getting-started/latest/schema/">Schema</a>
+      
+      
+    </li>
+  </ul>
+</ul>
+
+      
+      
+      
+      
+
+
+
+
+
+
+<ul class="td-sidebar-nav__section pr-md-3">
+  <li class="td-sidebar-nav__section-title">
+    <a  href="/kubernetes-operator/docs/getting-started/preview/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Preview</a>
+  </li>
+  <ul>
+    <li class="collapse " id="kubernetes-operator-docs-getting-started-preview">
+      
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-deploy-jenkins" href="/kubernetes-operator/docs/getting-started/preview/deploy-jenkins/">Deploy Jenkins</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-configuration" href="/kubernetes-operator/docs/getting-started/preview/configuration/">Configuration</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-customization" href="/kubernetes-operator/docs/getting-started/preview/customization/">Customization</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-configure-backup-and-restore" href="/kubernetes-operator/docs/getting-started/preview/configure-backup-and-restore/">Configure backup and restore</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-aks" href="/kubernetes-operator/docs/getting-started/preview/aks/">AKS</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-custom-backup-and-restore" href="/kubernetes-operator/docs/getting-started/preview/custom-backup-and-restore/">Custom Backup and Restore Providers</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-notifications" href="/kubernetes-operator/docs/getting-started/preview/notifications/">Notifications</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-openshift" href="/kubernetes-operator/docs/getting-started/preview/openshift/">OpenShift</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-diagnostics" href="/kubernetes-operator/docs/getting-started/preview/diagnostics/">Diagnostics</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-schema" href="/kubernetes-operator/docs/getting-started/preview/schema/">Schema</a>
       
       
     </li>
@@ -634,6 +740,29 @@
       <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-developer-guide-tools" href="/kubernetes-operator/docs/developer-guide/tools/">Tools</a>
       
       
+      
+      
+
+
+
+
+
+
+<ul class="td-sidebar-nav__section pr-md-3">
+  <li class="td-sidebar-nav__section-title">
+    <a  href="/kubernetes-operator/docs/developer-guide/preview/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Developer Guide - Preview</a>
+  </li>
+  <ul>
+    <li class="collapse " id="kubernetes-operator-docs-developer-guide-preview">
+      
+      
+      
+    </li>
+  </ul>
+</ul>
+
+      
+      
     </li>
   </ul>
 </ul>
@@ -728,7 +857,7 @@ via groovy scripts to prevent any security gaps.</p>
 
 <p>Currently <strong>Jenkins Operator</strong> generates a username and random password and stores them in a Kubernetes Secret.
 However any other authorization mechanisms are possible and can be done via groovy scripts or configuration as code plugin.
-For more information take a look at <a href="/website/content/en/docs/Security/_index.md">getting-started#jenkins-customization</a>.</p>
+For more information take a look at <a href="/kubernetes-operator/docs/getting-started/latest/customization/">getting-started#jenkins-customization</a>.</p>
 
 <p>Any change to Security Realm or Authorization requires that user called <code>jenkins-operator</code> must have admin rights
 because <strong>Jenkins Operator</strong> calls Jenkins API.</p>
@@ -747,7 +876,7 @@ because <strong>Jenkins Operator</strong> calls Jenkins API.</p>
 <li>configure kubernetes-plugin - secure configuration for Kubernetes plugin</li>
 </ul>
 
-<p>If you would like to dig a little bit into the code, take a look <a href="/pkg/controller/jenkins/configuration/base/resources/base_configuration_configmap.go">here</a>.</p>
+<p>If you would like to dig a little bit into the code, take a look <a href="https://github.com/jenkinsci/kubernetes-operator/blob/master/pkg/configuration/base/resources/base_configuration_configmap.go">here</a>.</p>
 
 <h2 id="jenkins-api">Jenkins API</h2>
 
@@ -759,8 +888,8 @@ and stores it in a Kubernetes Secret.</p>
 <p>Kubernetes API permissions are limited by the following roles:</p>
 
 <ul>
-<li><a href="/deploy/role.yaml">jenkins-operator role</a><br /></li>
-<li><a href="/pkg/controller/jenkins/configuration/base/resources/rbac.go">Jenkins Master role</a></li>
+<li><a href="https://github.com/jenkinsci/kubernetes-operator/blob/v0.5.0/deploy/role.yaml">jenkins-operator role</a><br /></li>
+<li><a href="https://github.com/jenkinsci/kubernetes-operator/blob/v0.5.0/pkg/configuration/base/resources/rbac.go">Jenkins Master role</a></li>
 </ul>
 
 <p>Since <strong>Jenkins Operator</strong> must be able to grant permission for its&rsquo; deployed Jenkins masters
@@ -812,6 +941,32 @@ $ kubectl -n jenkins apply -f role_binding_jenkins.yaml</code></pre></div>
     
     
     <hr class="panel-line">
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
+        
+            
         
             
         
