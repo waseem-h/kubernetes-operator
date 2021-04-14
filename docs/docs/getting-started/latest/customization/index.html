@@ -45,8 +45,8 @@
 
 
 
-<link rel="preload" href="/kubernetes-operator/scss/main.min.6c58fba96b88d035ce071c346f084a9dc4dedee4e80eb3724fe530520541a4ec.css" as="style">
-<link href="/kubernetes-operator/scss/main.min.6c58fba96b88d035ce071c346f084a9dc4dedee4e80eb3724fe530520541a4ec.css" rel="stylesheet" integrity="">
+<link rel="preload" href="/kubernetes-operator/scss/main.scss" as="style">
+<link href="/kubernetes-operator/scss/main.scss" rel="stylesheet" integrity="">
 
 <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -132,6 +132,29 @@
   <ul>
     <li class="collapse " id="kubernetes-operator-docs-installation">
       
+      
+      
+      
+      
+
+
+
+
+
+
+<ul class="td-sidebar-nav__section pr-md-3">
+  <li class="td-sidebar-nav__section-title">
+    <a  href="/kubernetes-operator/docs/installation/preview/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Installation - Preview</a>
+  </li>
+  <ul>
+    <li class="collapse " id="kubernetes-operator-docs-installation-preview">
+      
+      
+      
+    </li>
+  </ul>
+</ul>
+
       
       
     </li>
@@ -267,6 +290,89 @@
       
       
       <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-latest-schema" href="/kubernetes-operator/docs/getting-started/latest/schema/">Schema</a>
+      
+      
+    </li>
+  </ul>
+</ul>
+
+      
+      
+      
+      
+
+
+
+
+
+
+<ul class="td-sidebar-nav__section pr-md-3">
+  <li class="td-sidebar-nav__section-title">
+    <a  href="/kubernetes-operator/docs/getting-started/preview/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Preview</a>
+  </li>
+  <ul>
+    <li class="collapse " id="kubernetes-operator-docs-getting-started-preview">
+      
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-deploy-jenkins" href="/kubernetes-operator/docs/getting-started/preview/deploy-jenkins/">Deploy Jenkins</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-configuration" href="/kubernetes-operator/docs/getting-started/preview/configuration/">Configuration</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-customization" href="/kubernetes-operator/docs/getting-started/preview/customization/">Customization</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-configure-backup-and-restore" href="/kubernetes-operator/docs/getting-started/preview/configure-backup-and-restore/">Configure backup and restore</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-aks" href="/kubernetes-operator/docs/getting-started/preview/aks/">AKS</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-custom-backup-and-restore" href="/kubernetes-operator/docs/getting-started/preview/custom-backup-and-restore/">Custom Backup and Restore Providers</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-notifications" href="/kubernetes-operator/docs/getting-started/preview/notifications/">Notifications</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-openshift" href="/kubernetes-operator/docs/getting-started/preview/openshift/">OpenShift</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-diagnostics" href="/kubernetes-operator/docs/getting-started/preview/diagnostics/">Diagnostics</a>
+      
+      
+      
+      
+      
+      <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-getting-started-preview-schema" href="/kubernetes-operator/docs/getting-started/preview/schema/">Schema</a>
       
       
     </li>
@@ -641,6 +747,29 @@
       <a class="td-sidebar-link td-sidebar-link__page " id="m-kubernetes-operator-docs-developer-guide-tools" href="/kubernetes-operator/docs/developer-guide/tools/">Tools</a>
       
       
+      
+      
+
+
+
+
+
+
+<ul class="td-sidebar-nav__section pr-md-3">
+  <li class="td-sidebar-nav__section-title">
+    <a  href="/kubernetes-operator/docs/developer-guide/preview/" class="align-left pl-0 pr-2 collapsed td-sidebar-link td-sidebar-link__section">Developer Guide - Preview</a>
+  </li>
+  <ul>
+    <li class="collapse " id="kubernetes-operator-docs-developer-guide-preview">
+      
+      
+      
+    </li>
+  </ul>
+</ul>
+
+      
+      
     </li>
   </ul>
 </ul>
@@ -758,11 +887,11 @@ Plugin&rsquo;s configuration is applied as groovy scripts or the <a href="https:
 Any plugin working for Jenkins can be installed by the Jenkins Operator.</p>
 
 <p>Pre-installed plugins:
-* configuration-as-code v1.46
+* configuration-as-code v1.47
 * git v4.5.0
 * job-dsl v1.77
 * kubernetes-credentials-provider v0.15
-* kubernetes v1.28.6
+* kubernetes v1.29.2
 * workflow-aggregator v2.6
 * workflow-job v2.40</p>
 
@@ -789,7 +918,7 @@ spec:
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span>master<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>basePlugins<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>kubernetes<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.28.6&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.29.2&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>workflow-job<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;2.40&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>workflow-aggregator<span style="color:#f8f8f8;text-decoration:underline">
@@ -799,7 +928,7 @@ spec:
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>job-dsl<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.77&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>configuration-as-code<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.46&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;1.47&#34;</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>kubernetes-credentials-provider<span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>version<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#34;0.15&#34;</span></code></pre></div>
 <p>You can change their versions.</p>
