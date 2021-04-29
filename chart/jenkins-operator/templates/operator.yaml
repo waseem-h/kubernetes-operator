@@ -30,7 +30,7 @@ spec:
               containerPort: 80
               protocol: TCP
           command:
-            - jenkins-operator
+            - /manager
           args: []
           env:
             - name: WATCH_NAMESPACE
