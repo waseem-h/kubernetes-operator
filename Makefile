@@ -345,6 +345,7 @@ HAS_SEMBUMP := $(shell which $(PROJECT_DIR)/bin/sembump)
 sembump: # Download sembump locally if necessary
 	@echo "+ $@"
 ifndef HAS_SEMBUMP
+	mkdir bin
 	wget -O $(PROJECT_DIR)/bin/sembump https://github.com/justintout/sembump/releases/download/v0.1.0/sembump-$(PLATFORM)-amd64
 	chmod +x $(PROJECT_DIR)/bin/sembump
 endif

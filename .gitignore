@@ -89,5 +89,5 @@ tags
 ### IntelliJ IDEA ###
 *.iml
 
-bin
+/bin
 testbin/*
