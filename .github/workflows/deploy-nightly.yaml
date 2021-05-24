@@ -1,16 +1,10 @@
-name: Run tests
+name: Publish nightly snapshot
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, ready_for_review, reopened]
-    branches:
-      - master
+  schedule:
+    - cron: '0 2 * * *'
 jobs:
-  run-tests:
-    if: github.event.pull_request.draft == false
-    name: Run automated tests
+  publish-image:
+    name: Publish nightly snapshot
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
@@ -54,3 +48,14 @@ jobs:
           make helm-lint
           eval $(bin/minikube docker-env)
           make helm-e2e E2E_TEST_ARGS='-ginkgo.v'
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Release Container Runtime
+        run: |
+          git reset --hard
+          make container-runtime-snapshot-push
