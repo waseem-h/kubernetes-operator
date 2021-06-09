@@ -358,16 +358,18 @@ bump-version: sembump ## Bump the version in the version file. Set BUMP to [ pat
 	@echo "Bumping VERSION.txt from $(VERSION) to $(NEW_VERSION)"
 	echo $(NEW_VERSION) > VERSION.txt
 	@echo "Updating version from $(VERSION) to $(NEW_VERSION) in README.md"
-	sed -i s/$(VERSION)/$(NEW_VERSION)/g README.md
-	sed -i s/$(VERSION)/$(NEW_VERSION)/g deploy/operator.yaml
-	sed -i s/$(VERSION)/$(NEW_VERSION)/g deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	sed -i.bak 's/$(VERSION)/$(NEW_VERSION)/g' README.md
+	sed -i.bak 's/$(VERSION)/$(NEW_VERSION)/g' deploy/operator.yaml
+	sed -i.bak 's/$(VERSION)/$(NEW_VERSION)/g' deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	rm */**.bak
+	rm *.bak
 	cp config/service_account.yaml deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
-	cat config/rbac/leader_election_role.yaml >> config/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
-	cat config/rbac/leader_election_role_binding.yaml >> config/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)=$(API_VERSION).yaml
-	cat config/rbac/role.yaml >> config/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)=$(API_VERSION).yaml
-	cat config/rbac/role_binding.yaml >> config/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
-	cat config/manager/manager.yaml >> config/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
-	git add VERSION.txt README.md config/manager/manager.yaml config/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	cat config/rbac/leader_election_role.yaml >> deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	cat config/rbac/leader_election_role_binding.yaml >> deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	cat config/rbac/role.yaml >> deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	cat config/rbac/role_binding.yaml >> deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	cat config/manager/manager.yaml >> deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	git add VERSION.txt README.md config/manager/manager.yaml deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
 	git commit -vaem "Bump version to $(NEW_VERSION)"
 	@echo "Run make tag to create and push the tag for new version $(NEW_VERSION)"
 
@@ -439,18 +441,6 @@ generate-docs: hugo ## Re-generate docs directory from the website directory
 	cd website && npm install
 	$(HUGO_PATH)/hugo -s website -d ../docs
 
-.PHONY: all-in-one-build
-FILENAME := config/all_in_one_$(API_VERSION).yaml
-all-in-one-build: ## Re-generate all-in-one yaml
-	@echo "+ $@"
-	> $(FILENAME)
-	cat config/service_account.yaml >> $(FILENAME)
-	cat config/rbac/leader_election_role.yaml >> $(FILENAME)
-	cat config/rbac/leader_election_role_binding.yaml >> $(FILENAME)
-	cat config/rbac/role.yaml >> $(FILENAME)
-	cat config/rbac/role_binding.yaml >> $(FILENAME)
-	cat config/manager/manager.yaml >> $(FILENAME)
-
 ##################### FROM OPERATOR SDK ########################
 # Install CRDs into a cluster
 install-crds: manifests kustomize
@@ -470,7 +460,7 @@ undeploy:
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
-manifests: controller-gen all-in-one-build
+manifests: controller-gen
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 # Generate code

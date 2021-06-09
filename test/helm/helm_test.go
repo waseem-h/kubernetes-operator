@@ -23,7 +23,7 @@ var _ = Describe("Jenkins controller", func() {
 		namespace = e2e.CreateNamespace()
 	})
 	AfterEach(func() {
-		showLogsIfTestHasFailed(CurrentGinkgoTestDescription().Failed, namespace.Name)
+		e2e.ShowLogsIfTestHasFailed(CurrentGinkgoTestDescription().Failed, namespace.Name)
 		e2e.DestroyNamespace(namespace)
 	})
 	Context("when deploying Helm Chart to cluster", func() {

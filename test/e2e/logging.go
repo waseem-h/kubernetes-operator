@@ -1,4 +1,4 @@
-package helm
+package e2e
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"io"
 	"sort"
 
-	"github.com/jenkinsci/kubernetes-operator/test/e2e"
 	"github.com/onsi/ginkgo"
 
 	corev1 "k8s.io/api/core/v1"
@@ -32,7 +31,7 @@ func getOperatorPod(namespace string) (*corev1.Pod, error) {
 		Namespace:     namespace,
 	}
 	pods := &corev1.PodList{}
-	err := e2e.K8sClient.List(context.TODO(), pods, lo)
+	err := K8sClient.List(context.TODO(), pods, lo)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +46,7 @@ func getOperatorLogs(namespace string) (string, error) {
 	logOptions := corev1.PodLogOptions{TailLines: &podLogTailLimit}
 
 	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(e2e.Cfg)
+	clientset, err := kubernetes.NewForConfig(Cfg)
 	if err != nil {
 		return "", err
 	}
@@ -90,7 +89,7 @@ func getKubernetesEvents(namespace string) ([]v1beta1.Event, error) {
 	}
 
 	events := &v1beta1.EventList{}
-	err := e2e.K8sClient.List(context.TODO(), events, listOptions)
+	err := K8sClient.List(context.TODO(), events, listOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +123,7 @@ func printKubernetesPods(namespace string) {
 	}
 }
 
-func showLogsIfTestHasFailed(failed bool, namespace string) {
+func ShowLogsIfTestHasFailed(failed bool, namespace string) {
 	if failed {
 		_, _ = fmt.Fprintf(ginkgo.GinkgoWriter, "Test failed. Bellow here you can check logs:")
 

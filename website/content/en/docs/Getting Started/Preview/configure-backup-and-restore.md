@@ -48,7 +48,7 @@ spec:
       fsGroup: 1000
     containers:
     - name: jenkins-master
-      image: jenkins/jenkins:2.263.2-lts-alpine
+      image: jenkins/jenkins:2.277.4-lts-alpine
     - name: backup # container responsible for the backup and restore
       env:
       - name: BACKUP_DIR

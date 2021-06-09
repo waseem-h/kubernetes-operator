@@ -96,9 +96,9 @@ func createJenkinsCR(name, namespace string, seedJob *[]v1alpha2.SeedJob, groovy
 							},
 							InitialDelaySeconds: int32(80),
 							TimeoutSeconds:      int32(4),
-							FailureThreshold:    int32(10),
+							FailureThreshold:    int32(30),
 							SuccessThreshold:    int32(1),
-							PeriodSeconds:       int32(1),
+							PeriodSeconds:       int32(5),
 						},
 						VolumeMounts: []corev1.VolumeMount{
 							{

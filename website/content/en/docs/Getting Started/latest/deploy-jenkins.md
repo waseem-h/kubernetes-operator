@@ -19,7 +19,7 @@ spec:
   master:
     containers:
     - name: jenkins-master
-      image: jenkins/jenkins:2.263.3-lts-alpine
+      image: jenkins/jenkins:2.277.4-lts-alpine
       imagePullPolicy: Always
       livenessProbe:
         failureThreshold: 12
