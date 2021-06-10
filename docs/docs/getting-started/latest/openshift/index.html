@@ -32,7 +32,7 @@
 ">
 <meta itemprop="datePublished" content="2020-04-29T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2020-04-29T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="256">
+<meta itemprop="wordCount" content="14">
 
 
 
@@ -767,12 +767,7 @@
 <ul>
 <li>
 <ul>
-<li><a href="#securitycontext">SecurityContext</a></li>
-<li><a href="#openshift-jenkins-image">OpenShift Jenkins image</a>
-<ul>
-<li><a href="#sample-openshift-cr">Sample OpenShift CR</a></li>
-<li><a href="#openshift-oauth-integration">OpenShift OAuth integration</a></li>
-</ul></li>
+<li><a href="#release-0-6-0-is-not-compatible-with-openshift-and-jenkinsimage-crd-was-removed-from-it">Release 0.6.0 is not compatible with OpenShift and JenkinsImage crd was removed from it.</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -831,94 +826,7 @@
 	<div class="lead">Additional configuration for OpenShift</div>
 	
 
-<h2 id="securitycontext">SecurityContext</h2>
-
-<p>OpenShift enforces Security Constraints Context (scc) when deploying an image.
-By default, container images run in restricted scc which prevents from setting
-a fixed user id to run with. You need to have ensure that you do not provide a
-securityContext with a runAsUser and that your image does not use a hardcoded user.</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">securityContext<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>{}</code></pre></div>
-<h2 id="openshift-jenkins-image">OpenShift Jenkins image</h2>
-
-<p>OpenShift provides a pre-configured Jenkins image containing  3 openshift plugins for
-jenkins (openshift-login-plugin, openshift-sync-plugin and openshift-client-plugin)
-which allows better jenkins integration with kubernetes and OpenShift.</p>
-
-<p>The OpenShift Jenkins image requires additional configuration to be fully enabled.</p>
-
-<h3 id="sample-openshift-cr">Sample OpenShift CR</h3>
-
-<p>The following Custom Resource can be used to create a Jenkins instance using the<br />
-OpenShift Jenkins image and sets values for:
-- `image: &lsquo;quay.io/openshift/origin-jenkins:latest&rsquo; : This is the OpenShift Jenkins image.</p>
-
-<ul>
-<li><p>serviceAccount: to allow oauth authentication to work, the service account needs
-a specific annotation pointing to the route exposing the jenkins service. Here,
-the route is named <code>jenkins-route</code></p></li>
-
-<li><p><code>OPENSHIFT_ENABLE_OAUTH</code> environment variable for the master container is set to true.</p></li>
-</ul>
-
-<p>Here is a complete Jenkins CR allowing the deployment of the Jenkins OpenShift image.</p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">apiVersion<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins.io/v1alpha2<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline"></span>kind<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>Jenkins<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline"></span>metadata<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">  </span>annotations<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>jenkins.io/openshift-mode<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;true&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">  </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline"></span>spec<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">  </span>serviceAccount<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>annotations<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>serviceaccounts.openshift.io/oauth-redirectreference.jenkins<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;{&#34;kind&#34;:&#34;OAuthRedirectReference&#34;,&#34;apiVersion&#34;:&#34;v1&#34;,&#34;reference&#34;:{&#34;kind&#34;:&#34;Route&#34;,&#34;name&#34;:&#34;jenkins-route&#34;}}&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">  </span>master<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>containers<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins-master<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>image<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;quay.io/openshift/origin-jenkins:latest&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>command<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>/usr/bin/go-init<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;-main&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>/usr/libexec/s2i/run<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>env<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>OPENSHIFT_ENABLE_OAUTH<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;true&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>OPENSHIFT_ENABLE_REDIRECT_PROMPT<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;true&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>DISABLE_ADMINISTRATIVE_MONITORS<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;false&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>KUBERNETES_MASTER<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;https://kubernetes.default:443&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>KUBERNETES_TRUST_CERTIFICATES<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;true&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>JENKINS_SERVICE_NAME<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins-operator-http-jenkins<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>JNLP_SERVICE_NAME<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>jenkins-operator-slave-jenkins<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>JENKINS_UC_INSECURE<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#4e9a06">&#39;false&#39;</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>JENKINS_HOME<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>/var/lib/jenkins<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>name<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>JAVA_OPTS<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>value<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>&gt;<span style="color:#8f5902;font-style:italic">-
-</span><span style="color:#8f5902;font-style:italic">         </span><span style="color:#8f5902;font-style:italic"> </span><span style="color:#8f5902;font-style:italic">-XX:+UnlockExperimentalVMOptions -XX:+UnlockExperimentalVMOptions</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">          </span>-XX<span style="color:#000;font-weight:bold">:</span>+UseCGroupMemoryLimitForHeap<span style="color:#f8f8f8;text-decoration:underline"> </span>-XX<span style="color:#000;font-weight:bold">:</span>MaxRAMFraction=<span style="color:#0000cf;font-weight:bold">1</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">          </span>-Djenkins.install.runSetupWizard=<span style="color:#204a87;font-weight:bold">false</span><span style="color:#f8f8f8;text-decoration:underline"> </span>-Djava.awt.headless=<span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">      </span>imagePullPolicy<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>Always<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">  </span>service<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>port<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">8080</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>type<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>ClusterIP<span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">  </span>slaveService<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>port<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">50000</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">    </span>type<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span>ClusterIP</code></pre></div>
-<h3 id="openshift-oauth-integration">OpenShift OAuth integration</h3>
-
-<p>The creation of a Route is required for the integraiton of Jenkins with
-OpenShift oauth authentication. By default, the jenkins http service is named
-<code>jenkins-operator-http-${jenkins-cr-name}</code></p>
-<div class="highlight"><pre style="background-color:#f8f8f8;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">oc create route edge jenkins-route --service<span style="color:#ce5c00;font-weight:bold">=</span>jenkins-operator-http-jenkins</code></pre></div>
-<p>Note: the route name (jenkins-route) must match the pointed route on the serviceaccount annotation.</p>
-
-<p>After the creation of the Route. It can be used to navigate to the Jenkins Login Page and login with your Openshift Credentials.</p>
+<h2 id="release-0-6-0-is-not-compatible-with-openshift-and-jenkinsimage-crd-was-removed-from-it">Release 0.6.0 is not compatible with OpenShift and JenkinsImage crd was removed from it.</h2>
 
 	
 	
