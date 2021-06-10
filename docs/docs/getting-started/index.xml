@@ -20,7 +20,7 @@
     
     
     <item>
-      <title>Docs: Latest (v0.5.x)</title>
+      <title>Docs: Latest (v0.6.x)</title>
       <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/</link>
       <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
@@ -33,7 +33,7 @@
 
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;This document describes a getting started guide for &lt;strong&gt;Jenkins Operator&lt;/strong&gt; &lt;code&gt;v0.5.x&lt;/code&gt; and an additional configuration.&lt;/p&gt;
+&lt;p&gt;This document describes a getting started guide for &lt;strong&gt;Jenkins Operator&lt;/strong&gt; currently in preview version and an additional configuration.&lt;/p&gt;
 
 &lt;/div&gt;
 
@@ -48,11 +48,11 @@
     </item>
     
     <item>
-      <title>Docs: Preview</title>
-      <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/preview/</link>
+      <title>Docs: v0.5.x</title>
+      <link>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/v0.5.x/</link>
       <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/preview/</guid>
+      <guid>https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/v0.5.x/</guid>
       <description>
         
         
@@ -61,7 +61,7 @@
 
 
 &lt;div class=&#34;pageinfo pageinfo-primary&#34;&gt;
-&lt;p&gt;This document describes a getting started guide for &lt;strong&gt;Jenkins Operator&lt;/strong&gt; currently in preview version and an additional configuration.&lt;/p&gt;
+&lt;p&gt;This document describes a getting started guide for &lt;strong&gt;Jenkins Operator&lt;/strong&gt; &lt;code&gt;v0.5.x&lt;/code&gt; and an additional configuration.&lt;/p&gt;
 
 &lt;/div&gt;
 
