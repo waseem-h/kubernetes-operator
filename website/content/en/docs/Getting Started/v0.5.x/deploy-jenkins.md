@@ -10,7 +10,7 @@ description: >
 Once Jenkins Operator is up and running let's deploy actual Jenkins instance.
 Create manifest e.g. **`jenkins_instance.yaml`** with following data and save it on drive.
 
-```yaml
+```bash
 apiVersion: jenkins.io/v1alpha2
 kind: Jenkins
 metadata:

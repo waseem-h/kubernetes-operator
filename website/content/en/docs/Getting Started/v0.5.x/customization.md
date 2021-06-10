@@ -17,7 +17,7 @@ Pre-installed plugins:
 * git v4.5.0
 * job-dsl v1.77
 * kubernetes-credentials-provider v0.15
-* kubernetes v1.29.0
+* kubernetes v1.29.2
 * workflow-aggregator v2.6
 * workflow-job v2.40
 
@@ -28,7 +28,7 @@ Rest of the plugins can be found in [plugins repository](https://plugins.jenkins
 
 Edit Custom Resource under `spec.master.plugins`:
 
-```yaml
+```
 apiVersion: jenkins.io/v1alpha2
 kind: Jenkins
 metadata:
@@ -51,7 +51,7 @@ spec:
   master:
     basePlugins:
     - name: kubernetes
-      version: "1.28.6"
+      version: "1.29.2"
     - name: workflow-job
       version: "2.40"
     - name: workflow-aggregator
@@ -61,7 +61,7 @@ spec:
     - name: job-dsl
       version: "1.77"
     - name: configuration-as-code
-      version: "1.46"
+      version: "1.47"
     - name: kubernetes-credentials-provider
       version: "0.15"
 ```

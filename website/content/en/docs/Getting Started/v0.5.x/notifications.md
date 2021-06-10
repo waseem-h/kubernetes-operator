@@ -19,7 +19,7 @@ $ kubectl create secret generic jenkins-operator-notification-data --from-litera
 
 Example configuration for Slack:
 
-```yaml
+```
 kind: Jenkins
 spec:
   master:
@@ -40,7 +40,7 @@ Please follow [this](https://docs.microsoft.com/en-gb/outlook/actionable-message
 
 Example configuration for Microsoft Teams:
 
-```yaml
+```
 kind: Jenkins
 spec:
   master:
@@ -59,7 +59,7 @@ spec:
 
 Example configuration for Mailgun:
 
-```yaml
+```
 kind: Jenkins
 spec:
   master:
@@ -90,7 +90,7 @@ As you see there is two debugging options:
 You can use multiple providers to send notification to another communication channels at the same time.
 For example you will send notifications to Slack and Teams.
 
-```yaml
+```
 kind: Jenkins
 spec:
   master:

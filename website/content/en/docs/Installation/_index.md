@@ -15,10 +15,8 @@ All container images can be found at [virtuslab/jenkins-operator](https://hub.do
 ## Requirements
  
 To run **Jenkins Operator**, you will need:
-
-- access to a Kubernetes cluster version `1.11+`
-
-- `kubectl` version `1.11+`
+- access to a Kubernetes cluster version `1.17+`
+- `kubectl` version `1.17+`
 
 ## Configure Custom Resource Definition 
 
@@ -37,7 +35,7 @@ There are two ways to deploy the Jenkins Operator.
 Apply Service Account and RBAC roles:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/deploy/all-in-one-v1alpha2.yaml
+kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/config/all-in-one-v1alpha2.yaml
 ```
 
 Watch **Jenkins Operator** instance being created:
@@ -50,7 +48,7 @@ Now **Jenkins Operator** should be up and running in the `default` namespace.
 
 ### Using Helm Chart
 
-There is a option to use Helm to install the operator. It requires the Helm 3+ for deployment.
+There is an option to use Helm to install the operator. It requires the Helm 3+ for deployment.
 
 Create a namespace for the operator:
 
