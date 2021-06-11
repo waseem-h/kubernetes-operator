@@ -19,6 +19,8 @@ spec:
       name: {{ .Values.jenkins.configuration.secretRefName }}
       {{- else if .Values.jenkins.configuration.secretData }}
       name: jenkins-{{ .Values.jenkins.name }}
+      {{- else }}
+      name: ""
       {{- end }}
     {{- else }}
     configurations: []
@@ -36,6 +38,8 @@ spec:
       name: {{ .Values.jenkins.configuration.secretRefName }}
       {{- else if .Values.jenkins.configuration.secretData }}
       name: jenkins-{{ .Values.jenkins.name }}
+      {{- else }}
+      name: ""
       {{- end }}
     {{- else }}
     configurations: []
