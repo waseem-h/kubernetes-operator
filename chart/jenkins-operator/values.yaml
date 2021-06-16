@@ -47,6 +47,10 @@ jenkins:
   # See https://github.com/jenkinsci/kubernetes-operator/pull/193 for more info
   disableCSRFProtection: false
 
+
+  # ValidateSecurityWarnings enables or disables validating potential security warnings in Jenkins plugins via admission webhooks.
+  ValidateSecurityWarnings: false
+  
   # imagePullSecrets is used if you want to pull images from private repository
   # See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#pulling-docker-images-from-private-repositories for more info
   imagePullSecrets: []
