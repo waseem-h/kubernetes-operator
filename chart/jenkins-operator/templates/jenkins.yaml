@@ -148,6 +148,7 @@ spec:
     {{- toYaml . | nindent 6 }}
     {{- end }}
   {{- with .Values.jenkins.seedJobs }}
+  ValidateSecurityWarnings: {{ .Values.jenkins.ValidateSecurityWarnings }}
   seedJobs: {{- toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}

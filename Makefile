@@ -523,3 +523,24 @@ kubebuilder:
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0/hack/setup-envtest.sh
 	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR);
+
+#TODO Integrate with master Makefile.
+MANIFESTS := webhook/all_in_one_$(API_VERSION).yaml
+all-in-one-build-webhook: ## Re-generate all-in-one yaml
+	@echo "+ $@"
+	> $(MANIFESTS)
+	cat webhook/rbac.yaml >> $(MANIFESTS)
+	cat webhook/operator.yaml >> $(MANIFESTS)
+	cat webhook/cert-manager.yaml >> $(MANIFESTS)
+	cat webhook/webhook.yaml >> $(MANIFESTS)
+	sed -i "s~{DOCKER_REGISTRY}:{GITCOMMIT}~${DOCKER_REGISTRY}:${GITCOMMIT}~;" ${MANIFESTS} 
+	
+# start the cluster locally and set it to use the docker daemon from minikube
+install-cert-manager: minikube-start
+	kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.4.0/cert-manager.yaml 
+
+	
+#Launch cert-manager and deploy the operator locally along with webhook
+deploy-webhook: install-cert-manager install-crds container-runtime-build all-in-one-build-webhook 
+	@echo "+ $@"
+	kubectl apply -f ${MANIFESTS}
