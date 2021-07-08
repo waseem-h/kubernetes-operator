@@ -32,6 +32,10 @@ spec:
           command:
             - /manager
           args: []
+          volumeMounts:
+          - mountPath: /tmp/k8s-webhook-server/serving-certs
+            name: cert
+            readOnly: true
           env:
             - name: WATCH_NAMESPACE
               value: {{ .Values.jenkins.namespace }}
@@ -55,3 +59,9 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: webhook-server-cert  
+      terminationGracePeriodSeconds: 10
