@@ -95,6 +95,9 @@ func main() {
 	opts := zap.Options{
 		Development: true,
 	}
+
+	go v1alpha2.RetrieveDataFile()
+
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
