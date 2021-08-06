@@ -23,6 +23,7 @@ spec:
         - /manager
         args:
         - --leader-elect
+        - --validate-security-warnings 
         image: {DOCKER_REGISTRY}:{GITCOMMIT}
         name: jenkins-operator
         imagePullPolicy: IfNotPresent

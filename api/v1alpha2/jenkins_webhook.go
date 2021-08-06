@@ -36,14 +36,9 @@ import (
 )
 
 var (
-	jenkinslog       = logf.Log.WithName("jenkins-resource") // log is for logging in this package.
-	isRetrieved bool = false                                 // For checking whether the data file is downloaded and extracted or not
-)
-
-const (
-	hosturl        string = "https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip" // Url for downloading the plugins file
-	compressedFile string = "/tmp/plugins.json.gzip"                                                                                               // location where the gzip file will be downloaded
-	pluginDataFile string = "/tmp/plugins.json"                                                                                                    // location where the file will be extracted
+	jenkinslog                           = logf.Log.WithName("jenkins-resource") // log is for logging in this package.
+	PluginsDataManager PluginDataManager = *NewPluginsDataManager()
+	_                  webhook.Validator = &Jenkins{}
 )
 
 func (in *Jenkins) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -56,8 +51,6 @@ func (in *Jenkins) SetupWebhookWithManager(mgr ctrl.Manager) error {
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 // +kubebuilder:webhook:path=/validate-jenkins-io-jenkins-io-v1alpha2-jenkins,mutating=false,failurePolicy=fail,sideEffects=None,groups=jenkins.io.jenkins.io,resources=jenkins,verbs=create;update,versions=v1alpha2,name=vjenkins.kb.io,admissionReviewVersions={v1,v1beta1}
-
-var _ webhook.Validator = &Jenkins{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (in *Jenkins) ValidateCreate() error {
@@ -81,6 +74,15 @@ func (in *Jenkins) ValidateUpdate(old runtime.Object) error {
 
 func (in *Jenkins) ValidateDelete() error {
 	return nil
+}
+
+type PluginDataManager struct {
+	pluginDataCache    PluginsInfo
+	hosturl            string
+	compressedFilePath string
+	pluginDataFile     string
+	iscached           bool
+	maxattempts        int
 }
 
 type PluginsInfo struct {
@@ -112,36 +114,27 @@ type PluginData struct {
 
 // Validates security warnings for both updating and creating a Jenkins CR
 func Validate(r Jenkins) error {
-
 	pluginset := make(map[string]PluginData)
-	var warningmsg string
+	var faultybaseplugins string
+	var faultyuserplugins string
 	basePlugins := plugins.BasePlugins()
-	temp, err := NewPluginsInfo()
-	AllPluginData := *temp
-	if err != nil {
-		return err
-	}
 
 	for _, plugin := range basePlugins {
 		// Only Update the map if the plugin is not present or a lower version is being used
 		if pluginData, ispresent := pluginset[plugin.Name]; !ispresent || semver.Compare(MakeSemanticVersion(plugin.Version), pluginData.Version) == 1 {
-			jenkinslog.Info("Validate", plugin.Name, plugin.Version)
 			pluginset[plugin.Name] = PluginData{Version: plugin.Version, Kind: "base"}
 		}
 	}
 
 	for _, plugin := range r.Spec.Master.Plugins {
 		if pluginData, ispresent := pluginset[plugin.Name]; !ispresent || semver.Compare(MakeSemanticVersion(plugin.Version), pluginData.Version) == 1 {
-			jenkinslog.Info("Validate", plugin.Name, plugin.Version)
 			pluginset[plugin.Name] = PluginData{Version: plugin.Version, Kind: "user-defined"}
 		}
 	}
 
-	jenkinslog.Info("Checking through all the warnings")
-	for _, plugin := range AllPluginData.Plugins {
-
+	for _, plugin := range PluginsDataManager.pluginDataCache.Plugins {
 		if pluginData, ispresent := pluginset[plugin.Name]; ispresent {
-			jenkinslog.Info("Checking for plugin", "name", plugin.Name)
+			var hasvulnerabilities bool
 			for _, warning := range plugin.SecurityWarnings {
 				for _, version := range warning.Versions {
 					firstVersion := version.FirstVersion
@@ -154,113 +147,121 @@ func Validate(r Jenkins) error {
 					}
 
 					if CompareVersions(firstVersion, lastVersion, pluginData.Version) {
-						jenkinslog.Info("security Vulnerabilities detected", "message", warning.Message, "Check security Advisory", warning.URL)
-						warningmsg += "Security Vulnerabilities detected in " + pluginData.Kind + " plugin " + plugin.Name + "\n"
-
+						jenkinslog.Info("Security Vulnerability detected in "+pluginData.Kind+" "+plugin.Name+":"+pluginData.Version, "Warning message", warning.Message, "For more details,check security advisory", warning.URL)
+						hasvulnerabilities = true
 					}
-
 				}
 			}
 
+			if hasvulnerabilities {
+				if pluginData.Kind == "base" {
+					faultybaseplugins += plugin.Name + ":" + pluginData.Version + "\n"
+				} else {
+					faultyuserplugins += plugin.Name + ":" + pluginData.Version + "\n"
+				}
+			}
 		}
-
 	}
-
-	if len(warningmsg) > 0 {
-		return errors.New(warningmsg)
+	if len(faultybaseplugins) > 0 || len(faultyuserplugins) > 0 {
+		var errormsg string
+		if len(faultybaseplugins) > 0 {
+			errormsg += "Security vulnerabilities detected in the following base plugins: \n" + faultybaseplugins
+		}
+		if len(faultyuserplugins) > 0 {
+			errormsg += "Security vulnerabilities detected in the following user-defined plugins: \n" + faultyuserplugins
+		}
+		return errors.New(errormsg)
 	}
 
 	return nil
-
 }
 
-// Returns an object containing information of all the plugins present in the security center
-func NewPluginsInfo() (*PluginsInfo, error) {
-	var AllPluginData PluginsInfo
-	for i := 0; i < 28; i++ {
-		if isRetrieved {
-			break
-		}
-		time.Sleep(1 * time.Second)
+func NewPluginsDataManager() *PluginDataManager {
+	return &PluginDataManager{
+		hosturl:            "https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip",
+		compressedFilePath: "/tmp/plugins.json.gzip",
+		pluginDataFile:     "/tmp/plugins.json",
+		iscached:           false,
+		maxattempts:        5,
 	}
-	if !isRetrieved {
-		jenkinslog.Info("Plugins Data file hasn't been downloaded and extracted")
-		return &AllPluginData, errors.New("plugins data file not found")
-	}
-
-	jsonFile, err := os.Open(pluginDataFile)
-	if err != nil {
-		jenkinslog.Info("Failed to open the Plugins Data File")
-		return &AllPluginData, err
-	}
-	defer jsonFile.Close()
-
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		jenkinslog.Info("Failed to convert the JSON file into a byte array")
-		return &AllPluginData, err
-	}
-	err = json.Unmarshal(byteValue, &AllPluginData)
-	if err != nil {
-		jenkinslog.Info("Failed to decode the Plugin JSON data file")
-		return &AllPluginData, err
-	}
-
-	return &AllPluginData, nil
 }
 
-// Downloads and extracts the JSON file in every 12 hours
-func RetrieveDataFile() {
+// Downloads extracts and caches the JSON data in every 12 hours
+func (in *PluginDataManager) CachePluginData(ch chan bool) {
 	for {
-		jenkinslog.Info("Retreiving file", "Host Url", hosturl)
-		err := Download()
-		if err != nil {
-			jenkinslog.Info("Retrieving File", "Error while downloading", err)
-			continue
+		jenkinslog.Info("Initializing/Updating the plugin data cache")
+		var isdownloaded, isextracted, iscached bool
+		var err error
+		for i := 0; i < in.maxattempts; i++ {
+			err = in.Download()
+			if err == nil {
+				isdownloaded = true
+				break
+			}
 		}
 
-		jenkinslog.Info("Retrieve File", "Successfully downloaded", compressedFile)
-		err = Extract()
-		if err != nil {
-			jenkinslog.Info("Retreive File", "Error while extracting", err)
-			continue
+		if isdownloaded {
+			for i := 0; i < in.maxattempts; i++ {
+				err = in.Extract()
+				if err == nil {
+					isextracted = true
+					break
+				}
+			}
+		} else {
+			jenkinslog.Info("Cache Plugin Data", "failed to download file", err)
 		}
-		jenkinslog.Info("Retreive File", "Successfully extracted", pluginDataFile)
-		isRetrieved = true
+
+		if isextracted {
+			for i := 0; i < in.maxattempts; i++ {
+				err = in.Cache()
+				if err == nil {
+					iscached = true
+					break
+				}
+			}
+
+			if !iscached {
+				jenkinslog.Info("Cache Plugin Data", "failed to read plugin data file", err)
+			}
+		} else {
+			jenkinslog.Info("Cache Plugin Data", "failed to extract file", err)
+		}
+
+		if !in.iscached {
+			ch <- iscached
+		}
+		in.iscached = in.iscached || iscached
 		time.Sleep(12 * time.Hour)
-
 	}
 }
 
-func Download() error {
-
-	out, err := os.Create(compressedFile)
+func (in *PluginDataManager) Download() error {
+	out, err := os.Create(in.compressedFilePath)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
 
 	client := http.Client{
-		Timeout: 2000 * time.Second,
+		Timeout: 1000 * time.Second,
 	}
 
-	resp, err := client.Get(hosturl)
+	resp, err := client.Get(in.hosturl)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
-	jenkinslog.Info("Successfully Downloaded")
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return err
 	}
 
 	return nil
-
 }
 
-func Extract() error {
-	reader, err := os.Open(compressedFile)
+func (in *PluginDataManager) Extract() error {
+	reader, err := os.Open(in.compressedFilePath)
 
 	if err != nil {
 		return err
@@ -272,7 +273,7 @@ func Extract() error {
 	}
 
 	defer archive.Close()
-	writer, err := os.Create(pluginDataFile)
+	writer, err := os.Create(in.pluginDataFile)
 	if err != nil {
 		return err
 	}
@@ -280,10 +281,28 @@ func Extract() error {
 
 	_, err = io.Copy(writer, archive)
 	return err
-
 }
 
-// returns a semantic version that can be used for comparision
+// Loads the JSON data into memory and stores it
+func (in *PluginDataManager) Cache() error {
+	jsonFile, err := os.Open(in.pluginDataFile)
+	if err != nil {
+		return err
+	}
+	defer jsonFile.Close()
+
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(byteValue, &in.pluginDataCache)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// returns a semantic version that can be used for comparison
 func MakeSemanticVersion(version string) string {
 	version = "v" + version
 	return semver.Canonical(version)
