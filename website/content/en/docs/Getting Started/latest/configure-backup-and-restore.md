@@ -7,6 +7,10 @@ description: >
   Prevent loss of job history
 ---
 
+> Because of Jenkins Operator's architecture, the configuration of Jenkins should be done using ConfigurationAsCode 
+> or GroovyScripts and jobs should be defined as SeedJobs. It means that there is no point in backing up any job configuration 
+> up. Therefore, the backup script makes a copy of jobs history only.
+
 Backup and restore is done by a container sidecar.
 
 ### PVC
@@ -77,7 +81,7 @@ spec:
     getLatestAction:
       exec:
         command:
-        - /home/user/bin/get-latest.sh # this command is invoked on "backup" container to get last backup number before pod deletion. If you don't omit it in CR, you can lose data
+        - /home/user/bin/get-latest.sh # this command is invoked on "backup" container to get last backup number before pod deletion; not having it in the CR may cause loss of data
     interval: 30 # how often make backup in seconds
     makeBackupBeforePodDeletion: true # make a backup before pod deletion
   restore:

@@ -36,9 +36,9 @@ import (
 )
 
 var (
-	jenkinslog                           = logf.Log.WithName("jenkins-resource") // log is for logging in this package.
-	PluginsDataManager PluginDataManager = *NewPluginsDataManager()
-	_                  webhook.Validator = &Jenkins{}
+	jenkinslog                   = logf.Log.WithName("jenkins-resource") // log is for logging in this package.
+	PluginsMgr PluginDataManager = *NewPluginsDataManager()
+	_          webhook.Validator = &Jenkins{}
 )
 
 func (in *Jenkins) SetupWebhookWithManager(mgr ctrl.Manager) error {
@@ -77,12 +77,13 @@ func (in *Jenkins) ValidateDelete() error {
 }
 
 type PluginDataManager struct {
-	pluginDataCache    PluginsInfo
-	hosturl            string
-	compressedFilePath string
-	pluginDataFile     string
-	iscached           bool
-	maxattempts        int
+	PluginDataCache    PluginsInfo
+	Hosturl            string
+	CompressedFilePath string
+	PluginDataFile     string
+	IsCached           bool
+	Attempts           int
+	SleepTime          int
 }
 
 type PluginsInfo struct {
@@ -114,27 +115,31 @@ type PluginData struct {
 
 // Validates security warnings for both updating and creating a Jenkins CR
 func Validate(r Jenkins) error {
-	pluginset := make(map[string]PluginData)
-	var faultybaseplugins string
-	var faultyuserplugins string
+	if !PluginsMgr.IsCached {
+		return errors.New("plugins data has not been fetched")
+	}
+
+	pluginSet := make(map[string]PluginData)
+	var faultyBasePlugins string
+	var faultyUserPlugins string
 	basePlugins := plugins.BasePlugins()
 
 	for _, plugin := range basePlugins {
 		// Only Update the map if the plugin is not present or a lower version is being used
-		if pluginData, ispresent := pluginset[plugin.Name]; !ispresent || semver.Compare(MakeSemanticVersion(plugin.Version), pluginData.Version) == 1 {
-			pluginset[plugin.Name] = PluginData{Version: plugin.Version, Kind: "base"}
+		if pluginData, ispresent := pluginSet[plugin.Name]; !ispresent || semver.Compare(makeSemanticVersion(plugin.Version), pluginData.Version) == 1 {
+			pluginSet[plugin.Name] = PluginData{Version: plugin.Version, Kind: "base"}
 		}
 	}
 
 	for _, plugin := range r.Spec.Master.Plugins {
-		if pluginData, ispresent := pluginset[plugin.Name]; !ispresent || semver.Compare(MakeSemanticVersion(plugin.Version), pluginData.Version) == 1 {
-			pluginset[plugin.Name] = PluginData{Version: plugin.Version, Kind: "user-defined"}
+		if pluginData, ispresent := pluginSet[plugin.Name]; !ispresent || semver.Compare(makeSemanticVersion(plugin.Version), pluginData.Version) == 1 {
+			pluginSet[plugin.Name] = PluginData{Version: plugin.Version, Kind: "user-defined"}
 		}
 	}
 
-	for _, plugin := range PluginsDataManager.pluginDataCache.Plugins {
-		if pluginData, ispresent := pluginset[plugin.Name]; ispresent {
-			var hasvulnerabilities bool
+	for _, plugin := range PluginsMgr.PluginDataCache.Plugins {
+		if pluginData, ispresent := pluginSet[plugin.Name]; ispresent {
+			var hasVulnerabilities bool
 			for _, warning := range plugin.SecurityWarnings {
 				for _, version := range warning.Versions {
 					firstVersion := version.FirstVersion
@@ -146,29 +151,29 @@ func Validate(r Jenkins) error {
 						lastVersion = pluginData.Version // setting default value in case of empty string
 					}
 
-					if CompareVersions(firstVersion, lastVersion, pluginData.Version) {
+					if compareVersions(firstVersion, lastVersion, pluginData.Version) {
 						jenkinslog.Info("Security Vulnerability detected in "+pluginData.Kind+" "+plugin.Name+":"+pluginData.Version, "Warning message", warning.Message, "For more details,check security advisory", warning.URL)
-						hasvulnerabilities = true
+						hasVulnerabilities = true
 					}
 				}
 			}
 
-			if hasvulnerabilities {
+			if hasVulnerabilities {
 				if pluginData.Kind == "base" {
-					faultybaseplugins += plugin.Name + ":" + pluginData.Version + "\n"
+					faultyBasePlugins += plugin.Name + ":" + pluginData.Version + "\n"
 				} else {
-					faultyuserplugins += plugin.Name + ":" + pluginData.Version + "\n"
+					faultyUserPlugins += plugin.Name + ":" + pluginData.Version + "\n"
 				}
 			}
 		}
 	}
-	if len(faultybaseplugins) > 0 || len(faultyuserplugins) > 0 {
+	if len(faultyBasePlugins) > 0 || len(faultyUserPlugins) > 0 {
 		var errormsg string
-		if len(faultybaseplugins) > 0 {
-			errormsg += "Security vulnerabilities detected in the following base plugins: \n" + faultybaseplugins
+		if len(faultyBasePlugins) > 0 {
+			errormsg += "Security vulnerabilities detected in the following base plugins: \n" + faultyBasePlugins
 		}
-		if len(faultyuserplugins) > 0 {
-			errormsg += "Security vulnerabilities detected in the following user-defined plugins: \n" + faultyuserplugins
+		if len(faultyUserPlugins) > 0 {
+			errormsg += "Security vulnerabilities detected in the following user-defined plugins: \n" + faultyUserPlugins
 		}
 		return errors.New(errormsg)
 	}
@@ -178,33 +183,33 @@ func Validate(r Jenkins) error {
 
 func NewPluginsDataManager() *PluginDataManager {
 	return &PluginDataManager{
-		hosturl:            "https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip",
-		compressedFilePath: "/tmp/plugins.json.gzip",
-		pluginDataFile:     "/tmp/plugins.json",
-		iscached:           false,
-		maxattempts:        5,
+		Hosturl:            "https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip",
+		CompressedFilePath: "/tmp/plugins.json.gzip",
+		PluginDataFile:     "/tmp/plugins.json",
+		IsCached:           false,
+		Attempts:           0,
 	}
 }
 
-// Downloads extracts and caches the JSON data in every 12 hours
-func (in *PluginDataManager) CachePluginData(ch chan bool) {
+// Downloads extracts and reads the JSON data in every 12 hours
+func (in *PluginDataManager) FetchPluginData(isInitialized chan bool) {
 	for {
 		jenkinslog.Info("Initializing/Updating the plugin data cache")
-		var isdownloaded, isextracted, iscached bool
+		var isDownloaded, isExtracted, isCached bool
 		var err error
-		for i := 0; i < in.maxattempts; i++ {
-			err = in.Download()
+		for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
+			err = in.download()
 			if err == nil {
-				isdownloaded = true
+				isDownloaded = true
 				break
 			}
 		}
 
-		if isdownloaded {
-			for i := 0; i < in.maxattempts; i++ {
-				err = in.Extract()
+		if isDownloaded {
+			for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
+				err = in.extract()
 				if err == nil {
-					isextracted = true
+					isExtracted = true
 					break
 				}
 			}
@@ -212,32 +217,39 @@ func (in *PluginDataManager) CachePluginData(ch chan bool) {
 			jenkinslog.Info("Cache Plugin Data", "failed to download file", err)
 		}
 
-		if isextracted {
-			for i := 0; i < in.maxattempts; i++ {
-				err = in.Cache()
+		if isExtracted {
+			for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
+				err = in.cache()
 				if err == nil {
-					iscached = true
+					isCached = true
 					break
 				}
 			}
 
-			if !iscached {
+			if !isCached {
 				jenkinslog.Info("Cache Plugin Data", "failed to read plugin data file", err)
 			}
 		} else {
 			jenkinslog.Info("Cache Plugin Data", "failed to extract file", err)
 		}
 
-		if !in.iscached {
-			ch <- iscached
+		// Checks for the first time
+		if !in.IsCached {
+			isInitialized <- isCached
+			in.IsCached = isCached
 		}
-		in.iscached = in.iscached || iscached
-		time.Sleep(12 * time.Hour)
+
+		if isCached {
+			in.SleepTime = 12
+		} else {
+			in.SleepTime = 1
+		}
+		time.Sleep(time.Duration(in.SleepTime) * time.Hour)
 	}
 }
 
-func (in *PluginDataManager) Download() error {
-	out, err := os.Create(in.compressedFilePath)
+func (in *PluginDataManager) download() error {
+	out, err := os.Create(in.CompressedFilePath)
 	if err != nil {
 		return err
 	}
@@ -247,7 +259,7 @@ func (in *PluginDataManager) Download() error {
 		Timeout: 1000 * time.Second,
 	}
 
-	resp, err := client.Get(in.hosturl)
+	resp, err := client.Get(in.Hosturl)
 	if err != nil {
 		return err
 	}
@@ -260,8 +272,8 @@ func (in *PluginDataManager) Download() error {
 	return nil
 }
 
-func (in *PluginDataManager) Extract() error {
-	reader, err := os.Open(in.compressedFilePath)
+func (in *PluginDataManager) extract() error {
+	reader, err := os.Open(in.CompressedFilePath)
 
 	if err != nil {
 		return err
@@ -273,7 +285,7 @@ func (in *PluginDataManager) Extract() error {
 	}
 
 	defer archive.Close()
-	writer, err := os.Create(in.pluginDataFile)
+	writer, err := os.Create(in.PluginDataFile)
 	if err != nil {
 		return err
 	}
@@ -284,8 +296,8 @@ func (in *PluginDataManager) Extract() error {
 }
 
 // Loads the JSON data into memory and stores it
-func (in *PluginDataManager) Cache() error {
-	jsonFile, err := os.Open(in.pluginDataFile)
+func (in *PluginDataManager) cache() error {
+	jsonFile, err := os.Open(in.PluginDataFile)
 	if err != nil {
 		return err
 	}
@@ -295,7 +307,7 @@ func (in *PluginDataManager) Cache() error {
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(byteValue, &in.pluginDataCache)
+	err = json.Unmarshal(byteValue, &in.PluginDataCache)
 	if err != nil {
 		return err
 	}
@@ -303,16 +315,16 @@ func (in *PluginDataManager) Cache() error {
 }
 
 // returns a semantic version that can be used for comparison
-func MakeSemanticVersion(version string) string {
+func makeSemanticVersion(version string) string {
 	version = "v" + version
 	return semver.Canonical(version)
 }
 
 // Compare if the current version lies between first version and last version
-func CompareVersions(firstVersion string, lastVersion string, pluginVersion string) bool {
-	firstSemVer := MakeSemanticVersion(firstVersion)
-	lastSemVer := MakeSemanticVersion(lastVersion)
-	pluginSemVer := MakeSemanticVersion(pluginVersion)
+func compareVersions(firstVersion string, lastVersion string, pluginVersion string) bool {
+	firstSemVer := makeSemanticVersion(firstVersion)
+	lastSemVer := makeSemanticVersion(lastVersion)
+	pluginSemVer := makeSemanticVersion(pluginVersion)
 	if semver.Compare(pluginSemVer, firstSemVer) == -1 || semver.Compare(pluginSemVer, lastSemVer) == 1 {
 		return false
 	}

@@ -32,7 +32,7 @@
 ">
 <meta itemprop="datePublished" content="2021-01-25T00:00:00&#43;00:00" />
 <meta itemprop="dateModified" content="2021-01-25T00:00:00&#43;00:00" />
-<meta itemprop="wordCount" content="182">
+<meta itemprop="wordCount" content="230">
 
 
 
@@ -833,6 +833,12 @@
 	<div class="lead">Prevent loss of job history</div>
 	
 
+<blockquote>
+<p>Because of Jenkins Operator&rsquo;s architecture, the configuration of Jenkins should be done using ConfigurationAsCode
+or GroovyScripts and jobs should be defined as SeedJobs. It means that there is no point in backing up any job configuration
+up. Therefore, the backup script makes a copy of jobs history only.</p>
+</blockquote>
+
 <p>Backup and restore is done by a container sidecar.</p>
 
 <h3 id="pvc">PVC</h3>
@@ -895,7 +901,7 @@
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>getLatestAction<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">      </span>exec<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">        </span>command<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">
-</span><span style="color:#f8f8f8;text-decoration:underline">        </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>/home/user/bin/get-latest.sh<span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># this command is invoked on &#34;backup&#34; container to get last backup number before pod deletion. If you don&#39;t omit it in CR, you can lose data</span><span style="color:#f8f8f8;text-decoration:underline">
+</span><span style="color:#f8f8f8;text-decoration:underline">        </span>-<span style="color:#f8f8f8;text-decoration:underline"> </span>/home/user/bin/get-latest.sh<span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># this command is invoked on &#34;backup&#34; container to get last backup number before pod deletion; not having it in the CR may cause loss of data</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>interval<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#0000cf;font-weight:bold">30</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># how often make backup in seconds</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">    </span>makeBackupBeforePodDeletion<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#204a87;font-weight:bold">true</span><span style="color:#f8f8f8;text-decoration:underline"> </span><span style="color:#8f5902;font-style:italic"># make a backup before pod deletion</span><span style="color:#f8f8f8;text-decoration:underline">
 </span><span style="color:#f8f8f8;text-decoration:underline">  </span>restore<span style="color:#000;font-weight:bold">:</span><span style="color:#f8f8f8;text-decoration:underline">

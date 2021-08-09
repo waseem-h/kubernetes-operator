@@ -19,7 +19,6 @@ COPY internal/ internal/
 COPY pkg/ pkg/
 COPY version/ version/
 COPY main.go main.go
-RUN mkdir plugins/
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -ldflags "-w $CTIMEVAR" -o manager main.go
@@ -30,4 +29,5 @@ FROM gcr.io/distroless/static:nonroot
 WORKDIR /
 COPY --from=builder /workspace/manager .
 USER 65532:65532
+
 ENTRYPOINT ["/manager"]

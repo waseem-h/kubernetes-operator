@@ -2,24 +2,25 @@
 title: "Installation"
 linkTitle: "Installation"
 weight: 1
-date: 2020-10-05
+date: 2021-07-30
 description: >
   How to install Jenkins Operator
 ---
 
 {{% pageinfo %}}
 This document describes installation procedure for **Jenkins Operator**. 
-All container images can be found at [virtuslab/jenkins-operator](https://hub.docker.com/r/virtuslab/jenkins-operator)
+All container images can be found at [virtuslab/jenkins-operator](https://hub.docker.com/r/virtuslab/jenkins-operator) Docker Hub repository.
 {{% /pageinfo %}}
 
 ## Requirements
  
 To run **Jenkins Operator**, you will need:
+
 - access to a Kubernetes cluster version `1.17+`
 - `kubectl` version `1.17+`
 
 
-Listed below are the two ways to deploy Jenkins Operator. For details on how to customize your Jenkins instance, refer to [Getting Started](/kubernetes-operator/docs/installation/)
+Listed below are the two ways to deploy Jenkins Operator. For details on how to customize your Jenkins instance, refer to [Getting Started](/kubernetes-operator/docs/installation/).
 
 ## Deploy Jenkins Operator using YAML's
 
@@ -877,3 +878,24 @@ Example:<br />
      </tbody>
  </table>
 
+## Note on Operator's nightly built images
+If you wish to use the newest, not yet released version of the Operator, you can use one of nightly built snapshot images, however the maintainers of this project cannot guarantee their stability.
+
+You can find nightly built images by heading to [virtuslab/jenkins-operator](https://hub.docker.com/r/virtuslab/jenkins-operator) Docker Hub repository and looking for images with tag in the form of "{git-hash}", {git-hash} being the hash of master branch commit that you want to use snapshot of.
+
+## Note on restricted Jenkins controller pod volumeMounts
+Current design of the Operator puts an emphasis on creating a full GitOps flow of work for Jenkins users.
+One of the key points of this design is maintaining an immutable state of Jenkins. 
+
+One of the prerequisites of this is an ephemeral Jenkins home directory. To achieve that, Operator mounts emptyDir Volume
+(jenkins-home) as Jenkins home directory.
+It is not possible to overwrite volumeMount and specify any other Volume for Jenkins home directory,
+as attempting to do so will result in Operator error.
+
+jenkins-home is not the only Jenkins controller pod volumeMount that is non-configurable and managed by Operator,
+below is the full list of those volumeMounts:
+
+* jenkins-home
+* scripts
+* init-configuration
+* operator-credentials
