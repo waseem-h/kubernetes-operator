@@ -79,6 +79,7 @@ func (in *Jenkins) ValidateDelete() error {
 type PluginDataManager struct {
 	PluginDataCache    PluginsInfo
 	Hosturl            string
+	Timeout            time.Duration
 	CompressedFilePath string
 	PluginDataFile     string
 	IsCached           bool
@@ -160,9 +161,9 @@ func Validate(r Jenkins) error {
 
 			if hasVulnerabilities {
 				if pluginData.Kind == "base" {
-					faultyBasePlugins += plugin.Name + ":" + pluginData.Version + "\n"
+					faultyBasePlugins += "\n" + plugin.Name + ":" + pluginData.Version
 				} else {
-					faultyUserPlugins += plugin.Name + ":" + pluginData.Version + "\n"
+					faultyUserPlugins += "\n" + plugin.Name + ":" + pluginData.Version
 				}
 			}
 		}
@@ -170,10 +171,10 @@ func Validate(r Jenkins) error {
 	if len(faultyBasePlugins) > 0 || len(faultyUserPlugins) > 0 {
 		var errormsg string
 		if len(faultyBasePlugins) > 0 {
-			errormsg += "Security vulnerabilities detected in the following base plugins: \n" + faultyBasePlugins
+			errormsg += "security vulnerabilities detected in the following base plugins: " + faultyBasePlugins
 		}
 		if len(faultyUserPlugins) > 0 {
-			errormsg += "Security vulnerabilities detected in the following user-defined plugins: \n" + faultyUserPlugins
+			errormsg += "security vulnerabilities detected in the following user-defined plugins: " + faultyUserPlugins
 		}
 		return errors.New(errormsg)
 	}
@@ -188,6 +189,7 @@ func NewPluginsDataManager() *PluginDataManager {
 		PluginDataFile:     "/tmp/plugins.json",
 		IsCached:           false,
 		Attempts:           0,
+		Timeout:            time.Duration(1000) * time.Second,
 	}
 }
 
@@ -256,7 +258,7 @@ func (in *PluginDataManager) download() error {
 	defer out.Close()
 
 	client := http.Client{
-		Timeout: 1000 * time.Second,
+		Timeout: in.Timeout,
 	}
 
 	resp, err := client.Get(in.Hosturl)
@@ -314,9 +316,11 @@ func (in *PluginDataManager) cache() error {
 	return nil
 }
 
-// returns a semantic version that can be used for comparison
+// returns a semantic version that can be used for comparison, allowed versioning format vMAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH
 func makeSemanticVersion(version string) string {
-	version = "v" + version
+	if version[0] != 'v' {
+		version = "v" + version
+	}
 	return semver.Canonical(version)
 }
 
