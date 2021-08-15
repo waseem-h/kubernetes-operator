@@ -1,15 +1,16 @@
+{{- if .Values.webhook.enabled }}
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: webhook-certificate
+  name: jenkins-{{ .Values.webhook.certificate.name }}
   namespace: {{ .Release.Namespace }}
 spec:
-  duration: 2160h 
-  renewBefore: 360h
-  secretName: webhook-server-cert
+  duration: {{ .Values.webhook.certificate.duration }}
+  renewBefore: {{ .Values.webhook.certificate.renewbefore }}
+  secretName: jenkins-{{ .Values.webhook.certificate.name }}
   dnsNames:
-  - webhook-service.{{ .Release.Namespace }}.svc 
-  - webhook-service.{{ .Release.Namespace }}.svc.cluster.local 
+  - jenkins-webhook-service.{{ .Release.Namespace }}.svc 
+  - jenkins-webhook-service.{{ .Release.Namespace }}.svc.cluster.local 
   issuerRef:
     kind: Issuer
     name: selfsigned
@@ -24,3 +25,4 @@ spec:
   selfSigned: {}
 
 ---
+{{- end }}
