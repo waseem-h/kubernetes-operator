@@ -407,21 +407,15 @@ helm-lint: helm
 	@echo "+ $@"
 	bin/helm lint chart/jenkins-operator
 
-.PHONY: helm-package
-helm-package: helm
+.PHONY: helm-release-latest
+helm-release-latest: helm
 	@echo "+ $@"
 	mkdir -p /tmp/jenkins-operator-charts
 	mv chart/jenkins-operator/*.tgz /tmp/jenkins-operator-charts
 	cd chart && ../bin/helm package jenkins-operator
+	mv chart/jenkins-operator-*.tgz chart/jenkins-operator/
+	bin/helm repo index chart/ --url https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart/jenkins-operator/ --merge chart/index.yaml
 	mv /tmp/jenkins-operator-charts/*.tgz chart/jenkins-operator/
-	rm -rf /tmp/jenkins-operator-charts/
-	git add chart/jenkins-operator-*.tgz
-
-.PHONY: helm-deploy
-helm-deploy: helm-package
-	@echo "+ $@"
-	bin/helm repo index chart/ --url https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart/jenkins-operator/
-	cd chart/ && mv jenkins-operator-*.tgz jenkins-operator
 
 # Download and build hugo extended locally if necessary
 HUGO_PATH = $(shell pwd)/bin/hugo
