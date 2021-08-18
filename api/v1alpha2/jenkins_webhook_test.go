@@ -3,12 +3,8 @@ package v1alpha2
 import (
 	"errors"
 	"testing"
-	"time"
 
-	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 	"github.com/stretchr/testify/assert"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestMakeSemanticVersion(t *testing.T) {
@@ -81,83 +77,77 @@ func TestCompareVersions(t *testing.T) {
 func TestValidate(t *testing.T) {
 	t.Run("Validating when plugins data file is not fetched", func(t *testing.T) {
 		userplugins := []Plugin{{Name: "script-security", Version: "1.77"}, {Name: "git-client", Version: "3.9"}, {Name: "git", Version: "4.8.1"}, {Name: "plain-credentials", Version: "1.7"}}
-		jenkinscr := *createJenkinsCR(userplugins, true)
+		jenkinscr := *CreateJenkinsCR("Jenkins", "test", userplugins, true)
 		got := jenkinscr.ValidateCreate()
 		assert.Equal(t, got, errors.New("plugins data has not been fetched"))
 	})
 
-	isInitialized := make(chan bool)
-	go PluginsMgr.FetchPluginData(isInitialized)
-	if <-isInitialized {
-		t.Run("Validating a Jenkins CR with plugins not having security warnings and validation is turned on", func(t *testing.T) {
-			userplugins := []Plugin{{Name: "script-security", Version: "1.77"}, {Name: "git-client", Version: "3.9"}, {Name: "git", Version: "4.8.1"}, {Name: "plain-credentials", Version: "1.7"}}
-			jenkinscr := *createJenkinsCR(userplugins, true)
-			got := jenkinscr.ValidateCreate()
-			assert.Nil(t, got)
-		})
-
-		t.Run("Validating a Jenkins CR with some of the plugins having security warnings and validation is turned on", func(t *testing.T) {
-			userplugins := []Plugin{{Name: "google-login", Version: "1.2"}, {Name: "mailer", Version: "1.1"}, {Name: "git", Version: "4.8.1"}, {Name: "command-launcher", Version: "1.6"}, {Name: "workflow-cps", Version: "2.59"}}
-			jenkinscr := *createJenkinsCR(userplugins, true)
-			got := jenkinscr.ValidateCreate()
-			assert.Equal(t, got, errors.New("security vulnerabilities detected in the following user-defined plugins: \nworkflow-cps:2.59\ngoogle-login:1.2\nmailer:1.1"))
-		})
-
-		t.Run("Updating a Jenkins CR with some of the plugins having security warnings and validation is turned on", func(t *testing.T) {
-			userplugins := []Plugin{{Name: "google-login", Version: "1.2"}, {Name: "mailer", Version: "1.1"}, {Name: "git", Version: "4.8.1"}, {Name: "command-launcher", Version: "1.6"}, {Name: "workflow-cps", Version: "2.59"}}
-			oldjenkinscr := *createJenkinsCR(userplugins, true)
-
-			userplugins = []Plugin{{Name: "handy-uri-templates-2-api", Version: "2.1.8-1.0"}, {Name: "resource-disposer", Version: "0.8"}, {Name: "jjwt-api", Version: "0.11.2-9.c8b45b8bb173"}, {Name: "blueocean-github-pipeline", Version: "1.2.0-beta-3"}, {Name: "ghprb", Version: "1.39"}}
-			newjenkinscr := *createJenkinsCR(userplugins, true)
-			got := newjenkinscr.ValidateUpdate(&oldjenkinscr)
-			assert.Equal(t, got, errors.New("security vulnerabilities detected in the following user-defined plugins: \nresource-disposer:0.8\nblueocean-github-pipeline:1.2.0-beta-3\nghprb:1.39"))
-		})
-
-		t.Run("Validation is turned off", func(t *testing.T) {
-			userplugins := []Plugin{{Name: "google-login", Version: "1.2"}, {Name: "mailer", Version: "1.1"}, {Name: "git", Version: "4.8.1"}, {Name: "command-launcher", Version: "1.6"}, {Name: "workflow-cps", Version: "2.59"}}
-			jenkinscr := *createJenkinsCR(userplugins, false)
-			got := jenkinscr.ValidateCreate()
-			assert.Nil(t, got)
-		})
-	} else {
-		t.Fatal("Plugin Data File is not Downloaded")
-	}
-}
-
-func TestFetchPluginData(t *testing.T) {
-	t.Run("Timeout error while downloading plugins data file", func(t *testing.T) {
-		pluginsDataMgr := *NewPluginsDataManager()
-		pluginsDataMgr.Timeout = time.Duration(1) * time.Nanosecond
-		got := pluginsDataMgr.download()
-		assert.NotNil(t, got)
+	PluginsMgr.IsCached = true
+	t.Run("Validating a Jenkins CR with plugins not having security warnings and validation is turned on", func(t *testing.T) {
+		PluginsMgr.PluginDataCache = PluginsInfo{Plugins: []PluginInfo{
+			{Name: "security-script"},
+			{Name: "git-client"},
+			{Name: "git"},
+			{Name: "google-login", SecurityWarnings: CreateSecurityWarnings("", "1.2")},
+			{Name: "sample-plugin", SecurityWarnings: CreateSecurityWarnings("", "0.8")},
+			{Name: "mailer"},
+			{Name: "plain-credentials"}}}
+		userplugins := []Plugin{{Name: "script-security", Version: "1.77"}, {Name: "git-client", Version: "3.9"}, {Name: "git", Version: "4.8.1"}, {Name: "plain-credentials", Version: "1.7"}}
+		jenkinscr := *CreateJenkinsCR("Jenkins", "test", userplugins, true)
+		got := jenkinscr.ValidateCreate()
+		assert.Nil(t, got)
 	})
-	t.Run("Successfully fetching plugins data file", func(t *testing.T) {
-		isInitialized := make(chan bool)
-		pluginsDataMgr := *NewPluginsDataManager()
-		go pluginsDataMgr.FetchPluginData(isInitialized)
-		assert.Equal(t, <-isInitialized, true)
+
+	t.Run("Validating a Jenkins CR with some of the plugins having security warnings and validation is turned on", func(t *testing.T) {
+		PluginsMgr.PluginDataCache = PluginsInfo{Plugins: []PluginInfo{
+			{Name: "security-script", SecurityWarnings: CreateSecurityWarnings("1.2", "2.2")},
+			{Name: "workflow-cps", SecurityWarnings: CreateSecurityWarnings("2.59", "")},
+			{Name: "git-client"},
+			{Name: "git"},
+			{Name: "sample-plugin", SecurityWarnings: CreateSecurityWarnings("0.8", "")},
+			{Name: "command-launcher", SecurityWarnings: CreateSecurityWarnings("1.2", "1.4")},
+			{Name: "plain-credentials"},
+			{Name: "google-login", SecurityWarnings: CreateSecurityWarnings("1.1", "1.3")},
+			{Name: "mailer", SecurityWarnings: CreateSecurityWarnings("1.0.3", "1.1.4")},
+		}}
+		userplugins := []Plugin{{Name: "google-login", Version: "1.2"}, {Name: "mailer", Version: "1.1"}, {Name: "git", Version: "4.8.1"}, {Name: "command-launcher", Version: "1.6"}, {Name: "workflow-cps", Version: "2.59"}}
+		jenkinscr := *CreateJenkinsCR("Jenkins", "test", userplugins, true)
+		got := jenkinscr.ValidateCreate()
+		assert.Equal(t, got, errors.New("security vulnerabilities detected in the following user-defined plugins: \nworkflow-cps:2.59\ngoogle-login:1.2\nmailer:1.1"))
 	})
-}
 
-func createJenkinsCR(userPlugins []Plugin, validateSecurityWarnings bool) *Jenkins {
-	jenkins := &Jenkins{
-		TypeMeta: JenkinsTypeMeta(),
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "Jenkins",
-			Namespace: "test",
-		},
-		Spec: JenkinsSpec{
-			Master: JenkinsMaster{
-				Annotations: map[string]string{"test": "label"},
-				Plugins:     userPlugins,
-			},
-			ValidateSecurityWarnings: validateSecurityWarnings,
-			Service: Service{
-				Type: corev1.ServiceTypeNodePort,
-				Port: constants.DefaultHTTPPortInt32,
-			},
-		},
-	}
+	t.Run("Updating a Jenkins CR with some of the plugins having security warnings and validation is turned on", func(t *testing.T) {
+		PluginsMgr.PluginDataCache = PluginsInfo{Plugins: []PluginInfo{
+			{Name: "handy-uri-templates-2-api", SecurityWarnings: CreateSecurityWarnings("2.1.8-1.0", "2.2.8-1.0")},
+			{Name: "workflow-cps", SecurityWarnings: CreateSecurityWarnings("2.59", "")},
+			{Name: "resource-disposer", SecurityWarnings: CreateSecurityWarnings("0.7", "1.2")},
+			{Name: "git"},
+			{Name: "jjwt-api"},
+			{Name: "blueocean-github-pipeline", SecurityWarnings: CreateSecurityWarnings("1.2.0-alpha-2", "1.2.0-beta-5")},
+			{Name: "command-launcher", SecurityWarnings: CreateSecurityWarnings("1.2", "1.4")},
+			{Name: "plain-credentials"},
+			{Name: "ghprb", SecurityWarnings: CreateSecurityWarnings("1.1", "1.43")},
+			{Name: "mailer", SecurityWarnings: CreateSecurityWarnings("1.0.3", "1.1.4")},
+		}}
 
-	return jenkins
+		userplugins := []Plugin{{Name: "google-login", Version: "1.2"}, {Name: "mailer", Version: "1.1"}, {Name: "git", Version: "4.8.1"}, {Name: "command-launcher", Version: "1.6"}, {Name: "workflow-cps", Version: "2.59"}}
+		oldjenkinscr := *CreateJenkinsCR("Jenkins", "test", userplugins, true)
+
+		userplugins = []Plugin{{Name: "handy-uri-templates-2-api", Version: "2.1.8-1.0"}, {Name: "resource-disposer", Version: "0.8"}, {Name: "jjwt-api", Version: "0.11.2-9.c8b45b8bb173"}, {Name: "blueocean-github-pipeline", Version: "1.2.0-beta-3"}, {Name: "ghprb", Version: "1.39"}}
+		newjenkinscr := *CreateJenkinsCR("Jenkins", "test", userplugins, true)
+		got := newjenkinscr.ValidateUpdate(&oldjenkinscr)
+		assert.Equal(t, got, errors.New("security vulnerabilities detected in the following user-defined plugins: \nhandy-uri-templates-2-api:2.1.8-1.0\nresource-disposer:0.8\nblueocean-github-pipeline:1.2.0-beta-3\nghprb:1.39"))
+	})
+
+	t.Run("Validation is turned off", func(t *testing.T) {
+		userplugins := []Plugin{{Name: "google-login", Version: "1.2"}, {Name: "mailer", Version: "1.1"}, {Name: "git", Version: "4.8.1"}, {Name: "command-launcher", Version: "1.6"}, {Name: "workflow-cps", Version: "2.59"}}
+		jenkinscr := *CreateJenkinsCR("Jenkins", "test", userplugins, false)
+		got := jenkinscr.ValidateCreate()
+		assert.Nil(t, got)
+
+		userplugins = []Plugin{{Name: "google-login", Version: "1.2"}, {Name: "mailer", Version: "1.1"}, {Name: "git", Version: "4.8.1"}, {Name: "command-launcher", Version: "1.6"}, {Name: "workflow-cps", Version: "2.59"}}
+		newjenkinscr := *CreateJenkinsCR("jenkins", "test", userplugins, false)
+		got = newjenkinscr.ValidateUpdate(&jenkinscr)
+		assert.Nil(t, got)
+	})
 }

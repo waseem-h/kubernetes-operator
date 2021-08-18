@@ -26,9 +26,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 	"github.com/jenkinsci/kubernetes-operator/pkg/plugins"
 
 	"golang.org/x/mod/semver"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -37,7 +40,7 @@ import (
 
 var (
 	jenkinslog                   = logf.Log.WithName("jenkins-resource") // log is for logging in this package.
-	PluginsMgr PluginDataManager = *NewPluginsDataManager()
+	PluginsMgr PluginDataManager = *NewPluginsDataManager("https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip", "/tmp/plugins.json.gzip", "/tmp/plugins.json", false, time.Duration(1000)*time.Second)
 	_          webhook.Validator = &Jenkins{}
 )
 
@@ -182,14 +185,13 @@ func Validate(r Jenkins) error {
 	return nil
 }
 
-func NewPluginsDataManager() *PluginDataManager {
+func NewPluginsDataManager(hosturl string, compressedFilePath string, pluginDataFile string, isCached bool, timeout time.Duration) *PluginDataManager {
 	return &PluginDataManager{
-		Hosturl:            "https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip",
-		CompressedFilePath: "/tmp/plugins.json.gzip",
-		PluginDataFile:     "/tmp/plugins.json",
-		IsCached:           false,
-		Attempts:           0,
-		Timeout:            time.Duration(1000) * time.Second,
+		Hosturl:            hosturl,
+		CompressedFilePath: compressedFilePath,
+		PluginDataFile:     pluginDataFile,
+		IsCached:           isCached,
+		Timeout:            timeout,
 	}
 }
 
@@ -333,4 +335,31 @@ func compareVersions(firstVersion string, lastVersion string, pluginVersion stri
 		return false
 	}
 	return true
+}
+
+func CreateJenkinsCR(name string, namespace string, userPlugins []Plugin, validateSecurityWarnings bool) *Jenkins {
+	jenkins := &Jenkins{
+		TypeMeta: JenkinsTypeMeta(),
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: JenkinsSpec{
+			Master: JenkinsMaster{
+				Annotations: map[string]string{"test": "label"},
+				Plugins:     userPlugins,
+			},
+			ValidateSecurityWarnings: validateSecurityWarnings,
+			Service: Service{
+				Type: corev1.ServiceTypeNodePort,
+				Port: constants.DefaultHTTPPortInt32,
+			},
+		},
+	}
+
+	return jenkins
+}
+
+func CreateSecurityWarnings(firstVersion string, lastVersion string) []Warning {
+	return []Warning{{Versions: []Version{{FirstVersion: firstVersion, LastVersion: lastVersion}}, ID: "null", Message: "unit testing", URL: "null", Active: false}}
 }

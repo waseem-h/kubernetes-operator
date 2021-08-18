@@ -293,6 +293,3 @@ webhook:
     renewbefore: 360h
   # enable or disable the validation webhook
   enabled: false
-
-cert-manager:
-  installCRDs: true  
