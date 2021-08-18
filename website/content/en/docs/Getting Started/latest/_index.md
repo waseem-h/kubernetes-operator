@@ -4,11 +4,11 @@ linkTitle: "Latest (v0.6.x)"
 weight: 10
 date: 2021-01-18
 description: >
-  How to work with jenkins-operator to be released version
+  How to work with the latest, currently supported Jenkins Operator version.
 ---
 
 {{% pageinfo %}}
-This document describes a getting started guide for **Jenkins Operator** currently in preview version and an additional configuration.
+This document describes a getting started guide for **Jenkins Operator** `v0.6.x` and also additional configuration.
 {{% /pageinfo %}}
 
 ## First Steps
