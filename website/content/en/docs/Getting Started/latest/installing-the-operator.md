@@ -1,6 +1,6 @@
 ---
-title: "Installation"
-linkTitle: "Installation"
+title: "Installing the Operator"
+linkTitle: "Installing the Operator"
 weight: 1
 date: 2021-08-16
 description: >
@@ -20,7 +20,7 @@ To run **Jenkins Operator**, you will need:
 - `kubectl` version `1.17+`
 
 
-Listed below are the two ways to deploy Jenkins Operator. For details on how to customize your Jenkins instance, refer to [Getting Started](/kubernetes-operator/docs/getting-started/).
+Listed below are the two ways to deploy Jenkins Operator.
 
 ## Deploy Jenkins Operator using YAML's
 
@@ -30,7 +30,7 @@ First, install Jenkins Custom Resource Definition:
 kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/config/crd/bases/jenkins.io_jenkins.yaml 
 ```
 
-Then, apply the operator and other required resources:
+Then, install the Operator and other required resources:
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/deploy/all-in-one-v1alpha2.yaml
@@ -60,12 +60,6 @@ To install, you need only to type these commands:
 ```bash
 $ helm repo add jenkins https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart
 $ helm install <name> jenkins/jenkins-operator -n <your-namespace>
-```
-
-In case you want to use released Chart **v0.4.1**, before installing/upgrading please install additional CRD into the cluster:
-
-```bash
-$ kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/chart/jenkins-operator/crds/jenkinsimage-crd.yaml
 ```
 
 To add custom labels and annotations, you can use `values.yaml` file or pass them into `helm install` command, e.g.:
@@ -881,7 +875,7 @@ Example:<br />
 ## Note on Operator's nightly built images
 If you wish to use the newest, not yet released version of the Operator, you can use one of nightly built snapshot images, however the maintainers of this project cannot guarantee their stability.
 
-You can find nightly built images by heading to [virtuslab/jenkins-operator](https://hub.docker.com/r/virtuslab/jenkins-operator) Docker Hub repository and looking for images with tag in the form of "{git-hash}", {git-hash} being the hash of master branch commit that you want to use snapshot of.
+You can find nightly built images by heading to [virtuslab/jenkins-operator](https://hub.docker.com/r/virtuslab/jenkins-operator) Docker Hub repository and looking for images with tag in the form of `{git-hash}`, {git-hash} being the hash of master branch commit that you want to use snapshot of.
 
 ## Note on restricted Jenkins controller pod volumeMounts
 Current design of the Operator puts an emphasis on creating a full GitOps flow of work for Jenkins users.

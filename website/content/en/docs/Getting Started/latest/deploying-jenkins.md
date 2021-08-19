@@ -1,10 +1,10 @@
 ---
-title: "Deploy Jenkins"
-linkTitle: "Deploy Jenkins"
-weight: 1
+title: "Deploying Jenkins"
+linkTitle: "Deploying Jenkins"
+weight: 2
 date: 2021-01-25
 description: >
-  Deploy production ready Jenkins Operator manifest
+  Deploy production ready Jenkins manifest
 ---
 
 Once Jenkins Operator is up and running let's deploy actual Jenkins instance.
