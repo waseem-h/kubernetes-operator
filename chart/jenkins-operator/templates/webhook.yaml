@@ -16,6 +16,7 @@ webhooks:
       path: /validate-jenkins-io-v1alpha2-jenkins
   failurePolicy: Fail
   name: vjenkins.kb.io
+  timeoutSeconds: 30
   rules:
   - apiGroups:
     - jenkins.io

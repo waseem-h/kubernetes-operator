@@ -293,3 +293,9 @@ webhook:
     renewbefore: 360h
   # enable or disable the validation webhook
   enabled: false
+
+# This startupapicheck is a Helm post-install hook that waits for the webhook
+# endpoints to become available.
+cert-manager:
+  startupapicheck:
+    enabled: false

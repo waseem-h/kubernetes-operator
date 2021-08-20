@@ -25,4 +25,10 @@ spec:
   selfSigned: {}
 
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: jenkins-{{ .Values.webhook.certificate.name }}
+type: opaque
+
 {{- end }}

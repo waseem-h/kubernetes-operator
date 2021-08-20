@@ -180,8 +180,10 @@ func main() {
 		fatal(errors.Wrap(err, "unable to create Jenkins controller"), *debug)
 	}
 
-	if err = (&v1alpha2.Jenkins{}).SetupWebhookWithManager(mgr); err != nil {
-		fatal(errors.Wrap(err, "unable to create Webhook"), *debug)
+	if ValidateSecurityWarnings {
+		if err = (&v1alpha2.Jenkins{}).SetupWebhookWithManager(mgr); err != nil {
+			fatal(errors.Wrap(err, "unable to create Webhook"), *debug)
+		}
 	}
 	// +kubebuilder:scaffold:builder
 

@@ -26,6 +26,7 @@ import (
 	"os"
 	"time"
 
+	//"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
 	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
 	"github.com/jenkinsci/kubernetes-operator/pkg/plugins"
 
@@ -345,15 +346,32 @@ func CreateJenkinsCR(name string, namespace string, userPlugins []Plugin, valida
 			Namespace: namespace,
 		},
 		Spec: JenkinsSpec{
+			GroovyScripts: GroovyScripts{
+				Customization: Customization{
+					Configurations: []ConfigMapRef{},
+					Secret: SecretRef{
+						Name: "",
+					},
+				},
+			},
+			ConfigurationAsCode: ConfigurationAsCode{
+				Customization: Customization{
+					Configurations: []ConfigMapRef{},
+					Secret: SecretRef{
+						Name: "",
+					},
+				},
+			},
 			Master: JenkinsMaster{
-				Annotations: map[string]string{"test": "label"},
-				Plugins:     userPlugins,
+				Plugins:               userPlugins,
+				DisableCSRFProtection: false,
 			},
 			ValidateSecurityWarnings: validateSecurityWarnings,
 			Service: Service{
 				Type: corev1.ServiceTypeNodePort,
 				Port: constants.DefaultHTTPPortInt32,
 			},
+			JenkinsAPISettings: JenkinsAPISettings{AuthorizationStrategy: CreateUserAuthorizationStrategy},
 		},
 	}
 
