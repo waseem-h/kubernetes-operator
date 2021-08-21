@@ -27,12 +27,10 @@ import (
 	"time"
 
 	//"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
-	"github.com/jenkinsci/kubernetes-operator/pkg/constants"
+
 	"github.com/jenkinsci/kubernetes-operator/pkg/plugins"
 
 	"golang.org/x/mod/semver"
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -41,9 +39,11 @@ import (
 
 var (
 	jenkinslog                   = logf.Log.WithName("jenkins-resource") // log is for logging in this package.
-	PluginsMgr PluginDataManager = *NewPluginsDataManager("https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip", "/tmp/plugins.json.gzip", "/tmp/plugins.json", false, time.Duration(1000)*time.Second)
+	PluginsMgr PluginDataManager = *NewPluginsDataManager("/tmp/plugins.json.gzip", "/tmp/plugins.json", false, time.Duration(1000)*time.Second)
 	_          webhook.Validator = &Jenkins{}
 )
+
+const Hosturl = "https://ci.jenkins.io/job/Infra/job/plugin-site-api/job/generate-data/lastSuccessfulBuild/artifact/plugins.json.gzip"
 
 func (in *Jenkins) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -82,13 +82,12 @@ func (in *Jenkins) ValidateDelete() error {
 
 type PluginDataManager struct {
 	PluginDataCache    PluginsInfo
-	Hosturl            string
 	Timeout            time.Duration
 	CompressedFilePath string
 	PluginDataFile     string
 	IsCached           bool
 	Attempts           int
-	SleepTime          int
+	SleepTime          time.Duration
 }
 
 type PluginsInfo struct {
@@ -155,7 +154,7 @@ func Validate(r Jenkins) error {
 					if len(lastVersion) == 0 {
 						lastVersion = pluginData.Version // setting default value in case of empty string
 					}
-
+					// checking if this warning applies to our version as well
 					if compareVersions(firstVersion, lastVersion, pluginData.Version) {
 						jenkinslog.Info("Security Vulnerability detected in "+pluginData.Kind+" "+plugin.Name+":"+pluginData.Version, "Warning message", warning.Message, "For more details,check security advisory", warning.URL)
 						hasVulnerabilities = true
@@ -186,9 +185,8 @@ func Validate(r Jenkins) error {
 	return nil
 }
 
-func NewPluginsDataManager(hosturl string, compressedFilePath string, pluginDataFile string, isCached bool, timeout time.Duration) *PluginDataManager {
+func NewPluginsDataManager(compressedFilePath string, pluginDataFile string, isCached bool, timeout time.Duration) *PluginDataManager {
 	return &PluginDataManager{
-		Hosturl:            hosturl,
 		CompressedFilePath: compressedFilePath,
 		PluginDataFile:     pluginDataFile,
 		IsCached:           isCached,
@@ -196,61 +194,70 @@ func NewPluginsDataManager(hosturl string, compressedFilePath string, pluginData
 	}
 }
 
-// Downloads extracts and reads the JSON data in every 12 hours
-func (in *PluginDataManager) FetchPluginData(isInitialized chan bool) {
+func (in *PluginDataManager) ManagePluginData(sig chan bool) {
+	var isInit bool // checks if the operator
+	var retryInterval time.Duration
 	for {
-		jenkinslog.Info("Initializing/Updating the plugin data cache")
-		var isDownloaded, isExtracted, isCached bool
-		var err error
-		for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
-			err = in.download()
-			if err == nil {
-				isDownloaded = true
-				break
-			}
+		isCached := in.fetchPluginData()
+		if !isInit {
+			sig <- isCached // sending signal to main to continue
+			isInit = false
 		}
 
-		if isDownloaded {
-			for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
-				err = in.extract()
-				if err == nil {
-					isExtracted = true
-					break
-				}
-			}
+		in.IsCached = in.IsCached || isCached
+		if !isCached {
+			retryInterval = time.Duration(1) * time.Hour
 		} else {
-			jenkinslog.Info("Cache Plugin Data", "failed to download file", err)
+			retryInterval = time.Duration(12) * time.Hour
 		}
-
-		if isExtracted {
-			for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
-				err = in.cache()
-				if err == nil {
-					isCached = true
-					break
-				}
-			}
-
-			if !isCached {
-				jenkinslog.Info("Cache Plugin Data", "failed to read plugin data file", err)
-			}
-		} else {
-			jenkinslog.Info("Cache Plugin Data", "failed to extract file", err)
-		}
-
-		// Checks for the first time
-		if !in.IsCached {
-			isInitialized <- isCached
-			in.IsCached = isCached
-		}
-
-		if isCached {
-			in.SleepTime = 12
-		} else {
-			in.SleepTime = 1
-		}
-		time.Sleep(time.Duration(in.SleepTime) * time.Hour)
+		time.Sleep(retryInterval)
 	}
+}
+
+// Downloads extracts and reads the JSON data in every 12 hours
+func (in *PluginDataManager) fetchPluginData() bool {
+	jenkinslog.Info("Initializing/Updating the plugin data cache")
+	var err error
+	for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
+		err = in.download()
+		if err == nil {
+			break
+		}
+		jenkinslog.V(1).Info("Cache Plugin Data", "failed to download file", err)
+	}
+
+	if err != nil {
+		jenkinslog.Info("Cache Plugin Data", "failed to download file", err)
+		return false
+	}
+
+	for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
+		err = in.extract()
+		if err == nil {
+			break
+		}
+		jenkinslog.V(1).Info("Cache Plugin Data", "failed to extract file", err)
+	}
+
+	if err != nil {
+		jenkinslog.Info("Cache Plugin Data", "failed to extract file", err)
+		return false
+	}
+
+	for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
+		err = in.cache()
+		if err == nil {
+			break
+		}
+		jenkinslog.V(1).Info("Cache Plugin Data", "failed to read plugin data file", err)
+	}
+
+	if err != nil {
+		jenkinslog.Info("Cache Plugin Data", "failed to read plugin data file", err)
+		return false
+	}
+
+	return true
 }
 
 func (in *PluginDataManager) download() error {
@@ -264,11 +271,12 @@ func (in *PluginDataManager) download() error {
 		Timeout: in.Timeout,
 	}
 
-	resp, err := client.Get(in.Hosturl)
+	resp, err := client.Get(Hosturl)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
+
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return err
@@ -307,7 +315,6 @@ func (in *PluginDataManager) cache() error {
 		return err
 	}
 	defer jsonFile.Close()
-
 	byteValue, err := ioutil.ReadAll(jsonFile)
 	if err != nil {
 		return err
@@ -336,48 +343,4 @@ func compareVersions(firstVersion string, lastVersion string, pluginVersion stri
 		return false
 	}
 	return true
-}
-
-func CreateJenkinsCR(name string, namespace string, userPlugins []Plugin, validateSecurityWarnings bool) *Jenkins {
-	jenkins := &Jenkins{
-		TypeMeta: JenkinsTypeMeta(),
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: JenkinsSpec{
-			GroovyScripts: GroovyScripts{
-				Customization: Customization{
-					Configurations: []ConfigMapRef{},
-					Secret: SecretRef{
-						Name: "",
-					},
-				},
-			},
-			ConfigurationAsCode: ConfigurationAsCode{
-				Customization: Customization{
-					Configurations: []ConfigMapRef{},
-					Secret: SecretRef{
-						Name: "",
-					},
-				},
-			},
-			Master: JenkinsMaster{
-				Plugins:               userPlugins,
-				DisableCSRFProtection: false,
-			},
-			ValidateSecurityWarnings: validateSecurityWarnings,
-			Service: Service{
-				Type: corev1.ServiceTypeNodePort,
-				Port: constants.DefaultHTTPPortInt32,
-			},
-			JenkinsAPISettings: JenkinsAPISettings{AuthorizationStrategy: CreateUserAuthorizationStrategy},
-		},
-	}
-
-	return jenkins
-}
-
-func CreateSecurityWarnings(firstVersion string, lastVersion string) []Warning {
-	return []Warning{{Versions: []Version{{FirstVersion: firstVersion, LastVersion: lastVersion}}, ID: "null", Message: "unit testing", URL: "null", Active: false}}
 }

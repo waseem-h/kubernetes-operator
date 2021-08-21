@@ -113,7 +113,7 @@ func main() {
 
 	if ValidateSecurityWarnings {
 		isInitialized := make(chan bool)
-		go v1alpha2.PluginsMgr.FetchPluginData(isInitialized)
+		go v1alpha2.PluginsMgr.ManagePluginData(isInitialized)
 
 		if !<-isInitialized {
 			logger.Info("Unable to get the plugins data")
