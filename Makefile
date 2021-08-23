@@ -96,7 +96,8 @@ e2e: deepcopy-gen manifests ## Runs e2e tests, you can use EXTRA_ARGS
 
 .PHONY: helm-e2e
 IMAGE_NAME := $(DOCKER_REGISTRY):$(GITCOMMIT)
-helm-e2e: helm container-runtime-build ## Runs helm e2e tests, you can use EXTRA_ARGS
+#TODO: install cert-manager before running helm charts
+helm-e2e:  helm container-runtime-build ## Runs helm e2e tests, you can use EXTRA_ARGS
 	@echo "+ $@"
 	RUNNING_TESTS=1 go test -parallel=1 "./test/helm/" -ginkgo.v -tags "$(BUILDTAGS) cgo" -v -timeout 60m -run "$(E2E_TEST_SELECTOR)" -image-name=$(IMAGE_NAME) $(E2E_TEST_ARGS)
 
@@ -537,8 +538,10 @@ all-in-one-build-webhook: ## Re-generate all-in-one yaml
 	
 # start the cluster locally and set it to use the docker daemon from minikube
 install-cert-manager: minikube-start
-	kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.4.0/cert-manager.yaml 
+	kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.yaml 
 
+uninstall-cert-manager: minikube-start
+	kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.yaml 
 	
 #Launch cert-manager and deploy the operator locally along with webhook
 deploy-webhook: install-cert-manager install-crds container-runtime-build all-in-one-build-webhook 
