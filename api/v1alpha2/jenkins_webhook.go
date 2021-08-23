@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/lictenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,8 +26,7 @@ import (
 	"os"
 	"time"
 
-	//"github.com/jenkinsci/kubernetes-operator/pkg/configuration/base/resources"
-
+	"github.com/jenkinsci/kubernetes-operator/pkg/log"
 	"github.com/jenkinsci/kubernetes-operator/pkg/plugins"
 
 	"golang.org/x/mod/semver"
@@ -195,13 +194,20 @@ func NewPluginsDataManager(compressedFilePath string, pluginDataFile string, isC
 }
 
 func (in *PluginDataManager) ManagePluginData(sig chan bool) {
-	var isInit bool // checks if the operator
+	var isInit bool
 	var retryInterval time.Duration
 	for {
-		isCached := in.fetchPluginData()
+		var isCached bool
+		err := in.fetchPluginData()
+		if err == nil {
+			isCached = true
+		} else {
+			jenkinslog.Info("Cache plugin data", "failed to fetch plugin data", err)
+		}
+		// should only be executed once when the operator starts
 		if !isInit {
 			sig <- isCached // sending signal to main to continue
-			isInit = false
+			isInit = true
 		}
 
 		in.IsCached = in.IsCached || isCached
@@ -215,49 +221,45 @@ func (in *PluginDataManager) ManagePluginData(sig chan bool) {
 }
 
 // Downloads extracts and reads the JSON data in every 12 hours
-func (in *PluginDataManager) fetchPluginData() bool {
+func (in *PluginDataManager) fetchPluginData() error {
 	jenkinslog.Info("Initializing/Updating the plugin data cache")
 	var err error
 	for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
 		err = in.download()
-		if err == nil {
-			break
+		if err != nil {
+			jenkinslog.V(log.VDebug).Info("Cache Plugin Data", "failed to download file", err)
+			continue
 		}
-		jenkinslog.V(1).Info("Cache Plugin Data", "failed to download file", err)
+		break
 	}
 
 	if err != nil {
-		jenkinslog.Info("Cache Plugin Data", "failed to download file", err)
-		return false
+		return err
 	}
 
 	for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
 		err = in.extract()
-		if err == nil {
-			break
+		if err != nil {
+			jenkinslog.V(log.VDebug).Info("Cache Plugin Data", "failed to extract file", err)
+			continue
 		}
-		jenkinslog.V(1).Info("Cache Plugin Data", "failed to extract file", err)
+		break
 	}
 
 	if err != nil {
-		jenkinslog.Info("Cache Plugin Data", "failed to extract file", err)
-		return false
+		return err
 	}
 
 	for in.Attempts = 0; in.Attempts < 5; in.Attempts++ {
 		err = in.cache()
-		if err == nil {
-			break
+		if err != nil {
+			jenkinslog.V(log.VDebug).Info("Cache Plugin Data", "failed to read plugin data file", err)
+			continue
 		}
-		jenkinslog.V(1).Info("Cache Plugin Data", "failed to read plugin data file", err)
+		break
 	}
 
-	if err != nil {
-		jenkinslog.Info("Cache Plugin Data", "failed to read plugin data file", err)
-		return false
-	}
-
-	return true
+	return err
 }
 
 func (in *PluginDataManager) download() error {
@@ -278,11 +280,7 @@ func (in *PluginDataManager) download() error {
 	defer resp.Body.Close()
 
 	_, err = io.Copy(out, resp.Body)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (in *PluginDataManager) extract() error {
@@ -320,10 +318,7 @@ func (in *PluginDataManager) cache() error {
 		return err
 	}
 	err = json.Unmarshal(byteValue, &in.PluginDataCache)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // returns a semantic version that can be used for comparison, allowed versioning format vMAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH
