@@ -222,6 +222,7 @@ subjects:
 - kind: ServiceAccount
   name: jenkins-operator
 ---
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -246,7 +247,7 @@ spec:
         - /manager
         args:
         - --leader-elect
-        image: jenkins-operator:6f33fe82-dirty
+        image: jenkins-operator:37d0eac4-dirty
         name: jenkins-operator
         imagePullPolicy: IfNotPresent
         securityContext:
@@ -265,11 +266,11 @@ spec:
           periodSeconds: 10
         resources:
           limits:
-            cpu: 100m
-            memory: 30Mi
+            cpu: 200m
+            memory: 200Mi
           requests:
             cpu: 100m
-            memory: 20Mi
+            memory: 80Mi
         env:
           - name: WATCH_NAMESPACE
             valueFrom:
@@ -277,13 +278,12 @@ spec:
                 fieldPath: metadata.namespace
         volumeMounts:
           - mountPath: /tmp/k8s-webhook-server/serving-certs
-            name: cert
-            readOnly: true
+            name: cert       
       volumes:
       - name: cert
         secret:
           defaultMode: 420
-          secretName: webhook-server-cert  
+          secretName: webhook-server-cert
       terminationGracePeriodSeconds: 10
 ---
 apiVersion: cert-manager.io/v1
@@ -315,7 +315,6 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  creationTimestamp: null
   name: validating-webhook-configuration
   annotations:
     cert-manager.io/inject-ca-from: default/webhook-certificate
@@ -330,6 +329,7 @@ webhooks:
       path: /validate-jenkins-io-v1alpha2-jenkins
   failurePolicy: Fail
   name: vjenkins.kb.io
+  timeoutSeconds: 30
   rules:
   - apiGroups:
     - jenkins.io

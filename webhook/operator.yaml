@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,6 +23,7 @@ spec:
         - /manager
         args:
         - --leader-elect
+        - --validate-security-warnings 
         image: {DOCKER_REGISTRY}:{GITCOMMIT}
         name: jenkins-operator
         imagePullPolicy: IfNotPresent
@@ -41,11 +43,11 @@ spec:
           periodSeconds: 10
         resources:
           limits:
-            cpu: 100m
-            memory: 30Mi
+            cpu: 200m
+            memory: 200Mi
           requests:
             cpu: 100m
-            memory: 20Mi
+            memory: 80Mi
         env:
           - name: WATCH_NAMESPACE
             valueFrom:
@@ -53,12 +55,11 @@ spec:
                 fieldPath: metadata.namespace
         volumeMounts:
           - mountPath: /tmp/k8s-webhook-server/serving-certs
-            name: cert
-            readOnly: true
+            name: cert       
       volumes:
       - name: cert
         secret:
           defaultMode: 420
-          secretName: webhook-server-cert  
+          secretName: webhook-server-cert
       terminationGracePeriodSeconds: 10
 ---
