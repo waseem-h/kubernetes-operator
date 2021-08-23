@@ -241,7 +241,7 @@ kubectl --context remote-k8s --namespace default get po
 
 Tests are written using [Ginkgo](https://onsi.github.io/ginkgo/) with [Gomega](https://onsi.github.io/gomega/). 
 
-Run unit tests with go fmt, lint, statickcheck, vet:
+Run unit tests with go fmt, lint, staticcheck, vet:
 
 ```bash
 make verify
@@ -260,6 +260,12 @@ Run e2e tests with minikube:
 ```bash
 make minikube-start
 make e2e
+```
+
+Run helm e2e tests:
+```bash
+eval $(bin/minikube docker-env)
+make helm-e2e
 ```
 
 Run the specific e2e test:
@@ -292,8 +298,12 @@ kubectl get secret jenkins-operator-credentials-<cr_name> -o 'jsonpath={.data.us
 kubectl get secret jenkins-operator-credentials-<cr_name> -o 'jsonpath={.data.password}' | base64 -d
 ```
 
-
-
+### Webhook
+To deploy the operator along with webhook, run :
+```bash
+make deploy-webhook
+```
+It uses [cert-manager](https://cert-manager.io/) as an external dependancy.
 
 ## Self-learning
 
@@ -314,4 +324,3 @@ kubectl get secret jenkins-operator-credentials-<cr_name> -o 'jsonpath={.data.pa
 [minikube]:https://kubernetes.io/docs/tasks/tools/install-minikube/
 [virtualbox]:https://www.virtualbox.org/wiki/Downloads
 [install_dev_tools]:https://jenkinsci.github.io/kubernetes-operator/docs/developer-guide/tools/
-

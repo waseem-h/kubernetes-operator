@@ -899,3 +899,14 @@ below is the full list of those volumeMounts:
 * scripts
 * init-configuration
 * operator-credentials
+
+## Validating Webhook 
+You can also have a validating webhook which can be used to validate security warnings in plugins. It can be easily installed via helm charts by setting webhook.enabled in values.yaml or in the command line flag.
+>webhook.enabled=true
+
+Also, you can deploy it via kubectl manifests,  
+
+To enable security validation in the jenkins custom resource set
+>jenkins.ValidateSecurityWarnings=true
+
+**Note**: The webhook takes some time to get up and running,also when helm renders the template the validating webhook configuration is applied at last, hence if the user wants to deploy a jenkins custom resource with validation turned on, he needs to wait for sometime. After the webhook is up and running the user can deploy the jenkins custom resource using *helm* or *kubectl* 
