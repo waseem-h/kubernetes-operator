@@ -301,6 +301,7 @@ kubectl get secret jenkins-operator-credentials-<cr_name> -o 'jsonpath={.data.pa
 ### Webhook
 To deploy the operator along with webhook, run :
 ```bash
+eval $(minikube docker-env)
 make deploy-webhook
 ```
 It uses [cert-manager](https://cert-manager.io/) as an external dependancy.
@@ -313,6 +314,8 @@ It uses [cert-manager](https://cert-manager.io/) as an external dependancy.
 * [Operator Framework Training By OpenShift](https://www.katacoda.com/openshift/courses/operatorframework)
 
 * [Operator SDK Tutorial for Go](https://sdk.operatorframework.io/docs/building-operators/golang/tutorial/)
+
+* [Kubebuilder Validating Webhook Implementation](https://book.kubebuilder.io/cronjob-tutorial/webhook-implementation.html)
 
 [dep_tool]:https://golang.github.io/dep/docs/installation.html
 [git_tool]:https://git-scm.com/downloads

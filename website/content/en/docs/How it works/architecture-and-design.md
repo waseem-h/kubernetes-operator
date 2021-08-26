@@ -39,4 +39,3 @@ It helps to maintain or recover the desired state even after the operator or Jen
 ## Webhook 
 
 It rejects/accepts admission requests based on potential security warnings in plugins present in the jenkins custom resource. 
-

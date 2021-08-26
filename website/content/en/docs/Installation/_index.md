@@ -901,12 +901,88 @@ below is the full list of those volumeMounts:
 * operator-credentials
 
 ## Validating Webhook 
-You can also have a validating webhook which can be used to validate security warnings in plugins. It can be easily installed via helm charts by setting webhook.enabled in values.yaml or in the command line flag.
->webhook.enabled=true
+A validating webhook can be used in order to increase monitoring capabilities of the security issues. It will look for security vulnerabilities in the base and requested plugins. It can be easily installed via helm charts by setting webhook.enabled in values.yaml. 
 
-Also, you can deploy it via kubectl manifests,  
+**Note**: The webhook takes some time to get up and running. It's recommended to first deploy Operator and later Jenkins Custom Resource by using toggles in values.yaml
+If the installation happens with yamls, 
+First, install cert-manager:
+```bash
+kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.5.1/cert-manager.yaml 
+```
+It takes some time to get cert-manager up and running.
+Then, install the webhook and other required resources:
+```bash
+kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/deploy/all-in-one-webhook.yaml
+```
+Now, download the manifests for the operator and other resources from [here](https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/deploy/all-in-one-v1alpha2.yaml)and please provide these additional fields in the operator manifest:
+<pre><code>
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-operator
+  labels:
+    control-plane: controller-manager
+spec:
+  selector:
+    matchLabels:
+      control-plane: controller-manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        control-plane: controller-manager
+    spec:
+      serviceAccountName: jenkins-operator
+      securityContext:
+        runAsUser: 65532
+      containers:
+      - command:
+        - /manager
+        args:
+        - --leader-elect
+        <span style="color:orange">- --validate-security-warnings</span>
+        image: jenkins-operator:54231733-dirty 
+        name: jenkins-operator
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 20Mi
+        env:
+          - name: WATCH_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        <span style="color:orange">volumeMounts:
+          - mountPath: /tmp/k8s-webhook-server/serving-certs
+            name: webhook-certs
+            readOnly: true       
+      volumes:
+      - name: webhook-certs
+        secret:
+          defaultMode: 420
+          secretName: jenkins-webhook-certificate
+      terminationGracePeriodSeconds: 10</span>
+</code>
+</pre>
 
 To enable security validation in the jenkins custom resource set
 >jenkins.ValidateSecurityWarnings=true
 
-**Note**: The webhook takes some time to get up and running,also when helm renders the template the validating webhook configuration is applied at last, hence if the user wants to deploy a jenkins custom resource with validation turned on, he needs to wait for sometime. After the webhook is up and running the user can deploy the jenkins custom resource using *helm* or *kubectl* 
