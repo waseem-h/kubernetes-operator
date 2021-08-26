@@ -1,15 +1,15 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: webhook-certificate
+  name: jenkins-webhook-certificate
   namespace: default
 spec:
   duration: 2160h 
   renewBefore: 360h
-  secretName: webhook-server-cert
+  secretName: jenkins-webhook-certificate
   dnsNames:
-  - webhook-service.default.svc
-  - webhook-service.default.svc.cluster.local
+  - jenkins-webhook-service.default.svc
+  - jenkins-webhook-service.default.svc.cluster.local
   issuerRef:
     kind: Issuer
     name: selfsigned
@@ -22,5 +22,3 @@ metadata:
   namespace: default
 spec:
   selfSigned: {}
-
----
