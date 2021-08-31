@@ -262,7 +262,7 @@ make minikube-start
 make e2e
 ```
 
-Run helm e2e tests:
+Run Helm e2e tests:
 ```bash
 eval $(bin/minikube docker-env)
 make helm-e2e
@@ -304,7 +304,7 @@ To deploy the operator along with webhook, run :
 eval $(minikube docker-env)
 make deploy-webhook
 ```
-It uses [cert-manager](https://cert-manager.io/) as an external dependancy.
+It uses [cert-manager](https://cert-manager.io/) as an external dependency.
 
 ## Self-learning
 
