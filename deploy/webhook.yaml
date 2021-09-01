@@ -1,16 +1,17 @@
+---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: validating-webhook-configuration
+  name: jenkins-webhook
   annotations:
-    cert-manager.io/inject-ca-from: default/webhook-certificate
+    cert-manager.io/inject-ca-from: default/jenkins-webhook-certificate
 webhooks:
 - admissionReviewVersions:
   - v1
   - v1beta1
   clientConfig:
     service:
-      name: webhook-service
+      name: jenkins-webhook-service
       namespace: default
       path: /validate-jenkins-io-v1alpha2-jenkins
   failurePolicy: Fail
@@ -26,18 +27,19 @@ webhooks:
     - UPDATE
     resources:
     - jenkins
+    scope: "Namespaced"
   sideEffects: None
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: webhook-service
+  name: jenkins-webhook-service
   namespace: default
 spec:
   ports:
     - port: 443
       targetPort: 9443
   selector:
-    control-plane: controller-manager
+    name: jenkins-operator
 ---
+
