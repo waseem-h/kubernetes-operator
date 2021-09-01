@@ -912,7 +912,7 @@ Then, install the webhook and other required resources:
 kubectl apply -f https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/deploy/all-in-one-webhook.yaml
 ```
 
-Now, download the manifests for the operator and other resources from [here](https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/deploy/all-in-one-v1alpha2.yaml) and please provide these additional fields in the operator manifest:
+Now, download the manifests for the operator and other resources from [here](https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/master/deploy/all-in-one-v1alpha2.yaml) and provide these additional fields in the Operator manifest:
 
 <pre>
 <code>
@@ -983,7 +983,7 @@ spec:
 </code>
 </pre>
 
-To enable security validation in the jenkins custom resource,set
+To enable security validation in the Jenkins Custom Resource, set
 
 >jenkins.ValidateSecurityWarnings=true
 
