@@ -47,6 +47,10 @@ jenkins:
   # See https://github.com/jenkinsci/kubernetes-operator/pull/193 for more info
   disableCSRFProtection: false
 
+
+  # ValidateSecurityWarnings enables or disables validating potential security warnings in Jenkins plugins via admission webhooks.
+  ValidateSecurityWarnings: false
+  
   # imagePullSecrets is used if you want to pull images from private repository
   # See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#pulling-docker-images-from-private-repositories for more info
   imagePullSecrets: []
@@ -277,3 +281,22 @@ operator:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+
+webhook:
+# TLS certificates for webhook
+  certificate:
+    name: webhook-certificate
+
+    # validity of the certificate
+    duration: 2160h
+  
+    # time after which the certificate will be automatically renewed 
+    renewbefore: 360h
+  # enable or disable the validation webhook
+  enabled: false
+
+# This startupapicheck is a Helm post-install hook that waits for the webhook
+# endpoints to become available.
+cert-manager:
+  startupapicheck:
+    enabled: false

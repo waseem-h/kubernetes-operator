@@ -35,3 +35,7 @@ The **Jenkins Operator** design incorporates the following concepts:
 Operator state is kept in the custom resource status section, which is used for storing any configuration events or job statuses managed by the operator.
 
 It helps to maintain or recover the desired state even after the operator or Jenkins restarts.
+
+## Webhook 
+
+It rejects/accepts admission requests based on potential security warnings in plugins present in the Jenkins Custom Resource. 

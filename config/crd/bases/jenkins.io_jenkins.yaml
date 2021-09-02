@@ -5,6 +5,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
   name: jenkins.jenkins.io
 spec:
   group: jenkins.io
@@ -35,6 +36,10 @@ spec:
           spec:
             description: Spec defines the desired state of the Jenkins
             properties:
+              ValidateSecurityWarnings:
+                description: ValidateSecurityWarnings enables or disables validating
+                  potential security warnings in Jenkins plugins via admission webhooks.
+                type: boolean
               backup:
                 description: 'Backup defines configuration of Jenkins backup More
                   info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configure-backup-and-restore/'
