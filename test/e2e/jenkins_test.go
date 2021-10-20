@@ -113,9 +113,9 @@ func createJenkinsCR(name, namespace string, seedJob *[]v1alpha2.SeedJob, groovy
 					},
 				},
 				Plugins: []v1alpha2.Plugin{
-					{Name: "audit-trail", Version: "3.7"},
-					{Name: "simple-theme-plugin", Version: "0.6"},
-					{Name: "github", Version: "1.32.0"},
+					{Name: "audit-trail", Version: "3.10"},
+					{Name: "simple-theme-plugin", Version: "0.7"},
+					{Name: "github", Version: "1.34.1"},
 					{Name: "devoptics", Version: "1.1934", DownloadURL: "https://jenkins-updates.cloudbees.com/download/plugins/devoptics/1.1934/devoptics.hpi"},
 				},
 				PriorityClassName: priorityClassName,
