@@ -95,8 +95,7 @@ jenkins:
   plugins: []
 
   # seedJobs is placeholder for jenkins seed jobs
-  # For seed job creation tutorial, check https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#prepare-job-definitions-and-pipelines
-  # See https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration/#configure-seed-jobs for additional info
+  # For seed job creation tutorial, check https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuring-seed-jobs-and-pipelines/
   # Example:
   #
   # seedJobs:
