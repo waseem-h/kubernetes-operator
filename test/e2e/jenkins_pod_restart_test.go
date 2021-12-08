@@ -91,6 +91,7 @@ var _ = Describe("Jenkins controller", func() {
 	})
 
 	AfterEach(func() {
+		ShowLogsIfTestHasFailed(CurrentGinkgoTestDescription().Failed, namespace.Name)
 		DestroyNamespace(namespace)
 	})
 

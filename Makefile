@@ -346,7 +346,7 @@ HAS_SEMBUMP := $(shell which $(PROJECT_DIR)/bin/sembump)
 sembump: # Download sembump locally if necessary
 	@echo "+ $@"
 ifndef HAS_SEMBUMP
-	mkdir bin
+	mkdir -p $(PROJECT_DIR)/bin
 	wget -O $(PROJECT_DIR)/bin/sembump https://github.com/justintout/sembump/releases/download/v0.1.0/sembump-$(PLATFORM)-amd64
 	chmod +x $(PROJECT_DIR)/bin/sembump
 endif
@@ -360,8 +360,9 @@ bump-version: sembump ## Bump the version in the version file. Set BUMP to [ pat
 	echo $(NEW_VERSION) > VERSION.txt
 	@echo "Updating version from $(VERSION) to $(NEW_VERSION) in README.md"
 	sed -i.bak 's/$(VERSION)/$(NEW_VERSION)/g' README.md
-	sed -i.bak 's/$(VERSION)/$(NEW_VERSION)/g' deploy/operator.yaml
+	sed -i.bak 's/$(VERSION)/$(NEW_VERSION)/g' config/manager/manager.yaml
 	sed -i.bak 's/$(VERSION)/$(NEW_VERSION)/g' deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml
+	rm */*/**.bak
 	rm */**.bak
 	rm *.bak
 	cp config/service_account.yaml deploy/$(ALL_IN_ONE_DEPLOY_FILE_PREFIX)-$(API_VERSION).yaml

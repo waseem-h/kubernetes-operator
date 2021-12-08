@@ -85,6 +85,7 @@ var _ = Describe("Jenkins controller configuration", func() {
 	})
 
 	AfterEach(func() {
+		ShowLogsIfTestHasFailed(CurrentGinkgoTestDescription().Failed, namespace.Name)
 		DestroyNamespace(namespace)
 	})
 
@@ -185,6 +186,7 @@ var _ = Describe("Jenkins controller plugins test", func() {
 	})
 
 	AfterEach(func() {
+		ShowLogsIfTestHasFailed(CurrentGinkgoTestDescription().Failed, namespace.Name)
 		DestroyNamespace(namespace)
 	})
 
