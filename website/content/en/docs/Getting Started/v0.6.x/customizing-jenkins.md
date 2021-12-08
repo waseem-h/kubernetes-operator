@@ -2,7 +2,7 @@
 title: "Customizing Jenkins"
 linkTitle: "Customizing Jenkins"
 weight: 3
-date: 2021-12-08
+date: 2021-11-08
 description: >
   How to customize Jenkins
 ---
@@ -14,11 +14,11 @@ Any plugin working for Jenkins can be installed by the Jenkins Operator.
  
 Pre-installed plugins: 
 
-* configuration-as-code v1.55
-* git v4.10.0
-* job-dsl v1.78.1
+* configuration-as-code v1.54
+* git v4.9.0
+* job-dsl v1.77
 * kubernetes-credentials-provider v0.20
-* kubernetes v1.30.11
+* kubernetes v1.30.04
 * workflow-aggregator v2.6
 * workflow-job v2.42
 
@@ -38,7 +38,7 @@ spec:
   master:
    plugins:
    - name: simple-theme-plugin
-     version: "0.7"
+     version: "0.6"
 ```
 
 Under `spec.master.basePlugins` you can find plugins for a valid **Jenkins Operator**:
@@ -52,17 +52,17 @@ spec:
   master:
     basePlugins:
     - name: kubernetes
-      version: "1.30.11"
+      version: "1.30.04"
     - name: workflow-job
       version: "2.42"
     - name: workflow-aggregator
       version: "2.6"
     - name: git
-      version: "4.10.0"
+      version: "4.9.0"
     - name: job-dsl
-      version: "1.78.1"
+      version: "1.77"
     - name: configuration-as-code
-      version: "1.55"
+      version: "1.54"
     - name: kubernetes-credentials-provider
       version: "0.20"
 ```
