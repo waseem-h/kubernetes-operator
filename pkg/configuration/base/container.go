@@ -52,10 +52,10 @@ func (r *JenkinsBaseConfigurationReconciler) compareContainers(expected corev1.C
 		messages = append(messages, "Resources have changed")
 		verbose = append(verbose, fmt.Sprintf("Resources have changed to '%+v' in container '%s'", expected.Resources, expected.Name))
 	}
-	if !reflect.DeepEqual(expected.SecurityContext, actual.SecurityContext) {
+	/*if !reflect.DeepEqual(expected.SecurityContext, actual.SecurityContext) {
 		messages = append(messages, "Security context has changed")
 		verbose = append(verbose, fmt.Sprintf("Security context has changed to '%+v' in container '%s'", expected.SecurityContext, expected.Name))
-	}
+	}*/
 	if !reflect.DeepEqual(expected.WorkingDir, actual.WorkingDir) {
 		messages = append(messages, "Working directory has changed")
 		verbose = append(verbose, fmt.Sprintf("Working directory has changed to '%+v' in container '%s'", expected.WorkingDir, expected.Name))

@@ -58,11 +58,11 @@ func (r *JenkinsBaseConfigurationReconciler) checkForPodRecreation(currentJenkin
 	} else {
 		jenkinsSecurityContext = r.Configuration.Jenkins.Spec.Master.SecurityContext
 	}
-	if !reflect.DeepEqual(jenkinsSecurityContext, currentJenkinsMasterPod.Spec.SecurityContext) {
+	/*if !reflect.DeepEqual(jenkinsSecurityContext, currentJenkinsMasterPod.Spec.SecurityContext) {
 		messages = append(messages, "Jenkins pod security context has changed")
 		verbose = append(verbose, fmt.Sprintf("Jenkins pod security context has changed, actual '%+v' required '%+v'",
 			currentJenkinsMasterPod.Spec.SecurityContext, r.Configuration.Jenkins.Spec.Master.SecurityContext))
-	}
+	}*/
 
 	if !compareImagePullSecrets(r.Configuration.Jenkins.Spec.Master.ImagePullSecrets, currentJenkinsMasterPod.Spec.ImagePullSecrets) {
 		messages = append(messages, "Jenkins Pod ImagePullSecrets has changed")
