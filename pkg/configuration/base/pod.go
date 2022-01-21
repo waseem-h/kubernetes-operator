@@ -51,13 +51,13 @@ func (r *JenkinsBaseConfigurationReconciler) checkForPodRecreation(currentJenkin
 	}
 
 	//FIXME too hacky
-	var jenkinsSecurityContext *corev1.PodSecurityContext
+	/*var jenkinsSecurityContext *corev1.PodSecurityContext
 	if r.Configuration.Jenkins.Spec.Master.SecurityContext == nil {
 		jenkinsSecurityContext = &corev1.PodSecurityContext{}
 	} else {
 		jenkinsSecurityContext = r.Configuration.Jenkins.Spec.Master.SecurityContext
 	}
-	/*if !reflect.DeepEqual(jenkinsSecurityContext, currentJenkinsMasterPod.Spec.SecurityContext) {
+	if !reflect.DeepEqual(jenkinsSecurityContext, currentJenkinsMasterPod.Spec.SecurityContext) {
 		messages = append(messages, "Jenkins pod security context has changed")
 		verbose = append(verbose, fmt.Sprintf("Jenkins pod security context has changed, actual '%+v' required '%+v'",
 			currentJenkinsMasterPod.Spec.SecurityContext, r.Configuration.Jenkins.Spec.Master.SecurityContext))
