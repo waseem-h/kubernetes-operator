@@ -3,7 +3,6 @@ package base
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"github.com/jenkinsci/kubernetes-operator/api/v1alpha2"
 	"github.com/jenkinsci/kubernetes-operator/pkg/configuration/backuprestore"
